@@ -2,11 +2,11 @@
 ## Transitioning from Connectionist Transformers to Multi-Dimensional AGI
 
 ---
-**Version:** 1.0
-**Date:** March 2026
-**Authors:** Ravikash Gupta
-**Date:** March 2026
-**Focus:** Solving the Transformer Bottleneck through Neuro-Symbolic State Vectors
+**Version:** 1.0.
+**Date:** March 2026.
+**Authors:** Ravikash Gupta.
+**Date:** March 2026.
+**Focus:** Solving the Transformer Bottleneck through Neuro-Symbolic State Vectors.
 
 ## Subject: Transitioning from Connectionist Transformers to Neuro-Symbolic AGI via Multi-Dimensional State Vectors
 
