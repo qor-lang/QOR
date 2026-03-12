@@ -7,6 +7,10 @@
 
 ---
 
+**Focus:** Solving the Transformer Bottleneck through Neuro-Symbolic State Vectors
+
+---
+
 ## Executive Summary
 Current Large Language Models (LLMs) based on the Transformer architecture face a critical "Dimensional Collapse." By projecting the complexity of human logic onto a single probability axis, they become prone to hallucinations and ethical brittleness. 
 
@@ -131,6 +135,4 @@ By moving to a multidimensional framework, we create an AI that is:
 **Authors:** Ravikash Gupta
 
 **Date:** March 2026
-
-**Focus:** Solving the Transformer Bottleneck through Neuro-Symbolic State Vectors
 ---
