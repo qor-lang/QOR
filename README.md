@@ -2,11 +2,6 @@
 ## Transitioning from Connectionist Transformers to Multi-Dimensional AGI
 
 ---
-**Version:** 1.0.
-**Date:** March 2026.
-**Authors:** Ravikash Gupta.
-**Date:** March 2026.
-**Focus:** Solving the Transformer Bottleneck through Neuro-Symbolic State Vectors.
 
 ## Subject: Transitioning from Connectionist Transformers to Neuro-Symbolic AGI via Multi-Dimensional State Vectors
 
@@ -127,3 +122,15 @@ By moving to a multidimensional framework, we create an AI that is:
 1. **Auditable:** You can see the 6D score of any thought.
 2. **Safe:** Ethics is a mathematical constant, not a suggestion.
 3. **Current:** It knows when it is ignorant and uses the web to fix it.
+   
+---
+**Version:** 1.0
+
+**Date:** March 2026
+
+**Authors:** Ravikash Gupta
+
+**Date:** March 2026
+
+**Focus:** Solving the Transformer Bottleneck through Neuro-Symbolic State Vectors
+---
