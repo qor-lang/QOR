@@ -136,3 +136,5 @@ By moving to a multidimensional framework, we create an AI that is:
 **Authors:** Ravikash Gupta
 
 **Date:** March 2026
+
+**© 2026:** Ravikash Gupta (QORANET)
