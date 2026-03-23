@@ -1,0 +1,69 @@
+;; ═══════════════════════════════════════════════════════════════════════
+;; PERCEPTION RULES — meta/perception.qor
+;; ═══════════════════════════════════════════════════════════════════════
+;; These rules decide what short-term perceived data is WORTH KEEPING.
+;; Perceived facts arrive with @decay — they fade unless reasoning
+;; promotes them to long-term storage.
+;;
+;; The AI's "attention" mechanism: most data fades. Only significant
+;; patterns get promoted to permanent memory.
+;;
+;; NOTE: Predicate names come from the JSON flattener in perceive.rs.
+;; Run `qor perceive --once` to see what predicates your sources produce,
+;; then add rules here to match them.
+;; ═══════════════════════════════════════════════════════════════════════
+
+
+;; ─── PERCEPTION STATUS ─────────────────────────────────────────────────
+
+;; Mark that perception is active when any source has been fetched
+(perception-active yes) if (perceived $_source $_timestamp) <0.95, 0.90>
+
+
+;; ─── PROMOTION RULES ──────────────────────────────────────────────────
+;; Write domain-specific rules here after seeing your source predicates.
+;; Example pattern:
+;;
+;;   (alert high-price) if (btc-price-bitcoin-usd $price) (> $price 100000) <0.90, 0.85>
+;;   (promote btc-alert) if (alert high-price) <0.90, 0.85>
+;;
+;; Promoted facts can be saved to brain/ by the perceive loop.
+;; ═══════════════════════════════════════════════════════════════════════
+
+
+;; ═══════════════════════════════════════════════════════════════════════
+;; ACTIVE REASONING RULES — perceptual analysis of observations
+;; ═══════════════════════════════════════════════════════════════════════
+
+;; Object permanence
+(perception-insight object-permanence) if (objects-preserved $in $out) <0.92, 0.90>
+
+;; Figure-ground separation
+(perception-insight figure-ground) if (selective-removal $in $out) <0.90, 0.85>
+
+;; Gestalt grouping by similarity
+(perception-insight gestalt-similarity) if (same-color $id $o1 $o2 $c) <0.88, 0.85>
+
+;; Size constancy
+(perception-insight size-constancy) if (obs-consistent same-size) <0.92, 0.90>
+
+;; Motion perception
+(perception-insight apparent-motion $dr $dc) if (detected-shift $dr $dc) <0.90, 0.88>
+
+;; Color constancy
+(perception-insight color-mapping $from $to) if (consistent-remap $from $to) <0.90, 0.88>
+
+;; ─── UNIVERSAL RULES — fire on ANY data ────────────
+
+;; Attention — high-frequency patterns are salient
+(perception-insight salient-pattern $p $count) if (pattern-rate $p $count $total) <0.90, 0.85>
+;; Association — co-occurring = perceptually linked
+(perception-insight perceptual-link $a $b) if (co-occur $a $b $both $base) <0.88, 0.85>
+;; Context awareness
+(perception-insight domain-context $d) if (domain $d) <0.90, 0.85>
+;; Sensory input from perceive.rs
+(perception-insight sensory-active $src $ts) if (perceived $src $ts) <0.92, 0.90>
+;; Categorization — is-a = perceptual grouping
+(perception-insight category $x $group) if (is-a $x $group) <0.88, 0.85>
+;; User intent detection
+(perception-insight user-intent $type) if (intent $type) <0.92, 0.90>

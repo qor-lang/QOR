@@ -1,0 +1,368 @@
+;; ═══════════════════════════════════════════════════════════════════════
+;; PHYSICS KNOWLEDGE DNA — physics.qor
+;; ═══════════════════════════════════════════════════════════════════════
+
+
+;; ─── 1. CLASSICAL MECHANICS ─────────────────────────────────────────
+
+;; Newton's Laws
+(physics-law newton-1 "object at rest stays at rest unless acted on by force") <0.99, 0.99>
+(physics-law newton-2 "F = m * a") <0.99, 0.99>
+(physics-law newton-3 "every action has equal and opposite reaction") <0.99, 0.99>
+
+;; Kinematics
+(physics-formula velocity "v = d / t") <0.99, 0.99>
+(physics-formula acceleration "a = (v - v₀) / t") <0.99, 0.99>
+(physics-formula displacement "d = v₀t + ½at²") <0.99, 0.99>
+(physics-formula velocity-displacement "v² = v₀² + 2ad") <0.99, 0.99>
+(physics-formula average-velocity "v_avg = (v₀ + v) / 2") <0.99, 0.99>
+(physics-formula free-fall "d = ½gt² where g ≈ 9.81 m/s²") <0.99, 0.99>
+(physics-formula projectile-range "R = v²sin(2θ) / g") <0.99, 0.99>
+(physics-formula projectile-max-height "H = v²sin²(θ) / (2g)") <0.99, 0.99>
+
+;; Forces
+(physics-formula weight "W = m * g") <0.99, 0.99>
+(physics-formula friction "f = μ * N (friction = coefficient × normal force)") <0.99, 0.99>
+(physics-formula spring-force "F = -k * x (Hooke's law)") <0.99, 0.99>
+(physics-formula centripetal-force "F = m * v² / r") <0.99, 0.99>
+(physics-formula centripetal-accel "a = v² / r") <0.99, 0.99>
+(physics-formula tension "T = mg + ma (accelerating upward)") <0.99, 0.99>
+(physics-formula drag-force "F_drag = ½ * ρ * v² * C_d * A") <0.99, 0.99>
+
+;; Energy
+(physics-formula kinetic-energy "KE = ½mv²") <0.99, 0.99>
+(physics-formula potential-energy-gravity "PE = mgh") <0.99, 0.99>
+(physics-formula elastic-potential "PE = ½kx²") <0.99, 0.99>
+(physics-formula work "W = F * d * cos(θ)") <0.99, 0.99>
+(physics-formula work-energy-theorem "W_net = ΔKE") <0.99, 0.99>
+(physics-formula power "P = W / t = F * v") <0.99, 0.99>
+(physics-formula efficiency "η = useful_output / total_input") <0.99, 0.99>
+(physics-law conservation-energy "total energy in closed system is constant") <0.99, 0.99>
+
+;; Momentum
+(physics-formula momentum "p = m * v") <0.99, 0.99>
+(physics-formula impulse "J = F * Δt = Δp") <0.99, 0.99>
+(physics-law conservation-momentum "total momentum in closed system is constant") <0.99, 0.99>
+(physics-formula elastic-collision "both momentum and KE conserved") <0.99, 0.99>
+(physics-formula inelastic-collision "momentum conserved, KE not conserved") <0.99, 0.99>
+
+;; Rotation
+(physics-formula angular-velocity "ω = θ / t (rad/s)") <0.99, 0.99>
+(physics-formula angular-accel "α = Δω / t") <0.99, 0.99>
+(physics-formula torque "τ = r × F = rFsin(θ)") <0.99, 0.99>
+(physics-formula moment-of-inertia "I = Σ m_i * r_i²") <0.99, 0.99>
+(physics-formula rotational-KE "KE_rot = ½Iω²") <0.99, 0.99>
+(physics-formula angular-momentum "L = Iω") <0.99, 0.99>
+(physics-law conservation-angular-momentum "L is constant if no external torque") <0.99, 0.99>
+(physics-formula linear-angular "v = rω, a = rα") <0.99, 0.99>
+
+;; Gravitation
+(physics-formula gravity "F = G*m₁*m₂ / r²") <0.99, 0.99>
+(physics-constant gravitational-constant "G = 6.674e-11 N⋅m²/kg²") <0.99, 0.99>
+(physics-formula orbital-velocity "v = sqrt(GM/r)") <0.99, 0.99>
+(physics-formula escape-velocity "v_esc = sqrt(2GM/r)") <0.99, 0.99>
+(physics-formula gravitational-PE "U = -G*m₁*m₂ / r") <0.99, 0.99>
+(physics-law kepler-1 "planets orbit in ellipses with sun at one focus") <0.99, 0.99>
+(physics-law kepler-2 "equal areas swept in equal times") <0.99, 0.99>
+(physics-formula kepler-3 "T² = (4π²/GM) * r³") <0.99, 0.99>
+
+;; Simple Harmonic Motion
+(physics-formula shm-position "x = A*cos(ωt + φ)") <0.99, 0.99>
+(physics-formula shm-period-spring "T = 2π*sqrt(m/k)") <0.99, 0.99>
+(physics-formula shm-period-pendulum "T = 2π*sqrt(L/g)") <0.99, 0.99>
+(physics-formula shm-frequency "f = 1/T, ω = 2πf") <0.99, 0.99>
+
+;; Fluid Mechanics
+(physics-formula pressure "P = F / A") <0.99, 0.99>
+(physics-formula fluid-pressure "P = ρgh (pressure at depth h)") <0.99, 0.99>
+(physics-formula buoyancy "F_b = ρ_fluid * V_displaced * g (Archimedes)") <0.99, 0.99>
+(physics-formula continuity "A₁v₁ = A₂v₂ (continuity equation)") <0.99, 0.99>
+(physics-formula bernoulli "P + ½ρv² + ρgh = constant") <0.99, 0.99>
+(physics-formula pascal "pressure applied to enclosed fluid transmitted equally") <0.99, 0.99>
+
+
+;; ─── 2. THERMODYNAMICS ──────────────────────────────────────────────
+
+;; Temperature
+(physics-formula celsius-to-kelvin "K = °C + 273.15") <0.99, 0.99>
+(physics-formula fahrenheit-to-celsius "°C = (°F - 32) × 5/9") <0.99, 0.99>
+(physics-constant absolute-zero "0 K = -273.15 °C") <0.99, 0.99>
+
+;; Heat
+(physics-formula heat-capacity "Q = mcΔT") <0.99, 0.99>
+(physics-formula latent-heat "Q = mL (phase change)") <0.99, 0.99>
+(physics-formula heat-conduction "Q/t = kA(T₂-T₁)/d (Fourier's law)") <0.99, 0.99>
+(physics-formula stefan-boltzmann "P = σAT⁴ (radiation)") <0.99, 0.99>
+
+;; Ideal Gas
+(physics-formula ideal-gas "PV = nRT") <0.99, 0.99>
+(physics-constant gas-constant "R = 8.314 J/(mol⋅K)") <0.99, 0.99>
+(physics-formula combined-gas "P₁V₁/T₁ = P₂V₂/T₂") <0.99, 0.99>
+(physics-formula kinetic-theory "KE_avg = (3/2)kT per molecule") <0.99, 0.99>
+(physics-constant boltzmann "k_B = 1.381e-23 J/K") <0.99, 0.99>
+
+;; Laws of Thermodynamics
+(physics-law thermo-0 "if A in equilibrium with B, and B with C, then A with C") <0.99, 0.99>
+(physics-law thermo-1 "ΔU = Q - W (energy conservation with heat)") <0.99, 0.99>
+(physics-law thermo-2 "entropy of isolated system never decreases") <0.99, 0.99>
+(physics-law thermo-3 "entropy approaches constant as T approaches 0 K") <0.99, 0.99>
+(physics-formula entropy "ΔS = Q/T (for reversible process)") <0.99, 0.99>
+(physics-formula carnot-efficiency "η = 1 - T_cold/T_hot") <0.99, 0.99>
+
+
+;; ─── 3. ELECTROMAGNETISM ────────────────────────────────────────────
+
+;; Electrostatics
+(physics-formula coulomb "F = k*q₁*q₂/r² where k = 8.99e9 N⋅m²/C²") <0.99, 0.99>
+(physics-formula electric-field "E = F/q = kQ/r²") <0.99, 0.99>
+(physics-formula electric-potential "V = kQ/r") <0.99, 0.99>
+(physics-formula voltage-work "V = W/q") <0.99, 0.99>
+(physics-formula electric-PE "U = kq₁q₂/r") <0.99, 0.99>
+
+;; Circuits
+(physics-formula ohms-law "V = IR") <0.99, 0.99>
+(physics-formula power-electric "P = IV = I²R = V²/R") <0.99, 0.99>
+(physics-formula resistors-series "R_total = R₁ + R₂ + R₃ + ...") <0.99, 0.99>
+(physics-formula resistors-parallel "1/R_total = 1/R₁ + 1/R₂ + ...") <0.99, 0.99>
+(physics-formula capacitance "C = Q/V") <0.99, 0.99>
+(physics-formula capacitor-energy "U = ½CV²") <0.99, 0.99>
+(physics-formula capacitors-series "1/C_total = 1/C₁ + 1/C₂ + ...") <0.99, 0.99>
+(physics-formula capacitors-parallel "C_total = C₁ + C₂ + ...") <0.99, 0.99>
+(physics-law kirchhoff-voltage "sum of voltages around loop = 0") <0.99, 0.99>
+(physics-law kirchhoff-current "sum of currents at junction = 0") <0.99, 0.99>
+(physics-formula rc-time-constant "τ = RC") <0.99, 0.99>
+
+;; Magnetism
+(physics-formula magnetic-force-charge "F = qv × B = qvBsin(θ)") <0.99, 0.99>
+(physics-formula magnetic-force-wire "F = BILsin(θ)") <0.99, 0.99>
+(physics-formula solenoid-field "B = μ₀nI") <0.99, 0.99>
+(physics-constant permeability "μ₀ = 4π×10⁻⁷ T⋅m/A") <0.99, 0.99>
+(physics-formula faraday "EMF = -dΦ/dt (induced voltage)") <0.99, 0.99>
+(physics-formula magnetic-flux "Φ = B*A*cos(θ)") <0.99, 0.99>
+(physics-formula inductance-energy "U = ½LI²") <0.99, 0.99>
+
+;; Maxwell's Equations (conceptual)
+(physics-law maxwell-1 "∇⋅E = ρ/ε₀ (Gauss — charges create E fields)") <0.99, 0.99>
+(physics-law maxwell-2 "∇⋅B = 0 (no magnetic monopoles)") <0.99, 0.99>
+(physics-law maxwell-3 "∇×E = -∂B/∂t (Faraday — changing B creates E)") <0.99, 0.99>
+(physics-law maxwell-4 "∇×B = μ₀J + μ₀ε₀∂E/∂t (Ampere-Maxwell)") <0.99, 0.99>
+(physics-formula em-wave-speed "c = 1/sqrt(μ₀ε₀) = 3×10⁸ m/s") <0.99, 0.99>
+
+
+;; ─── 4. WAVES AND OPTICS ────────────────────────────────────────────
+
+;; Wave properties
+(physics-formula wave-speed "v = fλ") <0.99, 0.99>
+(physics-formula wave-period "T = 1/f") <0.99, 0.99>
+(physics-formula wave-equation "y = Asin(kx - ωt)") <0.99, 0.99>
+(physics-formula wave-number "k = 2π/λ") <0.99, 0.99>
+(physics-formula angular-frequency "ω = 2πf") <0.99, 0.99>
+(physics-formula intensity "I = P/A (power per area)") <0.99, 0.99>
+(physics-formula intensity-inverse-square "I ∝ 1/r²") <0.99, 0.99>
+(physics-formula doppler "f' = f(v ± v_observer)/(v ∓ v_source)") <0.99, 0.99>
+
+;; Sound
+(physics-formula sound-speed-air "v ≈ 343 m/s at 20°C") <0.99, 0.99>
+(physics-formula decibel "β = 10*log₁₀(I/I₀) where I₀ = 10⁻¹² W/m²") <0.99, 0.99>
+(physics-formula standing-wave "λ_n = 2L/n (string fixed both ends)") <0.99, 0.99>
+
+;; Optics
+(physics-formula snell "n₁sin(θ₁) = n₂sin(θ₂)") <0.99, 0.99>
+(physics-formula critical-angle "sin(θ_c) = n₂/n₁ (total internal reflection)") <0.99, 0.99>
+(physics-formula mirror-lens "1/f = 1/d_o + 1/d_i") <0.99, 0.99>
+(physics-formula magnification "M = -d_i/d_o = h_i/h_o") <0.99, 0.99>
+(physics-formula refraction-index "n = c/v") <0.99, 0.99>
+(physics-law reflection "angle of incidence = angle of reflection") <0.99, 0.99>
+(physics-formula double-slit "d*sin(θ) = mλ (bright fringes)") <0.99, 0.99>
+(physics-formula single-slit-min "a*sin(θ) = mλ (dark fringes)") <0.99, 0.99>
+(physics-formula diffraction-grating "d*sin(θ) = mλ") <0.99, 0.99>
+
+
+;; ─── 5. MODERN / QUANTUM PHYSICS ────────────────────────────────────
+
+;; Photoelectric Effect
+(physics-formula photon-energy "E = hf = hc/λ") <0.99, 0.99>
+(physics-constant planck "h = 6.626e-34 J⋅s") <0.99, 0.99>
+(physics-constant planck-reduced "ℏ = h/(2π) = 1.055e-34 J⋅s") <0.99, 0.99>
+(physics-formula photoelectric "KE_max = hf - φ (work function φ)") <0.99, 0.99>
+(physics-formula stopping-voltage "eV₀ = hf - φ") <0.99, 0.99>
+
+;; Wave-Particle Duality
+(physics-formula de-broglie "λ = h/p = h/(mv)") <0.99, 0.99>
+(physics-law wave-particle-duality "all matter has wave and particle properties") <0.99, 0.99>
+(physics-formula heisenberg-uncertainty "Δx * Δp ≥ ℏ/2") <0.99, 0.99>
+(physics-formula energy-time-uncertainty "ΔE * Δt ≥ ℏ/2") <0.99, 0.99>
+
+;; Quantum Mechanics
+(physics-formula schrodinger-time-dep "iℏ ∂ψ/∂t = Ĥψ") <0.99, 0.99>
+(physics-formula schrodinger-time-indep "Ĥψ = Eψ") <0.99, 0.99>
+(physics-law born-rule "|ψ|² = probability density") <0.99, 0.99>
+(physics-law superposition "quantum state can be sum of multiple states") <0.99, 0.99>
+(physics-law pauli-exclusion "no two identical fermions in same quantum state") <0.99, 0.99>
+(physics-law complementarity "wave and particle descriptions are complementary") <0.99, 0.99>
+
+;; Quantum numbers
+(physics-fact quantum-number-n "n = 1,2,3,... (principal — energy level)") <0.99, 0.99>
+(physics-fact quantum-number-l "l = 0,1,...,n-1 (angular momentum — orbital shape)") <0.99, 0.99>
+(physics-fact quantum-number-ml "m_l = -l,...,0,...,+l (magnetic — orbital orientation)") <0.99, 0.99>
+(physics-fact quantum-number-ms "m_s = +½ or -½ (spin)") <0.99, 0.99>
+
+;; Particle in a box
+(physics-formula particle-in-box-energy "E_n = n²h²/(8mL²)") <0.99, 0.99>
+(physics-formula particle-in-box-wavefunction "ψ_n = sqrt(2/L)*sin(nπx/L)") <0.99, 0.99>
+
+;; Hydrogen atom
+(physics-formula bohr-energy "E_n = -13.6/n² eV") <0.99, 0.99>
+(physics-formula bohr-radius "a₀ = 0.529 Å = 5.29e-11 m") <0.99, 0.99>
+(physics-formula rydberg "1/λ = R(1/n₁² - 1/n₂²)") <0.99, 0.99>
+(physics-constant rydberg-constant "R = 1.097e7 m⁻¹") <0.99, 0.99>
+
+;; Quantum phenomena
+(physics-law tunneling "particle can pass through barrier with E < V") <0.99, 0.99>
+(physics-law entanglement "measuring one entangled particle affects the other") <0.99, 0.99>
+(physics-law bell-theorem "no local hidden variable theory matches quantum predictions") <0.99, 0.99>
+(physics-law decoherence "interaction with environment destroys superposition") <0.99, 0.99>
+(physics-law no-cloning "impossible to copy unknown quantum state exactly") <0.99, 0.99>
+
+
+;; ─── 6. SPECIAL RELATIVITY ──────────────────────────────────────────
+
+(physics-constant speed-of-light "c = 2.998e8 m/s") <0.99, 0.99>
+(physics-law constancy-of-c "speed of light same in all inertial frames") <0.99, 0.99>
+(physics-law relativity-principle "laws of physics same in all inertial frames") <0.99, 0.99>
+(physics-formula lorentz-factor "γ = 1/sqrt(1 - v²/c²)") <0.99, 0.99>
+(physics-formula time-dilation "Δt' = γΔt (moving clocks run slower)") <0.99, 0.99>
+(physics-formula length-contraction "L' = L/γ (moving objects shorter)") <0.99, 0.99>
+(physics-formula relativistic-momentum "p = γmv") <0.99, 0.99>
+(physics-formula mass-energy "E = mc²") <0.99, 0.99>
+(physics-formula total-energy "E² = (pc)² + (mc²)²") <0.99, 0.99>
+(physics-formula relativistic-KE "KE = (γ-1)mc²") <0.99, 0.99>
+(physics-formula velocity-addition "u = (v+w)/(1+vw/c²)") <0.99, 0.99>
+(physics-law nothing-faster-than-light "no information or mass can travel faster than c") <0.99, 0.99>
+
+
+;; ─── 7. GENERAL RELATIVITY ──────────────────────────────────────────
+
+(physics-law equivalence-principle "gravity and acceleration are locally indistinguishable") <0.99, 0.99>
+(physics-law spacetime-curvature "mass/energy curves spacetime, curvature guides motion") <0.99, 0.99>
+(physics-formula einstein-field "G_μν + Λg_μν = (8πG/c⁴)T_μν") <0.99, 0.99>
+(physics-formula schwarzschild-radius "r_s = 2GM/c²") <0.99, 0.99>
+(physics-formula gravitational-time-dilation "Δt' = Δt*sqrt(1 - 2GM/(rc²))") <0.99, 0.99>
+(physics-formula gravitational-redshift "λ'/λ = 1/sqrt(1 - 2GM/(rc²))") <0.99, 0.99>
+(physics-law geodesic "free-falling objects follow geodesics in curved spacetime") <0.99, 0.99>
+(physics-fact gravitational-waves "accelerating masses produce gravitational waves") <0.99, 0.99>
+(physics-fact black-hole "when r < r_s, nothing escapes, not even light") <0.99, 0.99>
+(physics-formula hawking-temperature "T = ℏc³/(8πGMk_B) (black hole radiates)") <0.99, 0.99>
+
+
+;; ─── 8. NUCLEAR AND PARTICLE PHYSICS ────────────────────────────────
+
+;; Nuclear
+(physics-formula mass-defect "Δm = Z*m_p + N*m_n - m_nucleus") <0.99, 0.99>
+(physics-formula binding-energy "E_b = Δm*c²") <0.99, 0.99>
+(physics-formula radioactive-decay "N(t) = N₀*e^(-λt)") <0.99, 0.99>
+(physics-formula half-life "t½ = ln(2)/λ") <0.99, 0.99>
+(physics-formula activity "A = λN = A₀*e^(-λt)") <0.99, 0.99>
+(physics-fact alpha-decay "nucleus emits He-4: Z→Z-2, A→A-4") <0.99, 0.99>
+(physics-fact beta-minus-decay "neutron→proton + electron + antineutrino") <0.99, 0.99>
+(physics-fact beta-plus-decay "proton→neutron + positron + neutrino") <0.99, 0.99>
+(physics-fact gamma-decay "nucleus emits photon, no change in Z or A") <0.99, 0.99>
+(physics-formula fission "heavy nucleus splits into lighter nuclei + energy") <0.99, 0.99>
+(physics-formula fusion "light nuclei combine into heavier nucleus + energy") <0.99, 0.99>
+
+;; Fundamental particles
+(physics-fact quarks "6 quarks: up down charm strange top bottom") <0.99, 0.99>
+(physics-fact leptons "6 leptons: electron muon tau + 3 neutrinos") <0.99, 0.99>
+(physics-fact force-carriers "photon(EM) gluon(strong) W±Z(weak) graviton(gravity)") <0.99, 0.99>
+(physics-fact higgs "Higgs boson gives particles mass via Higgs field") <0.99, 0.99>
+(physics-fact proton "proton = uud (2 up + 1 down quark)") <0.99, 0.99>
+(physics-fact neutron "neutron = udd (1 up + 2 down quark)") <0.99, 0.99>
+
+;; Four fundamental forces
+(physics-fact strong-force "holds quarks together, mediated by gluons, range ~10⁻¹⁵m") <0.99, 0.99>
+(physics-fact electromagnetic-force "between charges, mediated by photons, infinite range") <0.99, 0.99>
+(physics-fact weak-force "radioactive decay, mediated by W±Z bosons, range ~10⁻¹⁸m") <0.99, 0.99>
+(physics-fact gravitational-force "between masses, (mediated by graviton?), infinite range") <0.99, 0.99>
+(physics-fact force-strength-order "strong > EM > weak >> gravity") <0.99, 0.99>
+
+;; Conservation laws
+(physics-law conservation-charge "total electric charge is conserved") <0.99, 0.99>
+(physics-law conservation-baryon "total baryon number is conserved") <0.99, 0.99>
+(physics-law conservation-lepton "total lepton number is conserved") <0.99, 0.99>
+(physics-law conservation-energy-mass "total energy-mass is conserved") <0.99, 0.99>
+(physics-law CPT-symmetry "physics invariant under C, P, T combined") <0.99, 0.99>
+
+;; Standard Model
+(physics-fact standard-model "describes EM + weak + strong but NOT gravity") <0.99, 0.99>
+(physics-fact electroweak-unification "EM and weak force unified at high energies") <0.99, 0.99>
+(physics-fact antimatter "every particle has antiparticle with opposite charge") <0.99, 0.99>
+
+
+;; ─── 9. PHYSICAL CONSTANTS ──────────────────────────────────────────
+
+(physics-constant speed-of-light "c = 2.998e8 m/s") <0.99, 0.99>
+(physics-constant planck-constant "h = 6.626e-34 J⋅s") <0.99, 0.99>
+(physics-constant gravitational "G = 6.674e-11 N⋅m²/kg²") <0.99, 0.99>
+(physics-constant boltzmann "k = 1.381e-23 J/K") <0.99, 0.99>
+(physics-constant avogadro "N_A = 6.022e23 mol⁻¹") <0.99, 0.99>
+(physics-constant electron-charge "e = 1.602e-19 C") <0.99, 0.99>
+(physics-constant electron-mass "m_e = 9.109e-31 kg") <0.99, 0.99>
+(physics-constant proton-mass "m_p = 1.673e-27 kg") <0.99, 0.99>
+(physics-constant neutron-mass "m_n = 1.675e-27 kg") <0.99, 0.99>
+(physics-constant vacuum-permittivity "ε₀ = 8.854e-12 F/m") <0.99, 0.99>
+(physics-constant vacuum-permeability "μ₀ = 4π×10⁻⁷ T⋅m/A") <0.99, 0.99>
+(physics-constant stefan-boltzmann "σ = 5.670e-8 W/(m²⋅K⁴)") <0.99, 0.99>
+(physics-constant gas-constant "R = 8.314 J/(mol⋅K)") <0.99, 0.99>
+(physics-constant coulomb-constant "k = 8.988e9 N⋅m²/C²") <0.99, 0.99>
+(physics-constant g-earth "g = 9.807 m/s²") <0.99, 0.99>
+(physics-constant atm "1 atm = 101325 Pa") <0.99, 0.99>
+
+
+;; ═══════════════════════════════════════════════════════════════════════
+;; ~250 physics formulas, laws, constants covering:
+;;   Classical Mechanics, Thermodynamics, Electromagnetism,
+;;   Waves/Optics, Quantum Mechanics, Special & General Relativity,
+;;   Nuclear & Particle Physics, Standard Model
+;; ═══════════════════════════════════════════════════════════════════════
+
+
+;; ═══════════════════════════════════════════════════════════════════════
+;; ACTIVE REASONING RULES — match on observations, produce physics insights
+;; ═══════════════════════════════════════════════════════════════════════
+
+;; Conservation laws
+(physics-insight conservation-of-matter) if (obs-consistent same-size) (objects-preserved $in $out) <0.93, 0.90>
+(physics-insight matter-creation) if (obs-consistent output-larger) <0.90, 0.85>
+(physics-insight matter-annihilation) if (obs-consistent output-smaller) <0.90, 0.85>
+
+;; Motion detection
+(physics-insight displacement $dr $dc) if (detected-shift $dr $dc) <0.95, 0.90>
+(physics-insight rotation-motion) if (detected-rotate-90) <0.93, 0.90>
+(physics-insight reflection-symmetry) if (detected-reflect-h) <0.93, 0.90>
+(physics-insight reflection-symmetry) if (detected-reflect-v) <0.93, 0.90>
+
+;; Force-like interactions
+(physics-insight selective-force) if (selective-removal $in $out) <0.88, 0.85>
+(physics-insight catalyst-interaction) if (marker-driven $in $out) <0.90, 0.85>
+
+;; Phase transition (color change = state change)
+(physics-insight phase-transition $from $to) if (consistent-remap $from $to) <0.90, 0.88>
+
+;; ─── UNIVERSAL RULES — fire on ANY data, not just puzzles ────────────
+
+;; Oscillation frequency from learning
+(physics-insight oscillation-frequency $pattern $count) if (pattern-rate $pattern $count $total) <0.88, 0.85>
+;; Coupled systems — things that co-occur are coupled
+(physics-insight coupled-system $a $b) if (co-occur $a $b $both $base) <0.90, 0.85>
+;; Phase boundary — threshold = critical point
+(physics-insight critical-point $indicator $value) if (threshold $indicator $pattern $value) <0.90, 0.88>
+;; Observable quantity
+(physics-insight observable $name) if (indicator $name $desc) <0.85, 0.80>
+
+;; Causal structure from knowledge
+(physics-insight causal-relation $cause $effect) if (dna-edge $cause causes $effect) <0.90, 0.85>
+(physics-insight system-property $system $prop) if (has $system $prop) <0.88, 0.85>
+(physics-insight classification $entity $type) if (is-a $entity $type) <0.85, 0.80>
+
+;; Domain awareness
+(physics-insight field-detected $d) if (domain $d) <0.85, 0.80>

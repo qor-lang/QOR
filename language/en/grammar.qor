@@ -1,0 +1,35 @@
+;; ── QOR Grammar Rules ────────────────────────────────────────────
+;; Forward chaining detects intent from (input N word) facts.
+;; Add new patterns here to teach QOR new sentence structures.
+
+;; ── Intent Detection ─────────────────────────────────────────────
+
+;; Greeting
+(intent greet) if (input $i $w) (vocab $w greeting) <0.95, 0.90>
+
+;; Farewell
+(intent farewell) if (input $i $w) (vocab $w farewell) <0.95, 0.90>
+
+;; Help
+(intent help) if (input $i help) <0.95, 0.90>
+
+;; "what is X" → define
+(intent-define $topic) if (input $i what) (input $j $cop) (vocab $cop copula) (input $k $topic) (> $k $j) not (vocab $topic article) not (vocab $topic preposition) not (vocab $topic question-word) not (vocab $topic copula) <0.90, 0.85>
+
+;; "tell me about X" → define
+(intent-define $topic) if (input $i tell) (input $j me) (input $k about) (input $l $topic) (> $l $k) not (vocab $topic article) not (vocab $topic preposition) <0.90, 0.85>
+
+;; "why is X Y" → explain
+(intent-explain $topic $state) if (input $i why) (input $j $cop) (vocab $cop copula) (input $k $topic) (input $l $state) (> $k $j) (> $l $k) not (vocab $topic article) not (vocab $state article) <0.90, 0.85>
+
+;; "show/list X" → list
+(intent-list $topic) if (input $i $cmd) (vocab $cmd command-word) (input $j $topic) (> $j $i) not (vocab $topic article) not (vocab $topic preposition) not (vocab $topic pronoun) not (vocab $topic command-word) <0.90, 0.85>
+
+;; "how many X" → count
+(intent-count $topic) if (input $i how) (input $j many) (input $k $topic) (> $j $i) (> $k $j) <0.90, 0.85>
+
+;; Affirmative
+(intent affirm) if (input $i $w) (vocab $w affirmative) <0.90, 0.85>
+
+;; Fallback: any question word present → curious
+(intent curious) if (input $i $w) (vocab $w question-word) <0.70, 0.60>

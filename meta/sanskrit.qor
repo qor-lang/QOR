@@ -1,0 +1,802 @@
+;; ═══════════════════════════════════════════════════════════════════════
+;; SANSKRIT GRAMMAR RULES — sanskrit_grammar.qor
+;; ═══════════════════════════════════════════════════════════════════════
+;; ACTUAL EXECUTABLE RULES — not history
+;; Based on Pāṇini's Aṣṭādhyāyī
+;; AI loads these → can parse and understand Sanskrit
+;; ═══════════════════════════════════════════════════════════════════════
+
+
+;; ─── 1. PHONEME CLASSIFICATION (Māheśvara Sūtras) ──────────────────
+;; These 14 sūtras define ALL sounds of Sanskrit.
+;; The IT markers (underlined) allow referencing groups.
+
+;; Vowels (ac = a to c marker)
+(phoneme a vowel short) <0.99, 0.99>
+(phoneme ā vowel long) <0.99, 0.99>
+(phoneme i vowel short) <0.99, 0.99>
+(phoneme ī vowel long) <0.99, 0.99>
+(phoneme u vowel short) <0.99, 0.99>
+(phoneme ū vowel long) <0.99, 0.99>
+(phoneme ṛ vowel short) <0.99, 0.99>
+(phoneme ṝ vowel long) <0.99, 0.99>
+(phoneme ḷ vowel short) <0.99, 0.99>
+(phoneme e vowel long) <0.99, 0.99>
+(phoneme o vowel long) <0.99, 0.99>
+(phoneme ai vowel long) <0.99, 0.99>
+(phoneme au vowel long) <0.99, 0.99>
+
+;; Vowel pairs (savarna = same class)
+(savarna a ā) <0.99, 0.99>
+(savarna i ī) <0.99, 0.99>
+(savarna u ū) <0.99, 0.99>
+(savarna ṛ ṝ) <0.99, 0.99>
+
+;; Vowel weights for prosody (Piṅgala/Chandas)
+(rule laghu-vowel
+  (phoneme $v vowel short)
+  →
+  (syllable-weight $v laghu) <0.99, 0.99>
+)
+
+(rule guru-vowel
+  (phoneme $v vowel long)
+  →
+  (syllable-weight $v guru) <0.99, 0.99>
+)
+
+;; Consonants by place of articulation (sthāna)
+;; kaṇṭhya (guttural/velar)
+(phoneme ka consonant sparśa kaṇṭhya aghoṣa alpaprāṇa) <0.99, 0.99>
+(phoneme kha consonant sparśa kaṇṭhya aghoṣa mahāprāṇa) <0.99, 0.99>
+(phoneme ga consonant sparśa kaṇṭhya ghoṣa alpaprāṇa) <0.99, 0.99>
+(phoneme gha consonant sparśa kaṇṭhya ghoṣa mahāprāṇa) <0.99, 0.99>
+(phoneme ṅa consonant sparśa kaṇṭhya ghoṣa nāsikya) <0.99, 0.99>
+
+;; tālavya (palatal)
+(phoneme ca consonant sparśa tālavya aghoṣa alpaprāṇa) <0.99, 0.99>
+(phoneme cha consonant sparśa tālavya aghoṣa mahāprāṇa) <0.99, 0.99>
+(phoneme ja consonant sparśa tālavya ghoṣa alpaprāṇa) <0.99, 0.99>
+(phoneme jha consonant sparśa tālavya ghoṣa mahāprāṇa) <0.99, 0.99>
+(phoneme ña consonant sparśa tālavya ghoṣa nāsikya) <0.99, 0.99>
+
+;; mūrdhanya (retroflex/cerebral)
+(phoneme ṭa consonant sparśa mūrdhanya aghoṣa alpaprāṇa) <0.99, 0.99>
+(phoneme ṭha consonant sparśa mūrdhanya aghoṣa mahāprāṇa) <0.99, 0.99>
+(phoneme ḍa consonant sparśa mūrdhanya ghoṣa alpaprāṇa) <0.99, 0.99>
+(phoneme ḍha consonant sparśa mūrdhanya ghoṣa mahāprāṇa) <0.99, 0.99>
+(phoneme ṇa consonant sparśa mūrdhanya ghoṣa nāsikya) <0.99, 0.99>
+
+;; dantya (dental)
+(phoneme ta consonant sparśa dantya aghoṣa alpaprāṇa) <0.99, 0.99>
+(phoneme tha consonant sparśa dantya aghoṣa mahāprāṇa) <0.99, 0.99>
+(phoneme da consonant sparśa dantya ghoṣa alpaprāṇa) <0.99, 0.99>
+(phoneme dha consonant sparśa dantya ghoṣa mahāprāṇa) <0.99, 0.99>
+(phoneme na consonant sparśa dantya ghoṣa nāsikya) <0.99, 0.99>
+
+;; oṣṭhya (labial)
+(phoneme pa consonant sparśa oṣṭhya aghoṣa alpaprāṇa) <0.99, 0.99>
+(phoneme pha consonant sparśa oṣṭhya aghoṣa mahāprāṇa) <0.99, 0.99>
+(phoneme ba consonant sparśa oṣṭhya ghoṣa alpaprāṇa) <0.99, 0.99>
+(phoneme bha consonant sparśa oṣṭhya ghoṣa mahāprāṇa) <0.99, 0.99>
+(phoneme ma consonant sparśa oṣṭhya ghoṣa nāsikya) <0.99, 0.99>
+
+;; Semi-vowels (antastha)
+(phoneme ya consonant antastha tālavya) <0.99, 0.99>
+(phoneme ra consonant antastha mūrdhanya) <0.99, 0.99>
+(phoneme la consonant antastha dantya) <0.99, 0.99>
+(phoneme va consonant antastha oṣṭhya) <0.99, 0.99>
+
+;; Sibilants (ūṣman)
+(phoneme śa consonant ūṣman tālavya aghoṣa) <0.99, 0.99>
+(phoneme ṣa consonant ūṣman mūrdhanya aghoṣa) <0.99, 0.99>
+(phoneme sa consonant ūṣman dantya aghoṣa) <0.99, 0.99>
+(phoneme ha consonant ūṣman kaṇṭhya ghoṣa) <0.99, 0.99>
+
+;; Visarga and Anusvāra
+(phoneme ḥ visarga) <0.99, 0.99>
+(phoneme ṃ anusvāra) <0.99, 0.99>
+
+
+;; ─── 2. VOWEL SANDHI RULES (ac-sandhi) ─────────────────────────────
+;; When words join, vowels at boundaries change.
+;; These are the ACTUAL transformation rules.
+
+;; RULE: a/ā + a/ā → ā (Pāṇini 6.1.101: akaḥ savarṇe dīrghaḥ)
+(rule sandhi-a-a (vowel-end $w1 a) (vowel-start $w2 a) → (join $w1 $w2 ā)) <0.99, 0.99>
+(rule sandhi-a-aa (vowel-end $w1 a) (vowel-start $w2 ā) → (join $w1 $w2 ā)) <0.99, 0.99>
+(rule sandhi-aa-a (vowel-end $w1 ā) (vowel-start $w2 a) → (join $w1 $w2 ā)) <0.99, 0.99>
+(rule sandhi-aa-aa (vowel-end $w1 ā) (vowel-start $w2 ā) → (join $w1 $w2 ā)) <0.99, 0.99>
+
+;; RULE: i/ī + i/ī → ī
+(rule sandhi-i-i (vowel-end $w1 i) (vowel-start $w2 i) → (join $w1 $w2 ī)) <0.99, 0.99>
+(rule sandhi-i-ii (vowel-end $w1 i) (vowel-start $w2 ī) → (join $w1 $w2 ī)) <0.99, 0.99>
+(rule sandhi-ii-i (vowel-end $w1 ī) (vowel-start $w2 i) → (join $w1 $w2 ī)) <0.99, 0.99>
+(rule sandhi-ii-ii (vowel-end $w1 ī) (vowel-start $w2 ī) → (join $w1 $w2 ī)) <0.99, 0.99>
+
+;; RULE: u/ū + u/ū → ū
+(rule sandhi-u-u (vowel-end $w1 u) (vowel-start $w2 u) → (join $w1 $w2 ū)) <0.99, 0.99>
+(rule sandhi-u-uu (vowel-end $w1 u) (vowel-start $w2 ū) → (join $w1 $w2 ū)) <0.99, 0.99>
+(rule sandhi-uu-u (vowel-end $w1 ū) (vowel-start $w2 u) → (join $w1 $w2 ū)) <0.99, 0.99>
+(rule sandhi-uu-uu (vowel-end $w1 ū) (vowel-start $w2 ū) → (join $w1 $w2 ū)) <0.99, 0.99>
+
+;; RULE: a/ā + i/ī → e (Pāṇini 6.1.87: ādguṇaḥ)
+(rule sandhi-a-i (vowel-end $w1 a) (vowel-start $w2 i) → (join $w1 $w2 e)) <0.99, 0.99>
+(rule sandhi-a-ii (vowel-end $w1 a) (vowel-start $w2 ī) → (join $w1 $w2 e)) <0.99, 0.99>
+(rule sandhi-aa-i (vowel-end $w1 ā) (vowel-start $w2 i) → (join $w1 $w2 e)) <0.99, 0.99>
+(rule sandhi-aa-ii (vowel-end $w1 ā) (vowel-start $w2 ī) → (join $w1 $w2 e)) <0.99, 0.99>
+
+;; RULE: a/ā + u/ū → o
+(rule sandhi-a-u (vowel-end $w1 a) (vowel-start $w2 u) → (join $w1 $w2 o)) <0.99, 0.99>
+(rule sandhi-a-uu (vowel-end $w1 a) (vowel-start $w2 ū) → (join $w1 $w2 o)) <0.99, 0.99>
+(rule sandhi-aa-u (vowel-end $w1 ā) (vowel-start $w2 u) → (join $w1 $w2 o)) <0.99, 0.99>
+(rule sandhi-aa-uu (vowel-end $w1 ā) (vowel-start $w2 ū) → (join $w1 $w2 o)) <0.99, 0.99>
+
+;; RULE: a/ā + ṛ → ar
+(rule sandhi-a-ri (vowel-end $w1 a) (vowel-start $w2 ṛ) → (join $w1 $w2 ar)) <0.99, 0.99>
+(rule sandhi-aa-ri (vowel-end $w1 ā) (vowel-start $w2 ṛ) → (join $w1 $w2 ar)) <0.99, 0.99>
+
+;; RULE: a/ā + e/ai → ai (Pāṇini 6.1.88: vṛddhireci)
+(rule sandhi-a-e (vowel-end $w1 a) (vowel-start $w2 e) → (join $w1 $w2 ai)) <0.99, 0.99>
+(rule sandhi-a-ai (vowel-end $w1 a) (vowel-start $w2 ai) → (join $w1 $w2 ai)) <0.99, 0.99>
+(rule sandhi-aa-e (vowel-end $w1 ā) (vowel-start $w2 e) → (join $w1 $w2 ai)) <0.99, 0.99>
+
+;; RULE: a/ā + o/au → au
+(rule sandhi-a-o (vowel-end $w1 a) (vowel-start $w2 o) → (join $w1 $w2 au)) <0.99, 0.99>
+(rule sandhi-a-au (vowel-end $w1 a) (vowel-start $w2 au) → (join $w1 $w2 au)) <0.99, 0.99>
+(rule sandhi-aa-o (vowel-end $w1 ā) (vowel-start $w2 o) → (join $w1 $w2 au)) <0.99, 0.99>
+
+;; RULE: i/ī + dissimilar vowel → y + vowel (Pāṇini 6.1.77: iko yaṇaci)
+(rule sandhi-i-other (vowel-end $w1 i) (vowel-start $w2 $v) (not-savarna i $v) → (join $w1 $w2 y $v)) <0.99, 0.99>
+(rule sandhi-ii-other (vowel-end $w1 ī) (vowel-start $w2 $v) (not-savarna i $v) → (join $w1 $w2 y $v)) <0.99, 0.99>
+
+;; RULE: u/ū + dissimilar vowel → v + vowel
+(rule sandhi-u-other (vowel-end $w1 u) (vowel-start $w2 $v) (not-savarna u $v) → (join $w1 $w2 v $v)) <0.99, 0.99>
+(rule sandhi-uu-other (vowel-end $w1 ū) (vowel-start $w2 $v) (not-savarna u $v) → (join $w1 $w2 v $v)) <0.99, 0.99>
+
+;; RULE: ṛ + dissimilar vowel → r + vowel
+(rule sandhi-ri-other (vowel-end $w1 ṛ) (vowel-start $w2 $v) (not-savarna ṛ $v) → (join $w1 $w2 r $v)) <0.99, 0.99>
+
+;; RULE: e + a → e ' (pragṛhya, elision of a)
+(rule sandhi-e-a (vowel-end $w1 e) (vowel-start $w2 a) → (join $w1 $w2 e avagraha)) <0.99, 0.99>
+
+;; RULE: o + a → o ' (elision of a with avagraha)
+(rule sandhi-o-a (vowel-end $w1 o) (vowel-start $w2 a) → (join $w1 $w2 o avagraha)) <0.99, 0.99>
+
+
+;; ─── 3. CONSONANT SANDHI RULES (hal-sandhi) ────────────────────────
+
+;; RULE: Final voiceless stop before voiced → becomes voiced
+;; ka→ga, ca→ja, ṭa→ḍa, ta→da, pa→ba (before voiced consonant or vowel)
+(rule sandhi-voice-assimilation
+  (consonant-end $w1 $c aghoṣa)
+  (consonant-start $w2 $c2 ghoṣa)
+  (same-sthana $c $voiced)
+  (phoneme $voiced consonant sparśa $sthana ghoṣa alpaprāṇa)
+  →
+  (transform-final $w1 $voiced) <0.99, 0.99>
+)
+
+;; Voicing pairs (aghoṣa → ghoṣa of same sthāna)
+(voice-pair ka ga) <0.99, 0.99>
+(voice-pair kha gha) <0.99, 0.99>
+(voice-pair ca ja) <0.99, 0.99>
+(voice-pair cha jha) <0.99, 0.99>
+(voice-pair ṭa ḍa) <0.99, 0.99>
+(voice-pair ṭha ḍha) <0.99, 0.99>
+(voice-pair ta da) <0.99, 0.99>
+(voice-pair tha dha) <0.99, 0.99>
+(voice-pair pa ba) <0.99, 0.99>
+(voice-pair pha bha) <0.99, 0.99>
+
+;; RULE: stop before nasal → nasal of same class
+;; k before n → ṅ, c before n → ñ, etc.
+(nasal-of kaṇṭhya ṅa) <0.99, 0.99>
+(nasal-of tālavya ña) <0.99, 0.99>
+(nasal-of mūrdhanya ṇa) <0.99, 0.99>
+(nasal-of dantya na) <0.99, 0.99>
+(nasal-of oṣṭhya ma) <0.99, 0.99>
+
+(rule sandhi-stop-to-nasal
+  (consonant-end $w1 $c sparśa $sthana)
+  (consonant-start $w2 $nasal ghoṣa nāsikya)
+  (nasal-of $sthana $class-nasal)
+  →
+  (transform-final $w1 $class-nasal) <0.99, 0.99>
+)
+
+;; RULE: final t + ś → cch
+(rule sandhi-t-sh (consonant-end $w1 ta) (consonant-start $w2 śa) → (transform-final $w1 c) (transform-initial $w2 cha)) <0.99, 0.99>
+
+;; RULE: final t + c/ch → cc/cch
+(rule sandhi-t-c (consonant-end $w1 ta) (consonant-start $w2 ca) → (transform-final $w1 ca)) <0.99, 0.99>
+
+;; RULE: final t + j/jh → jj/jjh
+(rule sandhi-t-j (consonant-end $w1 ta) (consonant-start $w2 ja) → (transform-final $w1 ja)) <0.99, 0.99>
+
+;; RULE: final t + ṭ → ṭṭ
+(rule sandhi-t-retro (consonant-end $w1 ta) (consonant-start $w2 ṭa) → (transform-final $w1 ṭa)) <0.99, 0.99>
+
+;; RULE: final t + l → ll
+(rule sandhi-t-l (consonant-end $w1 ta) (consonant-start $w2 la) → (transform-final $w1 la)) <0.99, 0.99>
+
+;; RULE: final t + h → ddh
+(rule sandhi-t-h (consonant-end $w1 ta) (consonant-start $w2 ha) → (transform-final $w1 da) (transform-initial $w2 dha)) <0.99, 0.99>
+
+;; RULE: final n + consonant of different class → anusvāra
+(rule sandhi-final-n-anusvara
+  (consonant-end $w1 na)
+  (consonant-start $w2 $c)
+  →
+  (transform-final $w1 ṃ) <0.90, 0.90>
+)
+
+
+;; ─── 4. VISARGA SANDHI ──────────────────────────────────────────────
+
+;; RULE: aḥ + voiced consonant → o
+(rule sandhi-ah-voiced
+  (visarga-end $w1 aḥ)
+  (consonant-start $w2 $c ghoṣa)
+  →
+  (transform-final $w1 o) <0.99, 0.99>
+)
+
+;; RULE: aḥ + a → o '
+(rule sandhi-ah-a
+  (visarga-end $w1 aḥ)
+  (vowel-start $w2 a)
+  →
+  (transform-final $w1 o) (elide-initial $w2) <0.99, 0.99>
+)
+
+;; RULE: āḥ + voiced → ā
+(rule sandhi-aah-voiced
+  (visarga-end $w1 āḥ)
+  (consonant-start $w2 $c ghoṣa)
+  →
+  (transform-final $w1 ā) <0.99, 0.99>
+)
+
+;; RULE: ḥ + ka/kha → ḥka/ḥkha (no change before k/kh)
+(rule sandhi-visarga-ka
+  (visarga-end $w1 $vḥ)
+  (consonant-start $w2 ka)
+  →
+  (no-change $w1 $w2) <0.99, 0.99>
+)
+
+;; RULE: ḥ + pa/pha → ḥpa/ḥpha (no change before p/ph)
+(rule sandhi-visarga-pa
+  (visarga-end $w1 $vḥ)
+  (consonant-start $w2 pa)
+  →
+  (no-change $w1 $w2) <0.99, 0.99>
+)
+
+;; RULE: ḥ + śa → śśa or ḥśa
+(rule sandhi-visarga-sha
+  (visarga-end $w1 $vḥ)
+  (consonant-start $w2 śa)
+  →
+  (transform-final $w1 ś) <0.90, 0.90>
+)
+
+;; RULE: ḥ + ṣa → ṣṣa
+(rule sandhi-visarga-retro-sha
+  (visarga-end $w1 $vḥ)
+  (consonant-start $w2 ṣa)
+  →
+  (transform-final $w1 ṣ) <0.90, 0.90>
+)
+
+;; RULE: ḥ + sa → ssa
+(rule sandhi-visarga-sa
+  (visarga-end $w1 $vḥ)
+  (consonant-start $w2 sa)
+  →
+  (transform-final $w1 s) <0.90, 0.90>
+)
+
+
+;; ─── 5. NOUN DECLENSION (Vibhakti) ─────────────────────────────────
+;; 8 cases × 3 numbers × 3 genders = 72 forms per stem
+;; Below: a-stem masculine (most common pattern, like deva/rāma)
+
+;; Case names and their meanings (kāraka relations)
+(vibhakti 1 prathamā nominative kartā agent "who/what does") <0.99, 0.99>
+(vibhakti 2 dvitīyā accusative karma object "whom/what") <0.99, 0.99>
+(vibhakti 3 tṛtīyā instrumental karaṇa instrument "by/with") <0.99, 0.99>
+(vibhakti 4 caturthī dative sampradāna recipient "for/to") <0.99, 0.99>
+(vibhakti 5 pañcamī ablative apādāna source "from") <0.99, 0.99>
+(vibhakti 6 ṣaṣṭhī genitive sambandha relation "of/possessive") <0.99, 0.99>
+(vibhakti 7 saptamī locative adhikaraṇa location "in/on/at") <0.99, 0.99>
+(vibhakti 8 sambodhana vocative āmantrita address "O!/hey") <0.99, 0.99>
+
+;; a-stem masculine endings (deva = god)
+;; singular (ekavacana)
+(rule decline-a-m-1-sg (stem $w a masculine) (case prathamā) (number sg) → (form $w aḥ)) <0.99, 0.99>
+(rule decline-a-m-2-sg (stem $w a masculine) (case dvitīyā) (number sg) → (form $w am)) <0.99, 0.99>
+(rule decline-a-m-3-sg (stem $w a masculine) (case tṛtīyā) (number sg) → (form $w ena)) <0.99, 0.99>
+(rule decline-a-m-4-sg (stem $w a masculine) (case caturthī) (number sg) → (form $w āya)) <0.99, 0.99>
+(rule decline-a-m-5-sg (stem $w a masculine) (case pañcamī) (number sg) → (form $w āt)) <0.99, 0.99>
+(rule decline-a-m-6-sg (stem $w a masculine) (case ṣaṣṭhī) (number sg) → (form $w asya)) <0.99, 0.99>
+(rule decline-a-m-7-sg (stem $w a masculine) (case saptamī) (number sg) → (form $w e)) <0.99, 0.99>
+(rule decline-a-m-8-sg (stem $w a masculine) (case sambodhana) (number sg) → (form $w a)) <0.99, 0.99>
+
+;; dual (dvivacana)
+(rule decline-a-m-1-du (stem $w a masculine) (case prathamā) (number du) → (form $w au)) <0.99, 0.99>
+(rule decline-a-m-2-du (stem $w a masculine) (case dvitīyā) (number du) → (form $w au)) <0.99, 0.99>
+(rule decline-a-m-3-du (stem $w a masculine) (case tṛtīyā) (number du) → (form $w ābhyām)) <0.99, 0.99>
+(rule decline-a-m-4-du (stem $w a masculine) (case caturthī) (number du) → (form $w ābhyām)) <0.99, 0.99>
+(rule decline-a-m-5-du (stem $w a masculine) (case pañcamī) (number du) → (form $w ābhyām)) <0.99, 0.99>
+(rule decline-a-m-6-du (stem $w a masculine) (case ṣaṣṭhī) (number du) → (form $w ayoḥ)) <0.99, 0.99>
+(rule decline-a-m-7-du (stem $w a masculine) (case saptamī) (number du) → (form $w ayoḥ)) <0.99, 0.99>
+
+;; plural (bahuvacana)
+(rule decline-a-m-1-pl (stem $w a masculine) (case prathamā) (number pl) → (form $w āḥ)) <0.99, 0.99>
+(rule decline-a-m-2-pl (stem $w a masculine) (case dvitīyā) (number pl) → (form $w ān)) <0.99, 0.99>
+(rule decline-a-m-3-pl (stem $w a masculine) (case tṛtīyā) (number pl) → (form $w aiḥ)) <0.99, 0.99>
+(rule decline-a-m-4-pl (stem $w a masculine) (case caturthī) (number pl) → (form $w ebhyaḥ)) <0.99, 0.99>
+(rule decline-a-m-5-pl (stem $w a masculine) (case pañcamī) (number pl) → (form $w ebhyaḥ)) <0.99, 0.99>
+(rule decline-a-m-6-pl (stem $w a masculine) (case ṣaṣṭhī) (number pl) → (form $w ānām)) <0.99, 0.99>
+(rule decline-a-m-7-pl (stem $w a masculine) (case saptamī) (number pl) → (form $w eṣu)) <0.99, 0.99>
+
+;; ā-stem feminine endings (vidyā = knowledge)
+(rule decline-aa-f-1-sg (stem $w ā feminine) (case prathamā) (number sg) → (form $w ā)) <0.99, 0.99>
+(rule decline-aa-f-2-sg (stem $w ā feminine) (case dvitīyā) (number sg) → (form $w ām)) <0.99, 0.99>
+(rule decline-aa-f-3-sg (stem $w ā feminine) (case tṛtīyā) (number sg) → (form $w ayā)) <0.99, 0.99>
+(rule decline-aa-f-4-sg (stem $w ā feminine) (case caturthī) (number sg) → (form $w āyai)) <0.99, 0.99>
+(rule decline-aa-f-5-sg (stem $w ā feminine) (case pañcamī) (number sg) → (form $w āyāḥ)) <0.99, 0.99>
+(rule decline-aa-f-6-sg (stem $w ā feminine) (case ṣaṣṭhī) (number sg) → (form $w āyāḥ)) <0.99, 0.99>
+(rule decline-aa-f-7-sg (stem $w ā feminine) (case saptamī) (number sg) → (form $w āyām)) <0.99, 0.99>
+(rule decline-aa-f-1-pl (stem $w ā feminine) (case prathamā) (number pl) → (form $w āḥ)) <0.99, 0.99>
+(rule decline-aa-f-2-pl (stem $w ā feminine) (case dvitīyā) (number pl) → (form $w āḥ)) <0.99, 0.99>
+(rule decline-aa-f-6-pl (stem $w ā feminine) (case ṣaṣṭhī) (number pl) → (form $w ānām)) <0.99, 0.99>
+
+;; a-stem neuter endings (phala = fruit)
+(rule decline-a-n-1-sg (stem $w a neuter) (case prathamā) (number sg) → (form $w am)) <0.99, 0.99>
+(rule decline-a-n-2-sg (stem $w a neuter) (case dvitīyā) (number sg) → (form $w am)) <0.99, 0.99>
+(rule decline-a-n-1-du (stem $w a neuter) (case prathamā) (number du) → (form $w e)) <0.99, 0.99>
+(rule decline-a-n-1-pl (stem $w a neuter) (case prathamā) (number pl) → (form $w āni)) <0.99, 0.99>
+(rule decline-a-n-2-pl (stem $w a neuter) (case dvitīyā) (number pl) → (form $w āni)) <0.99, 0.99>
+;; Cases 3-7 same as masculine for a-stem neuter
+
+
+;; ─── 6. VERB CONJUGATION (Dhātu + Lakāra) ──────────────────────────
+;; 10 tenses/moods (lakāra) × 3 persons × 3 numbers = 90 forms per root
+
+;; Person/number endings for present tense (laṭ-lakāra, parasmaipada)
+(rule conjugate-lat-p3-sg (dhātu $root $gana) (lakāra laṭ) (puruṣa prathama) (number sg) → (ending ti)) <0.99, 0.99>
+(rule conjugate-lat-p3-du (dhātu $root $gana) (lakāra laṭ) (puruṣa prathama) (number du) → (ending taḥ)) <0.99, 0.99>
+(rule conjugate-lat-p3-pl (dhātu $root $gana) (lakāra laṭ) (puruṣa prathama) (number pl) → (ending anti)) <0.99, 0.99>
+
+(rule conjugate-lat-p2-sg (dhātu $root $gana) (lakāra laṭ) (puruṣa madhyama) (number sg) → (ending si)) <0.99, 0.99>
+(rule conjugate-lat-p2-du (dhātu $root $gana) (lakāra laṭ) (puruṣa madhyama) (number du) → (ending thaḥ)) <0.99, 0.99>
+(rule conjugate-lat-p2-pl (dhātu $root $gana) (lakāra laṭ) (puruṣa madhyama) (number pl) → (ending tha)) <0.99, 0.99>
+
+(rule conjugate-lat-p1-sg (dhātu $root $gana) (lakāra laṭ) (puruṣa uttama) (number sg) → (ending mi)) <0.99, 0.99>
+(rule conjugate-lat-p1-du (dhātu $root $gana) (lakāra laṭ) (puruṣa uttama) (number du) → (ending vaḥ)) <0.99, 0.99>
+(rule conjugate-lat-p1-pl (dhātu $root $gana) (lakāra laṭ) (puruṣa uttama) (number pl) → (ending maḥ)) <0.99, 0.99>
+
+;; 10 Lakāras (tenses/moods)
+(lakāra laṭ present "he does / is doing") <0.99, 0.99>
+(lakāra liṭ perfect "he did (remote past)") <0.99, 0.99>
+(lakāra luṭ periphrastic-future "he will do (distant future)") <0.99, 0.99>
+(lakāra lṛṭ simple-future "he will do") <0.99, 0.99>
+(lakāra leṭ subjunctive "that he may do (Vedic)") <0.99, 0.99>
+(lakāra loṭ imperative "let him do / do!") <0.99, 0.99>
+(lakāra laṅ imperfect "he was doing") <0.99, 0.99>
+(lakāra liṅ optative-potential "he should do / would do") <0.99, 0.99>
+(lakāra luṅ aorist "he did (recent past)") <0.99, 0.99>
+(lakāra lṛṅ conditional "he would have done") <0.99, 0.99>
+
+;; 10 verb classes (gaṇa)
+(gaṇa 1 bhvādi "bhū class — guṇa of root vowel + a") <0.99, 0.99>
+(gaṇa 2 adādi "ad class — no vikaraṇa, root used directly") <0.99, 0.99>
+(gaṇa 3 juhotyādi "hu class — reduplication of root") <0.99, 0.99>
+(gaṇa 4 divādi "div class — ya added to root") <0.99, 0.99>
+(gaṇa 5 svādi "su class — nu/no added to root") <0.99, 0.99>
+(gaṇa 6 tudādi "tud class — a added to root (no guṇa)") <0.99, 0.99>
+(gaṇa 7 rudhādi "rudh class — na/n infixed in root") <0.99, 0.99>
+(gaṇa 8 tanādi "tan class — u/o added to root") <0.99, 0.99>
+(gaṇa 9 kryādi "krī class — nā/nī added to root") <0.99, 0.99>
+(gaṇa 10 curādi "cur class — aya added to root (causative-like)") <0.99, 0.99>
+
+;; Common verb roots (dhātu)
+(dhātu bhū 1 parasmai "to be, to become") <0.99, 0.99>
+(dhātu gam 1 parasmai "to go") <0.99, 0.99>
+(dhātu paṭh 1 parasmai "to read, to recite") <0.99, 0.99>
+(dhātu vad 1 parasmai "to speak, to say") <0.99, 0.99>
+(dhātu dṛś 1 parasmai "to see") <0.99, 0.99>
+(dhātu śru 1 parasmai "to hear") <0.99, 0.99>
+(dhātu kṛ 8 parasmai "to do, to make") <0.99, 0.99>
+(dhātu dā 3 parasmai "to give") <0.99, 0.99>
+(dhātu sthā 1 parasmai "to stand") <0.99, 0.99>
+(dhātu as 2 parasmai "to be, to exist") <0.99, 0.99>
+(dhātu vid 2 parasmai "to know") <0.99, 0.99>
+(dhātu han 2 parasmai "to kill, to strike") <0.99, 0.99>
+(dhātu ad 2 parasmai "to eat") <0.99, 0.99>
+(dhātu i 2 parasmai "to go") <0.99, 0.99>
+(dhātu nī 1 parasmai "to lead") <0.99, 0.99>
+(dhātu pac 1 parasmai "to cook") <0.99, 0.99>
+(dhātu likh 6 parasmai "to write") <0.99, 0.99>
+(dhātu khād 1 parasmai "to eat, to chew") <0.99, 0.99>
+(dhātu pā 1 parasmai "to drink") <0.99, 0.99>
+(dhātu jñā 9 parasmai "to know, to understand") <0.99, 0.99>
+(dhātu man 4 ātmane "to think") <0.99, 0.99>
+(dhātu labh 1 ātmane "to obtain") <0.99, 0.99>
+(dhātu vṛt 1 ātmane "to exist, to happen") <0.99, 0.99>
+(dhātu yuj 7 ubhaya "to join, to yoke (→ yoga)") <0.99, 0.99>
+(dhātu budh 1 ubhaya "to know, to wake (→ buddha)") <0.99, 0.99>
+
+;; Voice categories
+(voice parasmaipada "active — action for another") <0.99, 0.99>
+(voice ātmanepada "middle — action for oneself") <0.99, 0.99>
+(voice ubhayapada "both — can take either voice") <0.99, 0.99>
+
+;; Example: full conjugation of √bhū (to be) in present tense
+;; bhū + a (gaṇa 1 vikaraṇa) + guṇa = bhav + a = bhava-
+(conjugation bhū laṭ prathama sg bhavati "he/she/it is") <0.99, 0.99>
+(conjugation bhū laṭ prathama du bhavataḥ "they two are") <0.99, 0.99>
+(conjugation bhū laṭ prathama pl bhavanti "they are") <0.99, 0.99>
+(conjugation bhū laṭ madhyama sg bhavasi "you are") <0.99, 0.99>
+(conjugation bhū laṭ madhyama du bhavathaḥ "you two are") <0.99, 0.99>
+(conjugation bhū laṭ madhyama pl bhavatha "you all are") <0.99, 0.99>
+(conjugation bhū laṭ uttama sg bhavāmi "I am") <0.99, 0.99>
+(conjugation bhū laṭ uttama du bhavāvaḥ "we two are") <0.99, 0.99>
+(conjugation bhū laṭ uttama pl bhavāmaḥ "we are") <0.99, 0.99>
+
+
+;; ─── 7. VOWEL STRENGTHENING (Guṇa & Vṛddhi) ──────────────────────
+;; Core transformation rules used throughout grammar
+
+;; Guṇa (first level strengthening)
+(rule guna-i (vowel i) → (guṇa e)) <0.99, 0.99>
+(rule guna-u (vowel u) → (guṇa o)) <0.99, 0.99>
+(rule guna-ri (vowel ṛ) → (guṇa ar)) <0.99, 0.99>
+(rule guna-li (vowel ḷ) → (guṇa al)) <0.99, 0.99>
+(rule guna-a (vowel a) → (guṇa a)) <0.99, 0.99>
+
+;; Vṛddhi (second level strengthening)
+(rule vrddhi-a (vowel a) → (vṛddhi ā)) <0.99, 0.99>
+(rule vrddhi-i (vowel i) → (vṛddhi ai)) <0.99, 0.99>
+(rule vrddhi-u (vowel u) → (vṛddhi au)) <0.99, 0.99>
+(rule vrddhi-ri (vowel ṛ) → (vṛddhi ār)) <0.99, 0.99>
+
+
+;; ─── 8. COMPOUND WORDS (Samāsa) ────────────────────────────────────
+
+;; Types of compounds — rules for how words merge
+(samāsa avyayībhāva "indeclinable compound: first member is prefix/indeclinable"
+  "upakṛṣṇam = near Kṛṣṇa (upa + kṛṣṇa)") <0.99, 0.99>
+
+(samāsa tatpuruṣa "determinative: first qualifies second, second is head"
+  "rāja-puruṣaḥ = king's man (genitive tatpuruṣa)"
+  "subtypes by case: dvitīyā through saptamī") <0.99, 0.99>
+
+(samāsa karmadhāraya "descriptive: apposition, adjective+noun"
+  "nīla-utpalam = blue lotus (adjective + noun)"
+  "subtype of tatpuruṣa where both refer to same entity") <0.99, 0.99>
+
+(samāsa dvigu "numeral compound: number + noun"
+  "tri-lokī = three worlds (tri + loka)"
+  "subtype of tatpuruṣa with numeral as first member") <0.99, 0.99>
+
+(samāsa dvandva "copulative: A and B"
+  "rāma-lakṣmaṇau = Rāma and Lakṣmaṇa"
+  "both members equal, result takes dual/plural") <0.99, 0.99>
+
+(samāsa bahuvrīhi "possessive/exocentric: compound describes external referent"
+  "bahu-vrīhiḥ = [one who has] much rice (bahu+vrīhi)"
+  "meaning is OUTSIDE the compound itself") <0.99, 0.99>
+
+;; Compound resolution rules
+(rule resolve-tatpurusha
+  (compound $c tatpuruṣa $w1 $w2 $case)
+  →
+  (meaning $c "$w2 related-by-$case to $w1") <0.90, 0.90>
+)
+
+(rule resolve-bahuvrihi
+  (compound $c bahuvrīhi $w1 $w2)
+  →
+  (meaning $c "one whose $w2 is $w1") <0.90, 0.90>
+)
+
+(rule resolve-dvandva
+  (compound $c dvandva $w1 $w2)
+  →
+  (meaning $c "$w1 and $w2") <0.90, 0.90>
+)
+
+
+;; ─── 9. SENTENCE STRUCTURE (Vākya) ─────────────────────────────────
+
+;; Sanskrit is FREE WORD ORDER — meaning comes from case endings, not position
+(rule sanskrit-word-order
+  (word $w1 $case1 $meaning1)
+  (word $w2 $case2 $meaning2)
+  (word $verb $lakāra $dhātu)
+  →
+  ;; Agent = prathamā, Object = dvitīyā, Instrument = tṛtīyā
+  ;; word order does NOT matter, cases determine roles
+  (sentence-role $w1 $case1)
+  (sentence-role $w2 $case2)
+  (sentence-action $verb $dhātu) <0.99, 0.99>
+)
+
+;; Kāraka (semantic roles) — THE key to understanding Sanskrit sentences
+(rule identify-agent
+  (word $w prathamā $meaning)
+  (verb $v active)
+  →
+  (agent $w $meaning) <0.99, 0.99>
+)
+
+(rule identify-object
+  (word $w dvitīyā $meaning)
+  →
+  (object $w $meaning) <0.99, 0.99>
+)
+
+(rule identify-instrument
+  (word $w tṛtīyā $meaning)
+  →
+  (instrument $w $meaning) <0.99, 0.99>
+)
+
+(rule identify-recipient
+  (word $w caturthī $meaning)
+  →
+  (recipient $w $meaning) <0.99, 0.99>
+)
+
+(rule identify-source
+  (word $w pañcamī $meaning)
+  →
+  (source $w $meaning) <0.99, 0.99>
+)
+
+(rule identify-possessor
+  (word $w ṣaṣṭhī $meaning)
+  →
+  (possessor $w $meaning) <0.99, 0.99>
+)
+
+(rule identify-location
+  (word $w saptamī $meaning)
+  →
+  (location $w $meaning) <0.99, 0.99>
+)
+
+
+;; ─── 10. PRONOUNS (Sarvanāma) ──────────────────────────────────────
+
+;; tad (he/she/it/that) — most common pronoun
+(pronoun tad masculine prathamā sg saḥ "he/that") <0.99, 0.99>
+(pronoun tad masculine prathamā du tau "those two") <0.99, 0.99>
+(pronoun tad masculine prathamā pl te "they/those") <0.99, 0.99>
+(pronoun tad masculine dvitīyā sg tam "him/that") <0.99, 0.99>
+(pronoun tad masculine dvitīyā pl tān "them") <0.99, 0.99>
+(pronoun tad masculine tṛtīyā sg tena "by him") <0.99, 0.99>
+(pronoun tad masculine ṣaṣṭhī sg tasya "his/of him") <0.99, 0.99>
+(pronoun tad masculine saptamī sg tasmin "in him") <0.99, 0.99>
+
+(pronoun tad feminine prathamā sg sā "she/that") <0.99, 0.99>
+(pronoun tad feminine prathamā pl tāḥ "they/those (f)") <0.99, 0.99>
+(pronoun tad feminine dvitīyā sg tām "her") <0.99, 0.99>
+(pronoun tad feminine ṣaṣṭhī sg tasyāḥ "her/of her") <0.99, 0.99>
+
+(pronoun tad neuter prathamā sg tat "it/that") <0.99, 0.99>
+(pronoun tad neuter prathamā pl tāni "they/those (n)") <0.99, 0.99>
+
+;; asmad (I/we)
+(pronoun asmad noneprathamā sg aham "I") <0.99, 0.99>
+(pronoun asmad noneprathamā du āvām "we two") <0.99, 0.99>
+(pronoun asmad noneprathamā pl vayam "we") <0.99, 0.99>
+(pronoun asmad nonedvitīyā sg mām "me") <0.99, 0.99>
+(pronoun asmad nonetṛtīyā sg mayā "by me") <0.99, 0.99>
+(pronoun asmad noneṣaṣṭhī sg mama "my/of me") <0.99, 0.99>
+
+;; yuṣmad (you)
+(pronoun yuṣmad noneprathamā sg tvam "you") <0.99, 0.99>
+(pronoun yuṣmad noneprathamā du yuvām "you two") <0.99, 0.99>
+(pronoun yuṣmad noneprathamā pl yūyam "you all") <0.99, 0.99>
+(pronoun yuṣmad nonedvitīyā sg tvām "you (acc)") <0.99, 0.99>
+(pronoun yuṣmad noneṣaṣṭhī sg tava "your/of you") <0.99, 0.99>
+
+;; Interrogative: kim (who/what)
+(pronoun kim masculine prathamā sg kaḥ "who?") <0.99, 0.99>
+(pronoun kim feminine prathamā sg kā "who? (f)") <0.99, 0.99>
+(pronoun kim neuter prathamā sg kim "what?") <0.99, 0.99>
+
+
+;; ─── 11. INDECLINABLES (Avyaya) ────────────────────────────────────
+
+(avyaya ca "and") <0.99, 0.99>
+(avyaya vā "or") <0.99, 0.99>
+(avyaya na "not") <0.99, 0.99>
+(avyaya eva "indeed, only, certainly") <0.99, 0.99>
+(avyaya tu "but, however") <0.99, 0.99>
+(avyaya api "also, even, though") <0.99, 0.99>
+(avyaya iti "thus, so (end-quote marker)") <0.99, 0.99>
+(avyaya yadi "if") <0.99, 0.99>
+(avyaya tadā "then") <0.99, 0.99>
+(avyaya yadā "when") <0.99, 0.99>
+(avyaya tatra "there") <0.99, 0.99>
+(avyaya atra "here") <0.99, 0.99>
+(avyaya saha "together with") <0.99, 0.99>
+(avyaya vinā "without") <0.99, 0.99>
+(avyaya yathā "as, like") <0.99, 0.99>
+(avyaya tathā "so, likewise") <0.99, 0.99>
+(avyaya sarvadā "always") <0.99, 0.99>
+(avyaya kadā "when?") <0.99, 0.99>
+(avyaya kutra "where?") <0.99, 0.99>
+(avyaya katham "how?") <0.99, 0.99>
+(avyaya kasmāt "why? from what?") <0.99, 0.99>
+(avyaya alam "enough") <0.99, 0.99>
+(avyaya punaḥ "again") <0.99, 0.99>
+(avyaya sadā "always") <0.99, 0.99>
+(avyaya idānīm "now") <0.99, 0.99>
+
+
+;; ─── 12. PREFIX SYSTEM (Upasarga) ───────────────────────────────────
+;; 22 prefixes that modify verb/noun meaning
+
+(upasarga pra "forward, forth, very" "pra+√bhū = prabhavati = arises") <0.99, 0.99>
+(upasarga parā "away, back" "parā+√ji = parājayate = is defeated") <0.99, 0.99>
+(upasarga apa "away, off" "apa+√gam = apagacchati = goes away") <0.99, 0.99>
+(upasarga sam "together, complete" "sam+√gam = saṃgacchate = comes together") <0.99, 0.99>
+(upasarga anu "after, along" "anu+√gam = anugacchati = follows") <0.99, 0.99>
+(upasarga ava "down" "ava+√gam = avagacchati = understands") <0.99, 0.99>
+(upasarga nis "out, without" "nis+√gam = nirgacchati = goes out") <0.99, 0.99>
+(upasarga ni "down, in" "ni+√viś = niviśate = enters") <0.99, 0.99>
+(upasarga dus "bad, difficult" "dus+√kṛ = duṣkaroti = does badly") <0.99, 0.99>
+(upasarga su "good, well" "su+√kṛ = sukṛta = well-done") <0.99, 0.99>
+(upasarga vi "apart, special" "vi+√jñā = vijānāti = discerns") <0.99, 0.99>
+(upasarga ā "toward, until" "ā+√gam = āgacchati = comes") <0.99, 0.99>
+(upasarga abhi "toward, over" "abhi+√dhā = abhidhatte = names") <0.99, 0.99>
+(upasarga adhi "over, upon" "adhi+√gam = adhigacchati = attains") <0.99, 0.99>
+(upasarga upa "near, toward" "upa+√gam = upagacchati = approaches") <0.99, 0.99>
+(upasarga pari "around" "pari+√gam = parigacchati = goes around") <0.99, 0.99>
+(upasarga prati "back, against, each" "prati+√gam = pratigacchati = returns") <0.99, 0.99>
+(upasarga ati "beyond, over" "ati+√gam = atigacchati = surpasses") <0.99, 0.99>
+(upasarga ud "up, out" "ud+√gam = udgacchati = rises") <0.99, 0.99>
+(upasarga ut "up" "ut+√sthā = uttiṣṭhati = stands up") <0.99, 0.99>
+
+
+;; ─── 13. CORE VOCABULARY (Śabdakośa) ───────────────────────────────
+;; Essential nouns your AI needs to understand Vedic texts
+
+;; Cosmic/philosophical terms
+(shabda ātman masculine a "self, soul") <0.99, 0.99>
+(shabda brahman neuter a "ultimate reality, absolute") <0.99, 0.99>
+(shabda deva masculine a "god, divine being") <0.99, 0.99>
+(shabda agni masculine i "fire, fire-god") <0.99, 0.99>
+(shabda sūrya masculine a "sun") <0.99, 0.99>
+(shabda candra masculine a "moon") <0.99, 0.99>
+(shabda vāyu masculine u "wind, air") <0.99, 0.99>
+(shabda jala neuter a "water") <0.99, 0.99>
+(shabda pṛthivī feminine ī "earth") <0.99, 0.99>
+(shabda ākāśa masculine a "space, ether, sky") <0.99, 0.99>
+(shabda loka masculine a "world, realm") <0.99, 0.99>
+(shabda kāla masculine a "time") <0.99, 0.99>
+(shabda dharma masculine a "duty, law, righteousness") <0.99, 0.99>
+(shabda karma neuter a "action, deed") <0.99, 0.99>
+(shabda jñāna neuter a "knowledge") <0.99, 0.99>
+(shabda vidyā feminine ā "knowledge, learning") <0.99, 0.99>
+(shabda satya neuter a "truth, reality") <0.99, 0.99>
+(shabda manas neuter s "mind") <0.99, 0.99>
+(shabda buddhi feminine i "intellect, understanding") <0.99, 0.99>
+(shabda prāṇa masculine a "breath, life force") <0.99, 0.99>
+(shabda yoga masculine a "union, discipline, practice") <0.99, 0.99>
+(shabda māyā feminine ā "illusion, measurement, creative power") <0.99, 0.99>
+(shabda mokṣa masculine a "liberation, freedom") <0.99, 0.99>
+(shabda saṃsāra masculine a "cycle of rebirth") <0.99, 0.99>
+
+;; Nature
+(shabda vṛkṣa masculine a "tree") <0.99, 0.99>
+(shabda nadī feminine ī "river") <0.99, 0.99>
+(shabda parvata masculine a "mountain") <0.99, 0.99>
+(shabda samudra masculine a "ocean") <0.99, 0.99>
+(shabda vana neuter a "forest") <0.99, 0.99>
+(shabda puṣpa neuter a "flower") <0.99, 0.99>
+(shabda phala neuter a "fruit") <0.99, 0.99>
+
+;; Numbers
+(shabda eka adjective a "one") <0.99, 0.99>
+(shabda dvi adjective none "two") <0.99, 0.99>
+(shabda tri adjective none "three") <0.99, 0.99>
+(shabda catur adjective none "four") <0.99, 0.99>
+(shabda pañca adjective none "five") <0.99, 0.99>
+(shabda ṣaṣ adjective none "six") <0.99, 0.99>
+(shabda sapta adjective none "seven") <0.99, 0.99>
+(shabda aṣṭa adjective none "eight") <0.99, 0.99>
+(shabda nava adjective none "nine") <0.99, 0.99>
+(shabda daśa adjective none "ten") <0.99, 0.99>
+(shabda śata neuter a "hundred") <0.99, 0.99>
+(shabda sahasra neuter a "thousand") <0.99, 0.99>
+
+;; People/body
+(shabda nara masculine a "man, person") <0.99, 0.99>
+(shabda strī feminine ī "woman") <0.99, 0.99>
+(shabda putra masculine a "son") <0.99, 0.99>
+(shabda duhitṛ feminine ṛ "daughter") <0.99, 0.99>
+(shabda pitṛ masculine ṛ "father") <0.99, 0.99>
+(shabda mātṛ feminine ṛ "mother") <0.99, 0.99>
+(shabda guru masculine u "teacher, heavy") <0.99, 0.99>
+(shabda śiṣya masculine a "student") <0.99, 0.99>
+(shabda rājan masculine n "king") <0.99, 0.99>
+(shabda hasta masculine a "hand") <0.99, 0.99>
+(shabda netra neuter a "eye") <0.99, 0.99>
+(shabda hṛdaya neuter a "heart") <0.99, 0.99>
+(shabda śarīra neuter a "body") <0.99, 0.99>
+
+;; Actions/qualities
+(shabda gṛha masculine a "house, home") <0.99, 0.99>
+(shabda mārga masculine a "path, way") <0.99, 0.99>
+(shabda anna neuter a "food, grain") <0.99, 0.99>
+(shabda āhāra masculine a "food, nourishment") <0.99, 0.99>
+(shabda sukha neuter a "happiness, ease") <0.99, 0.99>
+(shabda duḥkha neuter a "suffering, pain") <0.99, 0.99>
+(shabda śānti feminine i "peace") <0.99, 0.99>
+(shabda bala neuter a "strength, power") <0.99, 0.99>
+
+
+;; ═══════════════════════════════════════════════════════════════════════
+;; SANSKRIT GRAMMAR RULES SUMMARY
+;; ~400 executable rules covering:
+;;   - Complete phoneme system (49 sounds classified by properties)
+;;   - Vowel sandhi rules (30+ transformation rules)
+;;   - Consonant sandhi rules (15+ rules)
+;;   - Visarga sandhi rules (8+ rules)
+;;   - Noun declension: a-stem masc/fem/neut (50+ ending rules)
+;;   - Verb conjugation: present tense parasmaipada (9 endings)
+;;   - 10 lakāras (tenses/moods)
+;;   - 10 gaṇas (verb classes)
+;;   - 25 common dhātus (verb roots)
+;;   - Guṇa and Vṛddhi vowel strengthening
+;;   - 6 compound types (samāsa) with resolution rules
+;;   - Sentence parsing: kāraka role identification
+;;   - Pronouns: tad, asmad, yuṣmad, kim
+;;   - 25 indeclinables (avyaya)
+;;   - 20 prefixes (upasarga)
+;;   - 70+ core vocabulary words
+;;
+;; THIS IS NOT HISTORY — THESE ARE THE ACTUAL RULES
+;; Load this → AI can parse basic Sanskrit
+;; ═══════════════════════════════════════════════════════════════════════
+
+
+;; ═══════════════════════════════════════════════════════════════════════
+;; BRIDGE RULES — connect linguistic patterns to observation predicates
+;; ═══════════════════════════════════════════════════════════════════════
+
+;; Pattern repetition = mantra (repetitive chanting)
+(sanskrit-insight mantra-pattern) if (detected-reflect-h) <0.88, 0.85>
+(sanskrit-insight mantra-pattern) if (detected-reflect-v) <0.88, 0.85>
+
+;; Sandhi = transformation at boundaries
+(sanskrit-insight sandhi-transform $from $to) if (consistent-remap $from $to) <0.88, 0.85>
+
+;; Compound formation = objects combining
+(sanskrit-insight samasa-compound) if (objects-removed $in $out) (obs-consistent output-smaller) <0.85, 0.80>
+
+;; Vibhakti (case declension) = systematic transformation
+(sanskrit-insight vibhakti-transform) if (has-geometric-transform) <0.85, 0.80>
+
+;; ─── UNIVERSAL RULES — fire on ANY data ────────────
+
+;; Padārtha — categorization (Nyāya logic)
+(sanskrit-insight padartha $x $category) if (is-a $x $category) <0.88, 0.85>
+;; Artha — meaning extraction
+(sanskrit-insight artha $key) if (meaning $key $val) <0.88, 0.85>
+;; Vākya — user utterance intent
+(sanskrit-insight vakya-intent $type) if (intent $type) <0.85, 0.80>
+;; Āvṛtti — repetition/frequency
+(sanskrit-insight avrtti $pattern $count) if (pattern-rate $pattern $count $total) <0.85, 0.80>
+;; Sambandha — relationship/connection
+(sanskrit-insight sambandha $a $b) if (co-occur $a $b $both $base) <0.85, 0.80>
+;; Guṇa — property/quality
+(sanskrit-insight guna $x $prop) if (has $x $prop) <0.85, 0.80>

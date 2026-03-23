@@ -1,0 +1,65 @@
+;; ══════════════════════════════════════════════════════════════════════
+;; ── QOR Puzzle Solver — Genesis Meta-Rules ───────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+;;
+;; These rules detect when QOR has NO applicable rules and trigger the
+;; genesis (rule invention) system. Based on the Creativity Formula:
+;;
+;;   1. DECOMPOSE  — analyze training pairs
+;;   2. CONTRADICT — find what changed
+;;   3. PROPOSE    — generate candidate rules (TRIZ/SCAMPER)
+;;   4. EVALUATE   — score against training data
+;;   5. COMBINE    — merge partial rules
+;;   6. EVOLVE     — mutate and improve
+;;
+;; Rust's genesis engine (invent.rs) does the heavy lifting.
+;; These DNA rules tell it WHEN to activate.
+
+;; ── Detection ────────────────────────────────────────────────────────
+;; When test input exists but no predict-cell was produced, we have
+;; zero applicable rules — trigger genesis.
+
+(no-predictions) if
+    (test-input $id)
+    not (predict-cell $id $any_r $any_c $any_v) <0.99, 0.99>
+
+;; Genesis activation — runs once per puzzle
+(try-genesis) if
+    (no-predictions)
+    not (genesis-done) <0.95, 0.95>
+
+;; ── Creativity Hints ─────────────────────────────────────────────────
+;; Guide the genesis engine on what to prioritize.
+;; Engine reads these to weight certain strategies higher.
+
+;; TRIZ: Copying — when output is larger, try tiling first
+(genesis-hint tiling) if
+    (obs-consistent output-larger) <0.90, 0.90>
+
+;; TRIZ: Inversion — when same size, try color remaps
+(genesis-hint color-remap) if
+    (obs-consistent same-size) <0.85, 0.85>
+
+;; TRIZ: Segmentation — when same size, try reflections
+(genesis-hint reflect) if
+    (obs-consistent same-size) <0.80, 0.80>
+
+;; SCAMPER: Eliminate — when output is smaller, try extraction
+(genesis-hint extraction) if
+    (obs-consistent output-smaller) <0.85, 0.85>
+
+;; Always-available fallbacks
+(genesis-hint identity) <0.70, 0.70>
+(genesis-hint shift) <0.70, 0.70>
+
+;; ── Post-Genesis ─────────────────────────────────────────────────────
+;; After genesis runs, Rust injects (genesis-done) and the invented
+;; rules. Forward chain re-runs and predictions appear.
+
+;; Track that genesis produced results
+(genesis-improved $id) if
+    (genesis-done)
+    (predict-cell $id $r $c $v) <0.90, 0.90>
+
+;; If genesis produced predictions but they're still wrong,
+;; the confidence system (agent.qor) handles retry/web fallback.

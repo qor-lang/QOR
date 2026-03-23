@@ -1,0 +1,556 @@
+;; ══════════════════════════════════════════════════════════════════════
+;; ── QOR Meta-Rule System v2 — Multi-Dimensional Reasoning
+;; ══════════════════════════════════════════════════════════════════════
+;;
+;; Formal framework combining:
+;;   - Dempster-Shafer evidence theory (2D confidence: trust/plausibility)
+;;   - N-dimensional state vectors (feasibility, novelty, simplicity, ethics,
+;;     consistency, information)
+;;   - Quantum-inspired operators (superposition, collapse, entanglement)
+;;
+;; Every candidate rule exists as a 6-dimensional state vector:
+;;
+;;   R⃗ = (f, n, s, e, c, i)
+;;
+;;   f = feasibility    ∈ [0,1]  — does it produce correct output?
+;;   n = novelty        ∈ [0,1]  — does it cover new uncovered cases?
+;;   s = simplicity     ∈ [0,1]  — fewer conditions = generalizes better
+;;   e = ethics         ∈ [0,1]  — does it respect constraints?
+;;   c = consistency    ∈ [0,1]  — works across ALL examples, not just some?
+;;   i = information    ∈ [0,1]  — how much of the problem does it explain?
+;;
+;; Each dimension has a DIFFERENT propagation operator when chaining.
+;; This is why collapsing to one number loses information.
+;;
+;; ── Theory ────────────────────────────────────────────────────────────
+;;
+;; Dempster-Shafer:
+;;   Bel(A) ≤ P(A) ≤ Pl(A)
+;;   <trust, plausibility> = <Bel, Pl>
+;;   Uncertainty gap = Pl - Bel = what we don't know
+;;
+;; Quantum analogy:
+;;   |rule⟩ = α_f|feasibility⟩ + α_n|novelty⟩ + α_s|simplicity⟩ + ...
+;;   All candidates exist in superposition until measured (scored)
+;;   Measurement collapses to accept/reject
+;;   Entangled rules: accepting one forces rejection of another
+;;
+;; ══════════════════════════════════════════════════════════════════════
+
+
+;; ── SECTION 1: State Vector Definition ────────────────────────────────
+;;
+;; (state $entity $f $n $s $e $c $i) <trust, plausibility>
+;;
+;; The <trust, plausibility> wrapping is the OVERALL Dempster-Shafer
+;; confidence in this state assessment itself.
+;; The 6 inner values are the dimensional breakdown.
+
+;; Default state for newly proposed rules — uncertain in all dimensions
+(default-state $rule 0.5 0.5 0.5 1.0 0.5 0.5) if
+    (proposed $rule $source)
+    not (state $rule $_ $_ $_ $_ $_ $_) <0.80, 0.80>
+
+
+;; ── SECTION 2: Dimension Scorers ──────────────────────────────────────
+;;
+;; Each dimension is computed independently.
+;; This is critical — collapsing to one number too early loses information.
+
+;; ── 2.1 Feasibility ──────────────────────────────────────────────────
+;; Does it produce correct output?
+;; Weighted: 70% average accuracy + 30% worst-case accuracy
+;; The min term prevents "works on 3/4 examples, fails on 1" from scoring high
+
+(feasibility $rule $score) if
+    (accuracy-avg $rule $avg)
+    (accuracy-min $rule $mn)
+    (* 0.70 $avg $t1)
+    (* 0.30 $mn $t2)
+    (+ $t1 $t2 $score) <0.95, 0.95>
+
+;; If no accuracy data yet, feasibility is unknown
+(feasibility $rule 0.0) if
+    (proposed $rule $source)
+    not (accuracy-avg $rule $_) <0.70, 0.70>
+
+
+;; ── 2.2 Novelty ──────────────────────────────────────────────────────
+;; Information gain — not just "is it different?" but "does it cover
+;; cases that NO existing rule covers?"
+;;
+;; Random garbage is novel but useless. This measures USEFUL novelty.
+
+(novelty $rule $score) if
+    (uncovered-cases $rule $gap)
+    (total-cases $total)
+    (> $total 0)
+    (/ $gap $total $score) <0.90, 0.90>
+
+;; Zero novelty for duplicates — no point keeping identical rules
+(novelty $rule 0.0) if
+    (duplicate-of $rule $existing)
+    not (same-as $rule $existing) <0.99, 0.99>
+
+;; Bonus novelty for rules from new sources (cross-domain discovery)
+(novelty-bonus $rule 0.1) if
+    (proposed $rule $source)
+    (source-type $source cross-domain) <0.85, 0.85>
+
+
+;; ── 2.3 Simplicity ──────────────────────────────────────────────────
+;; Occam's Razor / Kolmogorov complexity / MDL principle:
+;; Among rules with equal accuracy, the SHORTEST generalizes best.
+;;
+;; Measured by condition count in rule body.
+;; 1/(1 + n×0.2) gives:
+;;   1 condition  → 0.83
+;;   2 conditions → 0.71
+;;   3 conditions → 0.63
+;;   5 conditions → 0.50
+;;   10 conditions → 0.33
+
+(simplicity $rule $score) if
+    (condition-count $rule $n)
+    (* $n 0.2 $t1)
+    (+ 1.0 $t1 $t2)
+    (/ 1.0 $t2 $score) <0.95, 0.95>
+
+;; Single-body rules get maximum simplicity
+(simplicity $rule 0.90) if
+    (condition-count $rule 1) <0.95, 0.95>
+
+
+;; ── 2.4 Ethics ───────────────────────────────────────────────────────
+;; Default: ETHICAL. Only blocked if explicit violation detected.
+;; This is a GATE not a score — binary pass/fail with rare exceptions.
+;;
+;; Ethics at 0.5 threshold means the system gives benefit of doubt
+;; but a single violation drops it below threshold.
+
+(ethical $rule 1.0) if
+    (proposed $rule $source)
+    not (violates-constraint $rule $_) <0.99, 0.99>
+
+(ethical $rule 0.0) if
+    (violates-constraint $rule $constraint) <0.99, 0.99>
+
+;; Types of ethical violations
+(violates-constraint $rule safety) if
+    (produces-harmful $rule $output) <0.99, 0.99>
+
+(violates-constraint $rule consistency) if
+    (contradicts-axiom $rule $axiom) <0.95, 0.95>
+
+(violates-constraint $rule domain) if
+    (outside-domain $rule $domain) <0.80, 0.80>
+
+
+;; ── 2.5 Consistency ──────────────────────────────────────────────────
+;; Does the rule work uniformly across ALL training examples?
+;; A rule scoring 100% on pair 1 and 0% on pair 2 is WORSE than
+;; a rule scoring 60% on both — because the inconsistent rule
+;; is probably overfitting to one example.
+;;
+;; Noether's theorem: symmetry across examples → conservation of truth
+
+(consistency $rule $score) if
+    (accuracy-per-pair $rule $scores)
+    (variance $scores $var)
+    (min $var 1.0 $capped)
+    (- 1.0 $capped $score) <0.90, 0.90>
+
+;; Perfect consistency = same score on every training pair
+(consistency $rule 1.0) if
+    (accuracy-per-pair $rule $scores)
+    (variance $scores 0.0) <0.99, 0.99>
+
+
+;; ── 2.6 Information ──────────────────────────────────────────────────
+;; How much of the problem does this rule explain?
+;; Measured as fraction of output facts correctly produced.
+;;
+;; A rule explaining 90% of the output is worth more than one
+;; explaining 10%, even if both are correct where they apply.
+
+(information $rule $score) if
+    (facts-explained $rule $explained)
+    (facts-total $total)
+    (max $total 1 $safe_total)
+    (/ $explained $safe_total $score) <0.90, 0.90>
+
+
+;; ── SECTION 3: State Vector Assembly ──────────────────────────────────
+;; Combine individual dimension scores into a state vector.
+
+(state $rule $f $n $s $e $c $i) if
+    (feasibility $rule $f)
+    (novelty $rule $n_base)
+    (novelty-bonus $rule $n_bonus)
+    (+ $n_base $n_bonus $n_raw)
+    (min $n_raw 1.0 $n)
+    (simplicity $rule $s)
+    (ethical $rule $e)
+    (consistency $rule $c)
+    (information $rule $i) <0.90, 0.90>
+
+;; Without novelty bonus
+(state $rule $f $n $s $e $c $i) if
+    (feasibility $rule $f)
+    (novelty $rule $n)
+    not (novelty-bonus $rule $_)
+    (simplicity $rule $s)
+    (ethical $rule $e)
+    (consistency $rule $c)
+    (information $rule $i) <0.90, 0.90>
+
+
+;; ── SECTION 4: Chain Propagation ──────────────────────────────────────
+;;
+;; When a fact passes through a rule, the state vectors combine.
+;; CRITICAL: each dimension has a DIFFERENT operator.
+;;
+;;   feasibility:  multiply   — chain weakens confidence
+;;   novelty:      max        — novelty of the most novel part
+;;   simplicity:   min        — complexity of the most complex part
+;;   ethics:       min        — weakest ethical link breaks chain
+;;   consistency:  multiply   — inconsistency compounds through chains
+;;   information:  prob-OR    — combined info (1-(1-a)(1-b))
+;;
+;; This is the tensor product ⊗ adapted for reasoning.
+
+(chain-state $result $fact $rule) if
+    (state $fact $f1 $n1 $s1 $e1 $c1 $i1)
+    (state $rule $f2 $n2 $s2 $e2 $c2 $i2)
+    ;; Per-dimension operators (flat arithmetic)
+    (* $f1 $f2 $f3)
+    (max $n1 $n2 $n3)
+    (min $s1 $s2 $s3)
+    (min $e1 $e2 $e3)
+    (* $c1 $c2 $c3)
+    (+ $i1 $i2 $i_sum)
+    (* $i1 $i2 $i_prod)
+    (- $i_sum $i_prod $i3)
+    (state $result $f3 $n3 $s3 $e3 $c3 $i3)
+    <0.95, 0.95>
+
+;; Multi-hop chain: three levels deep
+(chain-state-3 $result $fact $rule1 $rule2) if
+    (chain-state $mid $fact $rule1)
+    (chain-state $result $mid $rule2) <0.90, 0.90>
+
+
+;; ── SECTION 5: Superposition ──────────────────────────────────────────
+;;
+;; Quantum analogy: all candidate rules exist simultaneously.
+;; None is "real" until measured against training data.
+;;
+;; genesis_swarm in invent.rs IS superposition —
+;; multiple workers explore different strategies in parallel.
+
+(in-superposition $puzzle) if
+    (proposed $puzzle $c1)
+    (proposed $puzzle $c2)
+    not (same-as $c1 $c2)
+    not (collapsed $puzzle $_) <0.90, 0.90>
+
+;; Count candidates in superposition
+(superposition-size $puzzle $count) if
+    (in-superposition $puzzle)
+    (count-proposed $puzzle $count) <0.90, 0.90>
+
+
+;; ── SECTION 6: Measurement / Collapse ─────────────────────────────────
+;;
+;; "Measurement" = scoring against training data.
+;; Collapses superposition to a single accepted rule (or set of rules).
+;;
+;; The combined score is the projection from N-dim → 1-dim decision.
+;; Weights reflect priority: accuracy > consistency > simplicity > novelty > info
+
+(combined-score $rule $score) if
+    (state $rule $f $n $s $e $c $i)
+    (* 0.35 $f $w1)
+    (* 0.20 $c $w2)
+    (* 0.15 $s $w3)
+    (* 0.15 $n $w4)
+    (* 0.10 $i $w5)
+    (* 0.05 $e $w6)
+    (+ $w1 $w2 $s12)
+    (+ $s12 $w3 $s13)
+    (+ $s13 $w4 $s14)
+    (+ $s14 $w5 $s15)
+    (+ $s15 $w6 $score) <0.90, 0.90>
+
+;; Adaptive threshold — more candidates → be pickier
+;; Few candidates → lower bar (take what you can get)
+;; Many candidates → raise bar (be selective)
+;;
+;; Formula: threshold = 0.40 + 0.05 × min(candidate_count, 10)
+;;   1 candidate  → 0.45  (lenient)
+;;   5 candidates → 0.65  (moderate)
+;;   10+ candidates → 0.90 (strict)
+
+(approval-threshold $puzzle $t) if
+    (superposition-size $puzzle $count)
+    (min $count 10 $capped)
+    (* 0.05 $capped $t1)
+    (+ 0.40 $t1 $t) <0.95, 0.95>
+
+;; Default threshold when count unknown
+(approval-threshold $puzzle 0.60) if
+    not (superposition-size $puzzle $_) <0.80, 0.80>
+
+;; ── Collapse: accept ──────────────────────────────────────────────────
+(collapse $rule accept) if
+    (state $rule $f $n $s $e $c $i)
+    (combined-score $rule $score)
+    (approval-threshold $puzzle $t)
+    (proposed-for $rule $puzzle)
+    (> $e 0.5)           ;; ethics GATE — must pass regardless of score
+    (> $score $t)         ;; must exceed adaptive threshold
+    <0.90, 0.90>
+
+;; ── Collapse: reject — ethics veto ────────────────────────────────────
+;; Instant rejection if ethics violated. No score can override this.
+(collapse $rule reject) if
+    (state $rule $f $n $s $e $c $i)
+    (< $e 0.5) <0.99, 0.99>
+
+;; ── Collapse: reject — below threshold ────────────────────────────────
+(collapse $rule reject) if
+    (combined-score $rule $score)
+    (approval-threshold $puzzle $t)
+    (proposed-for $rule $puzzle)
+    (< $score $t) <0.85, 0.85>
+
+;; ── Winner selection — best surviving candidate ───────────────────────
+(collapsed $puzzle $winner) if
+    (collapse $winner accept)
+    (proposed-for $winner $puzzle)
+    (combined-score $winner $score)
+    not (better-candidate $puzzle $winner) <0.95, 0.95>
+
+(better-candidate $puzzle $rule) if
+    (collapse $other accept)
+    (proposed-for $other $puzzle)
+    (combined-score $rule $score_r)
+    (combined-score $other $score_o)
+    (> $score_o $score_r)
+    not (same-as $rule $other) <0.90, 0.90>
+
+
+;; ── SECTION 7: Entanglement ───────────────────────────────────────────
+;;
+;; Quantum entanglement: two rules whose fates are linked.
+;; If rule A and rule B conflict (can't both be true),
+;; accepting A forces rejection of B.
+;;
+;; This prevents the system from keeping contradictory rules.
+
+(entangled $rule_a $rule_b) if
+    (shares-predicate $rule_a $rule_b $pred)
+    (contradicts $rule_a $rule_b)
+    not (same-as $rule_a $rule_b) <0.85, 0.85>
+
+;; Detect contradiction: same input conditions, different outputs
+(contradicts $rule_a $rule_b) if
+    (same-body $rule_a $rule_b)
+    (different-head $rule_a $rule_b) <0.90, 0.90>
+
+;; Resolve entanglement: keep higher-scoring rule
+(resolve-entanglement $keep $drop) if
+    (entangled $keep $drop)
+    (combined-score $keep $score_k)
+    (combined-score $drop $score_d)
+    (> $score_k $score_d) <0.90, 0.90>
+
+;; Dropped rules are marked — never re-proposed in this session
+(blocked $rule) if
+    (resolve-entanglement $_ $rule) <0.95, 0.95>
+
+
+;; ── SECTION 8: Creative Strategy Layer ────────────────────────────────
+;;
+;; The creative layer proposes NEW rules by combining existing ones.
+;; It sits between base facts and meta-rule approval.
+
+;; A creative strategy is born from combining multiple rules/facts
+(creative-strategy $strategy) if
+    (proposed $strategy $source)
+    (state $strategy $f $n $s $e $c $i)
+    (> $f 0.3)          ;; at least somewhat feasible
+    (> $e 0.5)          ;; must be ethical
+    not (blocked $strategy) <0.90, 0.90>
+
+;; Cross-domain creative strategy gets bonus trust
+(creative-strategy-cross $strategy) if
+    (creative-strategy $strategy)
+    (combines-domains $strategy $domain1 $domain2)
+    not (same-as $domain1 $domain2) <0.85, 0.85>
+
+
+;; ── SECTION 9: Meta-Rule Approval ─────────────────────────────────────
+;;
+;; The highest layer. A strategy becomes a real rule only after
+;; meta-rule approval. This is the consensus mechanism.
+
+(meta-rule $strategy) if
+    (creative-strategy $strategy)
+    (collapse $strategy accept) <0.95, 0.95>
+
+;; Generate the actual rule — this is the output of the whole system
+(generate-rule $strategy) if
+    (meta-rule $strategy)
+    (simulate $strategy $outcome)
+    (approval-threshold $puzzle $t)
+    (proposed-for $strategy $puzzle)
+    (> $outcome $t) <0.90, 0.90>
+
+
+;; ── SECTION 10: Feedback Loop ─────────────────────────────────────────
+;;
+;; After a generated rule is USED in production, track the outcome.
+;; This closes the loop: outcomes feed back into future scoring.
+;;
+;; Without this, the system never learns from its own mistakes.
+
+;; Track success
+(meta-rule-outcome $strategy success) if
+    (generate-rule $strategy)
+    (applied $strategy $result)
+    (> $result 0.8) <0.95, 0.95>
+
+;; Track failure
+(meta-rule-outcome $strategy failure) if
+    (generate-rule $strategy)
+    (applied $strategy $result)
+    (< $result 0.3) <0.95, 0.95>
+
+;; Track partial
+(meta-rule-outcome $strategy partial) if
+    (generate-rule $strategy)
+    (applied $strategy $result)
+    (>= $result 0.3)
+    (<= $result 0.8) <0.85, 0.85>
+
+;; ── Source trust — track record of rule sources ───────────────────────
+;; Sources that produce winning rules get higher trust for future proposals.
+;; Sources that produce failures get lower trust.
+
+(source-trust $source $trust) if
+    (count-source-outcomes $source success $wins)
+    (count-source-outcomes $source failure $losses)
+    (count-source-outcomes $source partial $partials)
+    (+ $wins $losses $wl)
+    (+ $wl $partials $total)
+    (* 0.5 $partials $half_p)
+    (+ $wins $half_p $numerator)
+    (max $total 1 $safe_total)
+    (/ $numerator $safe_total $trust) <0.85, 0.85>
+
+;; Default trust for new sources
+(source-trust $source 0.5) if
+    (source-exists $source)
+    not (count-source-outcomes $source $_ $_) <0.70, 0.70>
+
+;; Source trust adjusts approval threshold
+;; Trusted sources get a lower bar (their proposals are more likely good)
+(source-adjusted-threshold $rule $adjusted_t) if
+    (proposed $rule $source)
+    (source-trust $source $trust)
+    (proposed-for $rule $puzzle)
+    (approval-threshold $puzzle $base_t)
+    (* 0.1 $trust $t1)
+    (- $base_t $t1 $adjusted_t) <0.85, 0.85>
+
+
+;; ── SECTION 11: Uncertainty Quantification ────────────────────────────
+;;
+;; Dempster-Shafer uncertainty = plausibility - trust
+;; When uncertainty is HIGH, the system should:
+;;   1. Explore more (widen search)
+;;   2. Be more lenient on approval
+;;   3. Seek more training data
+;;
+;; When uncertainty is LOW:
+;;   1. Exploit (refine existing rules)
+;;   2. Be stricter on approval
+;;   3. Focus on simplicity
+
+(uncertainty $rule $gap) if
+    (state $rule $f $n $s $e $c $i)
+    (overall-confidence $rule $trust $plausibility)
+    (- $plausibility $trust $gap) <0.90, 0.90>
+
+;; High uncertainty → explore
+(strategy-mode explore) if
+    (average-uncertainty $avg_gap)
+    (> $avg_gap 0.3) <0.85, 0.85>
+
+;; Low uncertainty → exploit
+(strategy-mode exploit) if
+    (average-uncertainty $avg_gap)
+    (< $avg_gap 0.1) <0.85, 0.85>
+
+;; Moderate uncertainty → balanced
+(strategy-mode balanced) if
+    (average-uncertainty $avg_gap)
+    (>= $avg_gap 0.1)
+    (<= $avg_gap 0.3) <0.85, 0.85>
+
+;; Mode affects genesis behavior
+(genesis-hint wide-search) if
+    (strategy-mode explore) <0.90, 0.90>
+
+(genesis-hint refine-top) if
+    (strategy-mode exploit) <0.90, 0.90>
+
+(genesis-hint balanced-search) if
+    (strategy-mode balanced) <0.90, 0.90>
+
+
+;; ── SECTION 12: Decoherence ───────────────────────────────────────────
+;;
+;; Quantum decoherence: environment destroys superposition.
+;; In our system: over time, unused/low-scoring candidates decay.
+;; This prevents memory bloat and keeps the system focused.
+
+(decohered $rule) if
+    (proposed $rule $source)
+    (age $rule $age)
+    (combined-score $rule $score)
+    (* 0.01 $age $t1)
+    (- 0.90 $t1 $decay_threshold)
+    (< $score $decay_threshold) <0.80, 0.80>
+
+;; Decohered rules are removed from superposition
+(prune $rule) if
+    (decohered $rule)
+    not (meta-rule $rule) <0.90, 0.90>
+
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── END OF META-RULE SYSTEM
+;; ══════════════════════════════════════════════════════════════════════
+;;
+;; Execution flow:
+;;
+;;   1. PROPOSE → candidates enter superposition
+;;   2. SCORE   → each dimension computed independently
+;;   3. STATE   → 6D vector assembled
+;;   4. CHAIN   → propagation through rule chains (tensor product)
+;;   5. COMBINE → combined score (N-dim → 1-dim projection)
+;;   6. GATE    → ethics check (binary pass/fail)
+;;   7. COLLAPSE → above threshold? accept : reject
+;;   8. ENTANGLE → resolve contradictions between accepted rules
+;;   9. GENERATE → winning rules become real
+;;  10. FEEDBACK → track outcomes, adjust source trust
+;;  11. DECAY   → prune low-scoring old candidates (decoherence)
+;;
+;; The system learns from its own output and improves over time.
+;; Cross-domain discoveries get novelty bonuses.
+;; Ethical violations are hard vetoes that no score can override.
+;; Simplicity is rewarded — shorter rules generalize better.
+;; Consistency across examples prevents overfitting.
+;; ══════════════════════════════════════════════════════════════════════

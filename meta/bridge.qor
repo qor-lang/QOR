@@ -1,0 +1,249 @@
+;; ═══════════════════════════════════════════════════════════════════
+;; BRIDGE — Translate grid.rs observations → reasoning.qor inputs
+;; ═══════════════════════════════════════════════════════════════════
+;;
+;; grid.rs produces: obs-consistent, obs-parameter, grid-size, grid-cell
+;; reasoning.qor needs: conserved, has-symmetry, state-before, frequency, etc.
+;;
+;; This file bridges the gap so reasoning.qor strategies actually fire.
+;; Loaded AFTER classify.qor, BEFORE reasoning.qor.
+;;
+;; GENERIC: no domain-specific predicates. Translates any obs-* fact.
+;; ═══════════════════════════════════════════════════════════════════
+
+
+;; ── STRATEGY 1 (GAUSS): Conservation Laws ───────────────────────
+
+;; Shape conservation: same input/output dimensions
+(conserved shape puzzle) if
+    (obs-consistent same-size) <0.95, 0.95>
+
+;; Element count conservation: same number of cells
+(conserved element-count puzzle) if
+    (obs-consistent same-cell-count) <0.95, 0.95>
+
+;; Value set conservation: same set of colors/values used
+(conserved value-set puzzle) if
+    (obs-consistent value-set-preserved) <0.95, 0.95>
+
+;; Object count conservation
+(conserved object-count puzzle) if
+    (obs-consistent same-object-count) <0.95, 0.95>
+
+
+;; ── STRATEGY 2 (EULER): Symmetry & Reduction ────────────────────
+
+;; Symmetry detected from geometric transform observations
+(has-symmetry puzzle horizontal) if
+    (obs-consistent reflect-h) <0.90, 0.90>
+
+(has-symmetry puzzle vertical) if
+    (obs-consistent reflect-v) <0.90, 0.90>
+
+(has-symmetry puzzle diagonal) if
+    (obs-consistent transpose) <0.85, 0.85>
+
+;; Structural decomposition: separator = independent components
+(independent-components puzzle 2) if
+    (obs-consistent has-separator) <0.85, 0.85>
+
+;; 2D structure present (for try-transpose strategy)
+(has-2d-structure puzzle) if
+    (grid-size input-1 $r $c) <0.95, 0.95>
+
+
+;; ── STRATEGY 3 (SHANNON): Information Focus ─────────────────────
+
+;; Background detection from fill color
+(background puzzle $bg) if
+    (obs-fill-color $bg) <0.85, 0.85>
+
+
+;; ── STRATEGY 4 (RAMANUJAN): Scale & Partition ───────────────────
+
+;; Scale relationship from uniform-scale observation
+(scale-related input output $factor) if
+    (obs-uniform-scale $factor)
+    (> $factor 1) <0.95, 0.95>
+
+;; Size from grid dimensions (for scale detection)
+(size input $s) if
+    (grid-size input-1 $rows $cols)
+    (* $rows $cols $s) <0.95, 0.95>
+
+(size output $s) if
+    (grid-size output-1 $rows $cols)
+    (* $rows $cols $s) <0.95, 0.95>
+
+
+;; ── STRATEGY 5 (VEDIC SUTRAS) ───────────────────────────────────
+
+;; Failed direct approach — when a direct transform was tried but doesn't match
+;; reasoning.qor uses this for try-transpose and try-inverse-mapping
+(failed-direct puzzle) if
+    not (obs-consistent same-size)
+    not (obs-consistent pure-color-change) <0.70, 0.70>
+
+
+;; ── STRATEGY 6 (PĀṆINI): Identity + Exception ──────────────────
+
+;; Mostly unchanged: localized change means most cells are identity
+(mostly-unchanged puzzle 0.1) if
+    (obs-consistent localized-change) <0.90, 0.88>
+
+;; Total elements and changed elements for Pāṇini ratio computation
+;; (total-elements computed from grid size)
+(total-elements puzzle $total) if
+    (grid-size input-1 $rows $cols)
+    (* $rows $cols $total) <0.95, 0.95>
+
+
+;; ── STRATEGY 8 (NOETHER): Cross-example consistency ─────────────
+
+;; (conserved facts above feed directly into Noether's universal-law rule)
+;; No extra bridge needed — reasoning.qor's universal-law checks
+;; (conserved $property $example1) (conserved $property $example2)
+;; and our conserved facts use "puzzle" as the problem name.
+
+
+;; ── STRATEGY 11 (PÓLYA): Decomposition ─────────────────────────
+
+;; Color change detected
+(has-color-change puzzle) if
+    (obs-consistent pure-color-change) <0.92, 0.90>
+
+(has-color-change puzzle) if
+    (obs-consistent pure-recolor) <0.92, 0.90>
+
+(has-color-change puzzle) if
+    (obs-consistent new-values-introduced) <0.85, 0.85>
+
+;; Spatial change detected
+(has-spatial-change puzzle) if
+    (obs-parameter shift-dr $dr) <0.90, 0.88>
+
+(has-spatial-change puzzle) if
+    (obs-consistent content-rearranged) <0.90, 0.88>
+
+
+;; ── STRATEGY 13 (LEIBNIZ): Binary Classification ───────────────
+
+;; These feed the binary-question rules in reasoning.qor.
+;; (conserved shape puzzle) → binary-question same-size yes
+;; (conserved value-set puzzle) → binary-question colors-preserved yes
+;; (has-spatial-change puzzle) → binary-question spatial-change yes
+;; All bridged above — Leibniz classification tree fires automatically.
+
+
+;; ── STRATEGY 15 (ĀRYABHAṬA): Direct Computation ────────────────
+
+;; When we have both the consistent observation AND the parameter value,
+;; the transform is directly computable (no search needed).
+(observation-parameter puzzle color-remap $from) if
+    (obs-parameter color-remap $from $to) <0.92, 0.90>
+
+(observation-parameter puzzle shift $dr) if
+    (obs-parameter shift-dr $dr) <0.92, 0.90>
+
+(observation-parameter puzzle scale $factor) if
+    (obs-uniform-scale $factor) <0.92, 0.90>
+
+(observation-parameter puzzle fill $color) if
+    (obs-enclosed-fill-color $from $color) <0.92, 0.90>
+
+;; obs-consistent already matches Āryabhaṭa's directly-computable rule:
+;; (directly-computable $problem $type) if
+;;     (obs-consistent $type)
+;;     (observation-parameter $problem $type $value)
+;; Our obs-consistent facts + observation-parameter above → this fires.
+
+
+;; ── STRATEGY 16 (CANTOR): Bijection Detection ──────────────────
+
+;; obs-consistent value-set-preserved + same-cell-count → likely bijective
+;; obs-consistent values-removed → lossy (not bijective)
+(lossy puzzle) if
+    (obs-consistent values-removed) <0.85, 0.85>
+
+(lossy puzzle) if
+    (obs-consistent fewer-objects) <0.80, 0.80>
+
+
+;; ── OUTPUT STRUCTURE FACTS ──────────────────────────────────────
+;; These help reasoning.qor classify the problem type.
+
+(output-binary puzzle) if
+    (obs-consistent output-binary) <0.90, 0.88>
+
+(output-tiny puzzle) if
+    (obs-consistent output-tiny) <0.92, 0.90>
+
+(output-subgrid puzzle) if
+    (obs-consistent output-is-subgrid) <0.90, 0.88>
+
+(output-one-row puzzle) if
+    (obs-consistent output-1-row) <0.90, 0.88>
+
+(output-one-col puzzle) if
+    (obs-consistent output-1-col) <0.90, 0.88>
+
+
+;; ── PER-CELL BRIDGES ─────────────────────────────────────────────
+;; Translate grid-cell → state-before/state-after for Vedic Sutras.
+;; Also bridge to input-cell/output-cell for qor_arc_additions rules.
+;;
+;; Position encoded as ($row $col) — 2 args instead of 1.
+;; reasoning.qor's state-before uses ($problem $pos $val) with 1 pos,
+;; but these 4-arg versions enable diff-cell and cell-mapping rules.
+
+;; input-cell / output-cell aliases for training pair 1
+(input-cell 1 $r $c $v) if
+    (grid-cell input-1 $r $c $v) <0.99, 0.99>
+
+(output-cell 1 $r $c $v) if
+    (grid-cell output-1 $r $c $v) <0.99, 0.99>
+
+;; training pair 2
+(input-cell 2 $r $c $v) if
+    (grid-cell input-2 $r $c $v) <0.99, 0.99>
+
+(output-cell 2 $r $c $v) if
+    (grid-cell output-2 $r $c $v) <0.99, 0.99>
+
+;; training pair 3
+(input-cell 3 $r $c $v) if
+    (grid-cell input-3 $r $c $v) <0.99, 0.99>
+
+(output-cell 3 $r $c $v) if
+    (grid-cell output-3 $r $c $v) <0.99, 0.99>
+
+;; Difference grid (from qor_arc_additions Section B)
+;; Changed cells between input and output
+(diff-cell $id $r $c $delta) if
+    (input-cell $id $r $c $in_v)
+    (output-cell $id $r $c $out_v)
+    (- $out_v $in_v $delta)
+    (!= $delta 0) <0.99, 0.99>
+
+;; Color frequency per training pair input
+(color-freq-input $id $color $count) if
+    (count (input-cell $id $r $c $color) $r -> $count) <0.99, 0.99>
+
+;; Color frequency per training pair output
+(color-freq-output $id $color $count) if
+    (count (output-cell $id $r $c $color) $r -> $count) <0.99, 0.99>
+
+;; Color distribution changed → color remap or filter
+(color-distribution-changed $id) if
+    (color-freq-input $id $color $in_count)
+    (color-freq-output $id $color $out_count)
+    (!= $in_count $out_count) <0.90, 0.90>
+
+;; Color distribution preserved → purely spatial transform
+(color-distribution-preserved $id) if
+    not (color-distribution-changed $id) <0.90, 0.90>
+
+
+;; ═══════════════════════════════════════════════════════════════════
+;; END OF BRIDGE
+;; ═══════════════════════════════════════════════════════════════════

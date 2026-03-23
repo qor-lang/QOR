@@ -1,0 +1,506 @@
+;; ═══════════════════════════════════════════════════════════════════════
+;; MATH KNOWLEDGE DNA — math.qor
+;; ═══════════════════════════════════════════════════════════════════════
+;; This IS your AI's math brain. Every formula here = knowledge it HAS.
+;; Add more formulas = AI knows more math. Simple.
+;;
+;; Sources: Every math textbook ever written, distilled into QOR rules.
+;; ═══════════════════════════════════════════════════════════════════════
+
+
+;; ─── 1. BASIC ARITHMETIC IDENTITIES ─────────────────────────────────
+
+;; Commutative laws
+(math-law commutative-add "a + b = b + a") <0.99, 0.99>
+(math-law commutative-mul "a * b = b * a") <0.99, 0.99>
+
+;; Associative laws
+(math-law associative-add "(a + b) + c = a + (b + c)") <0.99, 0.99>
+(math-law associative-mul "(a * b) * c = a * (b * c)") <0.99, 0.99>
+
+;; Distributive law
+(math-law distributive "a * (b + c) = a*b + a*c") <0.99, 0.99>
+
+;; Identity elements
+(math-law additive-identity "a + 0 = a") <0.99, 0.99>
+(math-law multiplicative-identity "a * 1 = a") <0.99, 0.99>
+
+;; Inverse elements
+(math-law additive-inverse "a + (-a) = 0") <0.99, 0.99>
+(math-law multiplicative-inverse "a * (1/a) = 1 when a != 0") <0.99, 0.99>
+
+;; Zero property
+(math-law zero-product "a * 0 = 0") <0.99, 0.99>
+
+;; Division
+(math-law division-def "a / b = a * (1/b) when b != 0") <0.99, 0.99>
+(math-law division-by-self "a / a = 1 when a != 0") <0.99, 0.99>
+
+;; Sign rules
+(math-law neg-times-neg "(-a) * (-b) = a * b") <0.99, 0.99>
+(math-law neg-times-pos "(-a) * b = -(a * b)") <0.99, 0.99>
+
+;; Absolute value
+(math-law abs-def "|a| = a if a >= 0, -a if a < 0") <0.99, 0.99>
+(math-law abs-product "|a * b| = |a| * |b|") <0.99, 0.99>
+(math-law triangle-inequality "|a + b| <= |a| + |b|") <0.99, 0.99>
+
+
+;; ─── 2. EXPONENTS AND ROOTS ─────────────────────────────────────────
+
+(math-law exp-product "a^m * a^n = a^(m+n)") <0.99, 0.99>
+(math-law exp-quotient "a^m / a^n = a^(m-n)") <0.99, 0.99>
+(math-law exp-power "(a^m)^n = a^(m*n)") <0.99, 0.99>
+(math-law exp-product-base "(a*b)^n = a^n * b^n") <0.99, 0.99>
+(math-law exp-zero "a^0 = 1 when a != 0") <0.99, 0.99>
+(math-law exp-one "a^1 = a") <0.99, 0.99>
+(math-law exp-negative "a^(-n) = 1 / a^n") <0.99, 0.99>
+(math-law exp-fraction "a^(1/n) = nth-root(a)") <0.99, 0.99>
+(math-law sqrt-def "sqrt(a) = a^(1/2)") <0.99, 0.99>
+(math-law sqrt-product "sqrt(a*b) = sqrt(a) * sqrt(b)") <0.99, 0.99>
+(math-law sqrt-quotient "sqrt(a/b) = sqrt(a) / sqrt(b)") <0.99, 0.99>
+
+
+;; ─── 3. LOGARITHMS ──────────────────────────────────────────────────
+
+(math-law log-def "log_b(x) = y means b^y = x") <0.99, 0.99>
+(math-law log-product "log(a*b) = log(a) + log(b)") <0.99, 0.99>
+(math-law log-quotient "log(a/b) = log(a) - log(b)") <0.99, 0.99>
+(math-law log-power "log(a^n) = n * log(a)") <0.99, 0.99>
+(math-law log-one "log_b(1) = 0") <0.99, 0.99>
+(math-law log-base "log_b(b) = 1") <0.99, 0.99>
+(math-law log-change-base "log_b(x) = log_c(x) / log_c(b)") <0.99, 0.99>
+(math-law ln-def "ln(x) = log_e(x)") <0.99, 0.99>
+(math-law log10-def "log(x) = log_10(x)") <0.99, 0.99>
+(math-law exp-log "b^(log_b(x)) = x") <0.99, 0.99>
+(math-law log-exp "log_b(b^x) = x") <0.99, 0.99>
+
+
+;; ─── 4. ALGEBRA — POLYNOMIALS ───────────────────────────────────────
+
+;; Quadratic
+(math-formula quadratic-formula "x = (-b ± sqrt(b²-4ac)) / (2a)" for "ax² + bx + c = 0") <0.99, 0.99>
+(math-formula discriminant "D = b² - 4ac" determines "number of real roots") <0.99, 0.99>
+(math-fact discriminant-positive "D > 0 means 2 real roots") <0.99, 0.99>
+(math-fact discriminant-zero "D = 0 means 1 real root (repeated)") <0.99, 0.99>
+(math-fact discriminant-negative "D < 0 means 0 real roots (2 complex)") <0.99, 0.99>
+
+;; Vieta's formulas (roots and coefficients)
+(math-formula vieta-sum "x1 + x2 = -b/a" for "ax² + bx + c = 0") <0.99, 0.99>
+(math-formula vieta-product "x1 * x2 = c/a" for "ax² + bx + c = 0") <0.99, 0.99>
+
+;; Factoring patterns
+(math-law difference-of-squares "a² - b² = (a+b)(a-b)") <0.99, 0.99>
+(math-law perfect-square-plus "(a+b)² = a² + 2ab + b²") <0.99, 0.99>
+(math-law perfect-square-minus "(a-b)² = a² - 2ab + b²") <0.99, 0.99>
+(math-law sum-of-cubes "a³ + b³ = (a+b)(a² - ab + b²)") <0.99, 0.99>
+(math-law diff-of-cubes "a³ - b³ = (a-b)(a² + ab + b²)") <0.99, 0.99>
+(math-law cube-of-sum "(a+b)³ = a³ + 3a²b + 3ab² + b³") <0.99, 0.99>
+
+;; Binomial theorem
+(math-formula binomial-theorem "(a+b)^n = Σ C(n,k) * a^(n-k) * b^k for k=0..n") <0.99, 0.99>
+
+;; Polynomial division
+(math-law remainder-theorem "f(a) = remainder when f(x) divided by (x-a)") <0.99, 0.99>
+(math-law factor-theorem "f(a) = 0 iff (x-a) is factor of f(x)") <0.99, 0.99>
+
+
+;; ─── 5. NUMBER THEORY ───────────────────────────────────────────────
+
+;; Divisibility
+(math-law division-algorithm "a = b*q + r where 0 <= r < b") <0.99, 0.99>
+(math-law gcd-def "gcd(a,b) = largest d that divides both a and b") <0.99, 0.99>
+(math-law lcm-def "lcm(a,b) = smallest m divisible by both a and b") <0.99, 0.99>
+(math-formula gcd-lcm-relation "gcd(a,b) * lcm(a,b) = a * b") <0.99, 0.99>
+(math-law euclidean-algorithm "gcd(a,b) = gcd(b, a mod b)") <0.99, 0.99>
+(math-law coprime-def "gcd(a,b) = 1 means a and b are coprime") <0.99, 0.99>
+
+;; Primes
+(math-law prime-def "p is prime iff p > 1 and only divisors are 1 and p") <0.99, 0.99>
+(math-law fundamental-theorem-arithmetic "every n > 1 has unique prime factorization") <0.99, 0.99>
+(math-law infinite-primes "there are infinitely many primes") <0.99, 0.99>
+(math-law prime-test "to test if n is prime, check divisors up to sqrt(n)") <0.99, 0.99>
+
+;; Modular arithmetic
+(math-law mod-add "(a+b) mod m = ((a mod m) + (b mod m)) mod m") <0.99, 0.99>
+(math-law mod-mul "(a*b) mod m = ((a mod m) * (b mod m)) mod m") <0.99, 0.99>
+(math-law mod-power "a^n mod m can be computed by repeated squaring") <0.99, 0.99>
+(math-law fermat-little "a^(p-1) ≡ 1 (mod p) when p prime and gcd(a,p)=1") <0.99, 0.99>
+
+;; Fibonacci
+(math-formula fibonacci-recurrence "F(n) = F(n-1) + F(n-2)") <0.99, 0.99>
+(math-fact fibonacci-base "F(0) = 0, F(1) = 1") <0.99, 0.99>
+(math-formula binet-formula "F(n) = (φ^n - ψ^n) / sqrt(5) where φ=(1+sqrt(5))/2") <0.99, 0.99>
+
+;; Famous sequences
+(math-formula triangular-number "T(n) = n*(n+1)/2") <0.99, 0.99>
+(math-formula square-number "S(n) = n²") <0.99, 0.99>
+(math-formula pentagonal-number "P(n) = n*(3n-1)/2") <0.99, 0.99>
+(math-formula catalan-number "C(n) = (2n)! / ((n+1)! * n!)") <0.99, 0.99>
+
+
+;; ─── 6. COMBINATORICS ───────────────────────────────────────────────
+
+(math-formula factorial "n! = n * (n-1) * (n-2) * ... * 1") <0.99, 0.99>
+(math-fact factorial-zero "0! = 1") <0.99, 0.99>
+(math-formula permutation "P(n,k) = n! / (n-k)!") <0.99, 0.99>
+(math-formula combination "C(n,k) = n! / (k! * (n-k)!)") <0.99, 0.99>
+(math-law combination-symmetry "C(n,k) = C(n, n-k)") <0.99, 0.99>
+(math-formula pascal-identity "C(n,k) = C(n-1,k-1) + C(n-1,k)") <0.99, 0.99>
+(math-formula stars-and-bars "C(n+k-1, k-1) ways to put n items in k bins") <0.99, 0.99>
+(math-formula inclusion-exclusion "|A∪B| = |A| + |B| - |A∩B|") <0.99, 0.99>
+(math-formula pigeonhole "n+1 items in n boxes means some box has >= 2") <0.99, 0.99>
+(math-formula derangement "D(n) = n! * Σ(-1)^k/k! for k=0..n") <0.99, 0.99>
+
+
+;; ─── 7. GEOMETRY — 2D ───────────────────────────────────────────────
+
+;; Triangles
+(math-formula triangle-area "A = base * height / 2") <0.99, 0.99>
+(math-formula triangle-area-heron "A = sqrt(s*(s-a)*(s-b)*(s-c)) where s=(a+b+c)/2") <0.99, 0.99>
+(math-formula triangle-perimeter "P = a + b + c") <0.99, 0.99>
+(math-law triangle-inequality "a + b > c for any triangle sides") <0.99, 0.99>
+(math-law angle-sum-triangle "angles of triangle sum to 180°") <0.99, 0.99>
+(math-formula pythagorean-theorem "a² + b² = c² for right triangle") <0.99, 0.99>
+
+;; Rectangles
+(math-formula rectangle-area "A = length * width") <0.99, 0.99>
+(math-formula rectangle-perimeter "P = 2*(length + width)") <0.99, 0.99>
+(math-formula rectangle-diagonal "d = sqrt(l² + w²)") <0.99, 0.99>
+
+;; Circles
+(math-constant pi 3.14159265358979) <0.99, 0.99>
+(math-formula circle-area "A = π * r²") <0.99, 0.99>
+(math-formula circle-circumference "C = 2 * π * r") <0.99, 0.99>
+(math-formula circle-diameter "d = 2 * r") <0.99, 0.99>
+(math-formula arc-length "L = r * θ (θ in radians)") <0.99, 0.99>
+(math-formula sector-area "A = r² * θ / 2 (θ in radians)") <0.99, 0.99>
+
+;; Parallelogram
+(math-formula parallelogram-area "A = base * height") <0.99, 0.99>
+
+;; Trapezoid
+(math-formula trapezoid-area "A = (a + b) * h / 2") <0.99, 0.99>
+
+;; Regular polygon
+(math-formula regular-polygon-area "A = (n * s² * cot(π/n)) / 4") <0.99, 0.99>
+(math-formula polygon-angle-sum "sum of interior angles = (n-2) * 180°") <0.99, 0.99>
+(math-formula regular-polygon-angle "each angle = (n-2) * 180° / n") <0.99, 0.99>
+
+;; Coordinate geometry
+(math-formula distance-2d "d = sqrt((x2-x1)² + (y2-y1)²)") <0.99, 0.99>
+(math-formula midpoint "M = ((x1+x2)/2, (y1+y2)/2)") <0.99, 0.99>
+(math-formula slope "m = (y2-y1) / (x2-x1)") <0.99, 0.99>
+(math-formula slope-intercept "y = mx + b") <0.99, 0.99>
+(math-formula point-slope "y - y1 = m(x - x1)") <0.99, 0.99>
+(math-law parallel-slopes "parallel lines have equal slopes") <0.99, 0.99>
+(math-law perpendicular-slopes "perpendicular slopes multiply to -1") <0.99, 0.99>
+
+
+;; ─── 8. GEOMETRY — 3D ───────────────────────────────────────────────
+
+;; Cube
+(math-formula cube-volume "V = s³") <0.99, 0.99>
+(math-formula cube-surface-area "SA = 6s²") <0.99, 0.99>
+(math-formula cube-diagonal "d = s*sqrt(3)") <0.99, 0.99>
+
+;; Rectangular prism (box)
+(math-formula box-volume "V = l * w * h") <0.99, 0.99>
+(math-formula box-surface-area "SA = 2*(lw + lh + wh)") <0.99, 0.99>
+(math-formula box-diagonal "d = sqrt(l² + w² + h²)") <0.99, 0.99>
+
+;; Sphere
+(math-formula sphere-volume "V = (4/3) * π * r³") <0.99, 0.99>
+(math-formula sphere-surface-area "SA = 4 * π * r²") <0.99, 0.99>
+
+;; Cylinder
+(math-formula cylinder-volume "V = π * r² * h") <0.99, 0.99>
+(math-formula cylinder-surface-area "SA = 2πr² + 2πrh") <0.99, 0.99>
+
+;; Cone
+(math-formula cone-volume "V = (1/3) * π * r² * h") <0.99, 0.99>
+(math-formula cone-surface-area "SA = πr² + πr*sqrt(r²+h²)") <0.99, 0.99>
+(math-formula cone-slant-height "l = sqrt(r² + h²)") <0.99, 0.99>
+
+;; Pyramid
+(math-formula pyramid-volume "V = (1/3) * base_area * h") <0.99, 0.99>
+
+;; Distance 3D
+(math-formula distance-3d "d = sqrt((x2-x1)² + (y2-y1)² + (z2-z1)²)") <0.99, 0.99>
+
+
+;; ─── 9. TRIGONOMETRY ────────────────────────────────────────────────
+
+;; Definitions
+(math-formula sin-def "sin(θ) = opposite / hypotenuse") <0.99, 0.99>
+(math-formula cos-def "cos(θ) = adjacent / hypotenuse") <0.99, 0.99>
+(math-formula tan-def "tan(θ) = opposite / adjacent = sin(θ)/cos(θ)") <0.99, 0.99>
+(math-formula csc-def "csc(θ) = 1/sin(θ)") <0.99, 0.99>
+(math-formula sec-def "sec(θ) = 1/cos(θ)") <0.99, 0.99>
+(math-formula cot-def "cot(θ) = 1/tan(θ) = cos(θ)/sin(θ)") <0.99, 0.99>
+
+;; Pythagorean identities
+(math-law trig-pythag-1 "sin²(θ) + cos²(θ) = 1") <0.99, 0.99>
+(math-law trig-pythag-2 "1 + tan²(θ) = sec²(θ)") <0.99, 0.99>
+(math-law trig-pythag-3 "1 + cot²(θ) = csc²(θ)") <0.99, 0.99>
+
+;; Common values
+(math-fact sin-0 "sin(0) = 0") <0.99, 0.99>
+(math-fact sin-30 "sin(30°) = 1/2") <0.99, 0.99>
+(math-fact sin-45 "sin(45°) = sqrt(2)/2") <0.99, 0.99>
+(math-fact sin-60 "sin(60°) = sqrt(3)/2") <0.99, 0.99>
+(math-fact sin-90 "sin(90°) = 1") <0.99, 0.99>
+(math-fact cos-0 "cos(0) = 1") <0.99, 0.99>
+(math-fact cos-30 "cos(30°) = sqrt(3)/2") <0.99, 0.99>
+(math-fact cos-45 "cos(45°) = sqrt(2)/2") <0.99, 0.99>
+(math-fact cos-60 "cos(60°) = 1/2") <0.99, 0.99>
+(math-fact cos-90 "cos(90°) = 0") <0.99, 0.99>
+
+;; Angle sum/difference
+(math-formula sin-sum "sin(a+b) = sin(a)cos(b) + cos(a)sin(b)") <0.99, 0.99>
+(math-formula sin-diff "sin(a-b) = sin(a)cos(b) - cos(a)sin(b)") <0.99, 0.99>
+(math-formula cos-sum "cos(a+b) = cos(a)cos(b) - sin(a)sin(b)") <0.99, 0.99>
+(math-formula cos-diff "cos(a-b) = cos(a)cos(b) + sin(a)sin(b)") <0.99, 0.99>
+(math-formula tan-sum "tan(a+b) = (tan(a)+tan(b)) / (1-tan(a)tan(b))") <0.99, 0.99>
+
+;; Double angle
+(math-formula sin-double "sin(2θ) = 2sin(θ)cos(θ)") <0.99, 0.99>
+(math-formula cos-double "cos(2θ) = cos²(θ) - sin²(θ)") <0.99, 0.99>
+(math-formula cos-double-2 "cos(2θ) = 2cos²(θ) - 1") <0.99, 0.99>
+(math-formula cos-double-3 "cos(2θ) = 1 - 2sin²(θ)") <0.99, 0.99>
+(math-formula tan-double "tan(2θ) = 2tan(θ) / (1-tan²(θ))") <0.99, 0.99>
+
+;; Half angle
+(math-formula sin-half "sin(θ/2) = ±sqrt((1-cos(θ))/2)") <0.99, 0.99>
+(math-formula cos-half "cos(θ/2) = ±sqrt((1+cos(θ))/2)") <0.99, 0.99>
+
+;; Law of sines and cosines
+(math-formula law-of-sines "a/sin(A) = b/sin(B) = c/sin(C)") <0.99, 0.99>
+(math-formula law-of-cosines "c² = a² + b² - 2ab*cos(C)") <0.99, 0.99>
+
+;; Radians
+(math-formula degrees-to-radians "radians = degrees * π / 180") <0.99, 0.99>
+(math-formula radians-to-degrees "degrees = radians * 180 / π") <0.99, 0.99>
+
+
+;; ─── 10. CALCULUS ───────────────────────────────────────────────────
+
+;; Limits
+(math-formula limit-def "lim x→a f(x) = L") <0.99, 0.99>
+(math-law limit-sum "lim(f+g) = lim(f) + lim(g)") <0.99, 0.99>
+(math-law limit-product "lim(f*g) = lim(f) * lim(g)") <0.99, 0.99>
+
+;; Derivatives
+(math-formula derivative-def "f'(x) = lim h→0 (f(x+h)-f(x))/h") <0.99, 0.99>
+(math-formula power-rule "d/dx(x^n) = n*x^(n-1)") <0.99, 0.99>
+(math-formula constant-rule "d/dx(c) = 0") <0.99, 0.99>
+(math-formula sum-rule "d/dx(f+g) = f' + g'") <0.99, 0.99>
+(math-formula product-rule "d/dx(f*g) = f'*g + f*g'") <0.99, 0.99>
+(math-formula quotient-rule "d/dx(f/g) = (f'*g - f*g') / g²") <0.99, 0.99>
+(math-formula chain-rule "d/dx(f(g(x))) = f'(g(x)) * g'(x)") <0.99, 0.99>
+
+;; Common derivatives
+(math-formula deriv-sin "d/dx(sin(x)) = cos(x)") <0.99, 0.99>
+(math-formula deriv-cos "d/dx(cos(x)) = -sin(x)") <0.99, 0.99>
+(math-formula deriv-tan "d/dx(tan(x)) = sec²(x)") <0.99, 0.99>
+(math-formula deriv-exp "d/dx(e^x) = e^x") <0.99, 0.99>
+(math-formula deriv-ln "d/dx(ln(x)) = 1/x") <0.99, 0.99>
+(math-formula deriv-log "d/dx(log_a(x)) = 1/(x*ln(a))") <0.99, 0.99>
+
+;; Integrals
+(math-formula integral-power "∫x^n dx = x^(n+1)/(n+1) + C when n≠-1") <0.99, 0.99>
+(math-formula integral-reciprocal "∫(1/x) dx = ln|x| + C") <0.99, 0.99>
+(math-formula integral-exp "∫e^x dx = e^x + C") <0.99, 0.99>
+(math-formula integral-sin "∫sin(x) dx = -cos(x) + C") <0.99, 0.99>
+(math-formula integral-cos "∫cos(x) dx = sin(x) + C") <0.99, 0.99>
+(math-formula fundamental-theorem "∫_a^b f(x)dx = F(b) - F(a) where F'=f") <0.99, 0.99>
+
+;; Series
+(math-formula taylor-series "f(x) = Σ f^(n)(a)/n! * (x-a)^n for n=0..∞") <0.99, 0.99>
+(math-formula maclaurin-series "f(x) = Σ f^(n)(0)/n! * x^n (Taylor at a=0)") <0.99, 0.99>
+(math-formula exp-series "e^x = Σ x^n/n! for n=0..∞") <0.99, 0.99>
+(math-formula sin-series "sin(x) = x - x³/3! + x⁵/5! - x⁷/7! + ...") <0.99, 0.99>
+(math-formula cos-series "cos(x) = 1 - x²/2! + x⁴/4! - x⁶/6! + ...") <0.99, 0.99>
+(math-formula geometric-series "Σ r^n = 1/(1-r) for |r|<1, n=0..∞") <0.99, 0.99>
+
+;; Summation formulas
+(math-formula sum-naturals "Σk for k=1..n = n(n+1)/2") <0.99, 0.99>
+(math-formula sum-squares "Σk² for k=1..n = n(n+1)(2n+1)/6") <0.99, 0.99>
+(math-formula sum-cubes "Σk³ for k=1..n = (n(n+1)/2)²") <0.99, 0.99>
+(math-formula arithmetic-series "Σ(a+kd) for k=0..n-1 = n*(2a+(n-1)d)/2") <0.99, 0.99>
+(math-formula geometric-series-finite "Σ a*r^k for k=0..n-1 = a*(r^n-1)/(r-1)") <0.99, 0.99>
+
+
+;; ─── 11. LINEAR ALGEBRA ─────────────────────────────────────────────
+
+;; Vectors
+(math-formula dot-product "a·b = a1*b1 + a2*b2 + ... + an*bn") <0.99, 0.99>
+(math-formula dot-product-angle "a·b = |a|*|b|*cos(θ)") <0.99, 0.99>
+(math-formula cross-product-magnitude "|a×b| = |a|*|b|*sin(θ)") <0.99, 0.99>
+(math-formula vector-magnitude "|v| = sqrt(v1² + v2² + ... + vn²)") <0.99, 0.99>
+(math-law orthogonal-condition "a·b = 0 means a ⊥ b") <0.99, 0.99>
+
+;; Matrices
+(math-formula det-2x2 "det([[a,b],[c,d]]) = ad - bc") <0.99, 0.99>
+(math-formula matrix-inverse-2x2 "[[a,b],[c,d]]^-1 = (1/det)*[[d,-b],[-c,a]]") <0.99, 0.99>
+(math-law det-product "det(AB) = det(A)*det(B)") <0.99, 0.99>
+(math-law invertible-condition "A is invertible iff det(A) ≠ 0") <0.99, 0.99>
+(math-law matrix-transpose "(AB)^T = B^T * A^T") <0.99, 0.99>
+(math-formula cramers-rule "x_i = det(A_i) / det(A)") <0.99, 0.99>
+
+
+;; ─── 12. PROBABILITY AND STATISTICS ─────────────────────────────────
+
+;; Basic probability
+(math-formula probability "P(A) = favorable outcomes / total outcomes") <0.99, 0.99>
+(math-law probability-range "0 <= P(A) <= 1") <0.99, 0.99>
+(math-law probability-complement "P(not A) = 1 - P(A)") <0.99, 0.99>
+(math-formula probability-union "P(A∪B) = P(A) + P(B) - P(A∩B)") <0.99, 0.99>
+(math-formula conditional-prob "P(A|B) = P(A∩B) / P(B)") <0.99, 0.99>
+(math-formula bayes-theorem "P(A|B) = P(B|A)*P(A) / P(B)") <0.99, 0.99>
+(math-law independent-events "P(A∩B) = P(A)*P(B) when independent") <0.99, 0.99>
+
+;; Statistics
+(math-formula mean "μ = Σx_i / n") <0.99, 0.99>
+(math-formula variance "σ² = Σ(x_i - μ)² / n") <0.99, 0.99>
+(math-formula std-deviation "σ = sqrt(variance)") <0.99, 0.99>
+(math-formula median "middle value when sorted (or avg of two middle)") <0.99, 0.99>
+
+;; Distributions
+(math-formula binomial-probability "P(k) = C(n,k) * p^k * (1-p)^(n-k)") <0.99, 0.99>
+(math-formula binomial-mean "μ = n*p") <0.99, 0.99>
+(math-formula binomial-variance "σ² = n*p*(1-p)") <0.99, 0.99>
+(math-formula poisson-probability "P(k) = (λ^k * e^(-λ)) / k!") <0.99, 0.99>
+(math-formula normal-distribution "f(x) = (1/(σ*sqrt(2π))) * e^(-(x-μ)²/(2σ²))") <0.99, 0.99>
+
+;; Expected value
+(math-formula expected-value "E[X] = Σ x_i * P(x_i)") <0.99, 0.99>
+(math-law linearity-of-expectation "E[aX+bY] = a*E[X] + b*E[Y]") <0.99, 0.99>
+
+
+;; ─── 13. LOGIC ──────────────────────────────────────────────────────
+
+(math-law law-of-identity "A = A") <0.99, 0.99>
+(math-law law-of-noncontradiction "NOT (A AND NOT A)") <0.99, 0.99>
+(math-law law-of-excluded-middle "A OR NOT A") <0.99, 0.99>
+(math-law modus-ponens "if A and (A→B) then B") <0.99, 0.99>
+(math-law modus-tollens "if (A→B) and NOT B then NOT A") <0.99, 0.99>
+(math-law contrapositive "(A→B) ≡ (NOT B → NOT A)") <0.99, 0.99>
+(math-law de-morgan-1 "NOT (A AND B) = (NOT A) OR (NOT B)") <0.99, 0.99>
+(math-law de-morgan-2 "NOT (A OR B) = (NOT A) AND (NOT B)") <0.99, 0.99>
+(math-law double-negation "NOT (NOT A) = A") <0.99, 0.99>
+(math-law implication-def "(A→B) ≡ (NOT A) OR B") <0.99, 0.99>
+
+
+;; ─── 14. SET THEORY ─────────────────────────────────────────────────
+
+(math-formula set-union "|A∪B| = |A| + |B| - |A∩B|") <0.99, 0.99>
+(math-law union-commutative "A∪B = B∪A") <0.99, 0.99>
+(math-law intersection-commutative "A∩B = B∩A") <0.99, 0.99>
+(math-law union-associative "(A∪B)∪C = A∪(B∪C)") <0.99, 0.99>
+(math-law de-morgan-sets "(A∪B)' = A'∩B'") <0.99, 0.99>
+(math-law de-morgan-sets-2 "(A∩B)' = A'∪B'") <0.99, 0.99>
+(math-law subset-def "A⊆B means every element of A is in B") <0.99, 0.99>
+(math-formula power-set-size "|P(A)| = 2^|A|") <0.99, 0.99>
+
+
+;; ─── 15. CONSTANTS ──────────────────────────────────────────────────
+
+(math-constant pi 3.14159265358979) <0.99, 0.99>
+(math-constant e 2.71828182845905) <0.99, 0.99>
+(math-constant phi 1.61803398874989) <0.99, 0.99>
+(math-constant sqrt2 1.41421356237310) <0.99, 0.99>
+(math-constant sqrt3 1.73205080756888) <0.99, 0.99>
+(math-constant ln2 0.69314718055995) <0.99, 0.99>
+
+;; Famous identities
+(math-formula euler-identity "e^(iπ) + 1 = 0") <0.99, 0.99>
+(math-formula euler-formula "e^(iθ) = cos(θ) + i*sin(θ)") <0.99, 0.99>
+(math-formula golden-ratio "φ = (1 + sqrt(5)) / 2") <0.99, 0.99>
+(math-law golden-ratio-property "φ² = φ + 1") <0.99, 0.99>
+
+
+;; ─── 16. PHYSICS FORMULAS (as math) ─────────────────────────────────
+
+(math-formula distance "d = v * t (distance = velocity × time)") <0.99, 0.99>
+(math-formula acceleration "v = v₀ + a*t") <0.99, 0.99>
+(math-formula displacement "d = v₀*t + (1/2)*a*t²") <0.99, 0.99>
+(math-formula velocity-squared "v² = v₀² + 2*a*d") <0.99, 0.99>
+(math-formula newton-force "F = m * a") <0.99, 0.99>
+(math-formula gravity-force "F = G*m1*m2 / r²") <0.99, 0.99>
+(math-formula kinetic-energy "KE = (1/2)*m*v²") <0.99, 0.99>
+(math-formula potential-energy "PE = m*g*h") <0.99, 0.99>
+(math-formula work "W = F * d * cos(θ)") <0.99, 0.99>
+(math-formula power "P = W / t") <0.99, 0.99>
+(math-formula momentum "p = m * v") <0.99, 0.99>
+(math-formula ohms-law "V = I * R") <0.99, 0.99>
+(math-formula power-electrical "P = V * I = I²R = V²/R") <0.99, 0.99>
+(math-formula wave-speed "v = f * λ (velocity = frequency × wavelength)") <0.99, 0.99>
+(math-formula einstein-energy "E = m * c²") <0.99, 0.99>
+
+
+;; ═══════════════════════════════════════════════════════════════════════
+;; END OF MATH KNOWLEDGE DNA
+;; 
+;; Total: ~250 formulas, laws, and facts covering:
+;;   - Arithmetic, Exponents, Logarithms
+;;   - Algebra, Polynomials
+;;   - Number Theory, Sequences
+;;   - Combinatorics
+;;   - 2D and 3D Geometry
+;;   - Trigonometry
+;;   - Calculus (derivatives, integrals, series)
+;;   - Linear Algebra
+;;   - Probability and Statistics
+;;   - Logic, Set Theory
+;;   - Constants and Famous Identities
+;;   - Physics formulas
+;;
+;; TO ADD MORE: just keep adding (math-formula ...) facts
+;; Your engine loads this file → now it KNOWS all this math
+;; ═══════════════════════════════════════════════════════════════════════
+
+
+;; ═══════════════════════════════════════════════════════════════════════
+;; ACTIVE REASONING RULES — match on observations, produce math insights
+;; ═══════════════════════════════════════════════════════════════════════
+
+;; Symmetry group detection
+(math-insight symmetry-reflection) if (detected-reflect-h) <0.95, 0.90>
+(math-insight symmetry-reflection) if (detected-reflect-v) <0.95, 0.90>
+(math-insight rotational-symmetry) if (detected-rotate-180) <0.95, 0.90>
+(math-insight rotational-symmetry) if (detected-rotate-90) <0.95, 0.90>
+
+;; Set operations on cells
+(math-insight set-subtraction) if (selective-removal $in $out) <0.90, 0.85>
+(math-insight set-intersection) if (objects-preserved $in $out) (objects-removed $in $out) <0.90, 0.85>
+
+;; Invariant detection
+(math-insight size-invariant) if (obs-consistent same-size) <0.92, 0.90>
+(math-insight bijection) if (consistent-remap $from $to) not (conflicting-remap $from) <0.88, 0.85>
+
+;; Scaling = multiplication
+(math-insight multiplicative-scaling $f) if (detected-scale-up $f) <0.95, 0.90>
+
+;; Translation = group action
+(math-insight translation-vector $dr $dc) if (detected-shift $dr $dc) <0.93, 0.90>
+
+;; ─── UNIVERSAL RULES — fire on ANY data, not just puzzles ────────────
+
+;; Statistical patterns from learning pipeline
+(math-insight frequency $pattern $count) if (pattern-rate $pattern $count $total) <0.90, 0.85>
+(math-insight correlation $a $b) if (co-occur $a $b $both $base) <0.88, 0.85>
+(math-insight boundary $indicator $value) if (threshold $indicator $pattern $value) <0.90, 0.88>
+(math-insight measured $name) if (indicator $name $desc) <0.85, 0.80>
+
+;; Knowledge structure — set membership, mapping
+(math-insight set-membership $x $set) if (is-a $x $set) <0.90, 0.85>
+(math-insight property-map $x $prop) if (has $x $prop) <0.88, 0.85>
+(math-insight capability $x $ability) if (can $x $ability) <0.85, 0.80>
+
+;; Semantic structure
+(math-insight domain-identified $d) if (domain $d) <0.85, 0.80>
+(math-insight definition $key) if (meaning $key $val) <0.85, 0.80>
+
+;; Graph structure — edges as relations
+(math-insight graph-edge $src $tgt) if (dna-edge $src $rel $tgt) <0.85, 0.80>

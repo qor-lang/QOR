@@ -1,0 +1,152 @@
+;; ══════════════════════════════════════════════════════════════════════
+;; UNIVERSAL CLASSIFICATION — transform-class from raw observations
+;; ══════════════════════════════════════════════════════════════════════
+;; These rules fire on observation facts (obs-consistent, obs-size-ratio,
+;; obs-uniform-scale, obs-color-map, etc.) and derive (transform-class ...)
+;; facts that reasoning.qor uses to set strategy order and skip irrelevant
+;; approaches.
+;;
+;; Domain-agnostic: works for any input→output data, not just grids.
+;; Rust emits raw measurements. QOR classifies them here.
+
+;; ── TILING ──────────────────────────────────────────────────────────
+;; Output is an exact integer multiple of input → likely tiling/repetition
+(transform-class tiling) if (obs-uniform-scale $f) (> $f 1) <0.92, 0.90>
+(transform-class scaling) if (obs-size-ratio $rf $cf) (> $rf 1) <0.85, 0.85>
+(transform-class scaling) if (obs-size-ratio $rf $cf) (> $cf 1) <0.85, 0.85>
+
+;; Tiling with input embedded at top-left = strong tiling signal
+(transform-class tiling) if (obs-uniform-scale $f) (obs-consistent input-embedded-in-output) <0.97, 0.95>
+
+;; ── GEOMETRIC TRANSFORM ─────────────────────────────────────────────
+;; Detected by perception layer — direct classification
+(transform-class geometric) if (obs-consistent reflect-h) <0.95, 0.95>
+(transform-class geometric) if (obs-consistent reflect-v) <0.95, 0.95>
+(transform-class geometric) if (obs-consistent rotate-90) <0.95, 0.95>
+(transform-class geometric) if (obs-consistent rotate-180) <0.95, 0.95>
+(transform-class geometric) if (obs-consistent rotate-270) <0.95, 0.95>
+(transform-class geometric) if (obs-consistent transpose) <0.95, 0.95>
+(transform-class geometric) if (obs-consistent crop-to-bbox) <0.95, 0.95>
+(transform-class geometric) if (obs-consistent gravity-down) <0.95, 0.95>
+
+;; ── COLOR REMAP ─────────────────────────────────────────────────────
+;; Same structure, only colors change
+(transform-class color-remap) if (obs-consistent pure-color-change) <0.92, 0.90>
+(transform-class color-remap) if (obs-color-map $from $to) (obs-consistent same-size) <0.88, 0.85>
+
+;; ── FILTERING / NOISE REMOVAL ───────────────────────────────────────
+;; Output is subset: fewer values, smaller, fewer objects
+(transform-class filtering) if (obs-consistent output-smaller) (obs-consistent output-values-subset) <0.90, 0.88>
+(transform-class filtering) if (obs-consistent noise-remove-isolated) <0.92, 0.90>
+(transform-class filtering) if (obs-consistent noise-remove-minority) <0.92, 0.90>
+(transform-class filtering) if (obs-consistent keep-largest) <0.92, 0.90>
+(transform-class filtering) if (obs-consistent noise-remove-small) <0.92, 0.90>
+
+;; ── FILL / REGION OPERATIONS ────────────────────────────────────────
+;; Same size, enclosed regions, new values added
+(transform-class region-fill) if (obs-consistent same-size) (obs-consistent has-enclosed-regions) (obs-consistent new-values-introduced) <0.90, 0.88>
+(transform-class region-fill) if (obs-consistent region-fill-seed) <0.92, 0.90>
+(transform-class fill) if (obs-consistent row-fill) <0.92, 0.90>
+(transform-class fill) if (obs-consistent col-fill) <0.92, 0.90>
+(transform-class fill) if (obs-consistent cross-fill) <0.92, 0.90>
+
+;; ── COMPOSITION ─────────────────────────────────────────────────────
+;; Composed transforms detected by perception
+(transform-class composed) if (obs-consistent composed $t1 $t2) <0.90, 0.88>
+
+;; ── SEPARATOR / COMBINATION ─────────────────────────────────────────
+(transform-class separator-combine) if (obs-consistent same-size) (obs-consistent value-set-preserved) (obs-consistent few-cells-change) <0.80, 0.78>
+
+;; ── MARKER-DRIVEN ───────────────────────────────────────────────────
+;; Same size, few changes, new values introduced
+(transform-class marker-driven) if (obs-consistent same-size) (obs-consistent few-cells-change) (obs-consistent new-values-introduced) <0.82, 0.80>
+(transform-class marker-driven) if (obs-consistent same-size) (obs-consistent moderate-change) (obs-consistent new-values-introduced) <0.78, 0.78>
+
+;; ── UNKNOWN ─────────────────────────────────────────────────────────
+;; No classification matched — flag for full genesis search
+(transform-class unknown) if not (transform-class geometric) not (transform-class tiling) not (transform-class color-remap) not (transform-class filtering) not (transform-class region-fill) not (transform-class fill) not (transform-class composed) not (transform-class marker-driven) <0.60, 0.60>
+
+;; ══════════════════════════════════════════════════════════════════════
+;; STRATEGY GUIDANCE — skip irrelevant approaches per classification
+;; ══════════════════════════════════════════════════════════════════════
+
+;; Tiling: skip identity/reflect/rotate — they can't produce larger output
+(genesis-skip identity) if (transform-class tiling) <0.90, 0.90>
+(genesis-skip reflect) if (transform-class tiling) <0.90, 0.90>
+(genesis-skip rotate) if (transform-class tiling) <0.90, 0.90>
+(genesis-skip crop) if (transform-class tiling) <0.90, 0.90>
+(genesis-skip noise-remove) if (transform-class tiling) <0.90, 0.90>
+
+;; Tiling: hint the scale factor
+(genesis-hint tile $f) if (transform-class tiling) (obs-uniform-scale $f) <0.92, 0.90>
+
+;; Geometric: skip tiling/fill/remap — geometric is sufficient
+(genesis-skip tiling) if (transform-class geometric) <0.88, 0.88>
+(genesis-skip fill) if (transform-class geometric) <0.88, 0.88>
+(genesis-skip remap) if (transform-class geometric) not (obs-color-map $a $b) <0.85, 0.85>
+
+;; Filtering: skip tiling/fill — output is a subset
+(genesis-skip tiling) if (transform-class filtering) <0.90, 0.90>
+(genesis-skip fill) if (transform-class filtering) <0.88, 0.88>
+
+;; Color remap: skip geometric — structure doesn't change
+(genesis-skip geometric) if (transform-class color-remap) not (transform-class geometric) <0.85, 0.85>
+(genesis-skip tiling) if (transform-class color-remap) <0.88, 0.88>
+
+;; Region fill: hint the approach
+(genesis-hint region-fill) if (transform-class region-fill) <0.90, 0.90>
+(genesis-skip tiling) if (transform-class region-fill) <0.88, 0.88>
+(genesis-skip geometric) if (transform-class region-fill) not (transform-class geometric) <0.85, 0.85>
+
+;; ══════════════════════════════════════════════════════════════════════
+;; PROBLEM CLASS — high-level classification for reasoning.qor
+;; ══════════════════════════════════════════════════════════════════════
+
+(problem-class $type) if (transform-class $type) <0.90, 0.90>
+
+;; ══════════════════════════════════════════════════════════════════════
+;; EXTERNAL TAXONOMY — Neural Affinity Framework classification
+;; ══════════════════════════════════════════════════════════════════════
+;; Rust injects (external-class puzzle <code>) from taxonomy JSON.
+;; These rules translate external codes → QOR transform-class + hints.
+;; Higher confidence than observation-based classification (pre-validated).
+
+;; C1 = Color Transform (Direct) — recoloring, filtering
+(transform-class color-remap) if (external-class puzzle C1) <0.95, 0.93>
+(genesis-hint color-remap) if (external-class puzzle C1) <0.92, 0.90>
+(genesis-skip tiling) if (external-class puzzle C1) <0.88, 0.88>
+
+;; C2 = Pattern Matching — template-based, marker-to-pattern
+(transform-class marker-driven) if (external-class puzzle C2) <0.95, 0.93>
+(genesis-hint extraction) if (external-class puzzle C2) <0.90, 0.88>
+
+;; S1 = Geometric Transform (Direct) — reflections, rotations
+(transform-class geometric) if (external-class puzzle S1) <0.95, 0.93>
+(genesis-hint reflect) if (external-class puzzle S1) <0.90, 0.88>
+(genesis-skip tiling) if (external-class puzzle S1) <0.88, 0.88>
+(genesis-skip fill) if (external-class puzzle S1) <0.85, 0.85>
+
+;; S2 = Geometric Composition — concat, tiling, replication
+(transform-class tiling) if (external-class puzzle S2) <0.95, 0.93>
+(transform-class composed) if (external-class puzzle S2) <0.90, 0.88>
+(genesis-hint tiling) if (external-class puzzle S2) <0.92, 0.90>
+
+;; S3 = Topological Operations — paths, connectivity, neighbors
+(transform-class region-fill) if (external-class puzzle S3) <0.90, 0.88>
+(genesis-hint region-fill) if (external-class puzzle S3) <0.88, 0.85>
+
+;; A1 = Iterative Refinement — while loops, convergence
+(transform-class composed) if (external-class puzzle A1) <0.90, 0.88>
+
+;; A2 = Spatial Packing — constraint-based placement
+(transform-class marker-driven) if (external-class puzzle A2) <0.90, 0.88>
+
+;; K1 = Scaling Operations — upscale, downscale, crop
+(transform-class scaling) if (external-class puzzle K1) <0.95, 0.93>
+(genesis-hint tile 2) if (external-class puzzle K1) <0.85, 0.85>
+(genesis-skip fill) if (external-class puzzle K1) <0.88, 0.88>
+
+;; L1 = Set Operations — intersection, union, difference, merge
+(transform-class filtering) if (external-class puzzle L1) <0.90, 0.88>
+(transform-class separator-combine) if (external-class puzzle L1) <0.85, 0.85>
+(genesis-hint extraction) if (external-class puzzle L1) <0.88, 0.85>

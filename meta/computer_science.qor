@@ -1,0 +1,181 @@
+;; ═══════════════════════════════════════════════════════════════════════
+;; COMPUTER SCIENCE KNOWLEDGE DNA — computer_science.qor
+;; ═══════════════════════════════════════════════════════════════════════
+
+
+;; ─── 1. COMPLEXITY & BIG-O ──────────────────────────────────────────
+
+(cs-fact big-o "O(f(n)) = upper bound on growth rate") <0.99, 0.99>
+(cs-fact O-1 "O(1) = constant time (hash lookup)") <0.99, 0.99>
+(cs-fact O-logn "O(log n) = logarithmic (binary search)") <0.99, 0.99>
+(cs-fact O-n "O(n) = linear (scan array)") <0.99, 0.99>
+(cs-fact O-nlogn "O(n log n) = linearithmic (merge sort)") <0.99, 0.99>
+(cs-fact O-n2 "O(n²) = quadratic (bubble sort, nested loops)") <0.99, 0.99>
+(cs-fact O-2n "O(2ⁿ) = exponential (brute force subsets)") <0.99, 0.99>
+(cs-fact O-nfact "O(n!) = factorial (all permutations)") <0.99, 0.99>
+(cs-law complexity-order "O(1) < O(log n) < O(n) < O(n log n) < O(n²) < O(2ⁿ) < O(n!)") <0.99, 0.99>
+(cs-fact P "problems solvable in polynomial time") <0.99, 0.99>
+(cs-fact NP "solutions verifiable in polynomial time") <0.99, 0.99>
+(cs-fact NP-complete "hardest problems in NP, all equivalent") <0.99, 0.99>
+(cs-fact P-vs-NP "unknown if P = NP, most important open problem in CS") <0.99, 0.99>
+
+;; ─── 2. DATA STRUCTURES ─────────────────────────────────────────────
+
+(cs-fact array "contiguous memory, O(1) access by index, O(n) insert/delete") <0.99, 0.99>
+(cs-fact linked-list "nodes with pointers, O(1) insert/delete at known position, O(n) access") <0.99, 0.99>
+(cs-fact stack "LIFO — last in first out, push/pop O(1)") <0.99, 0.99>
+(cs-fact queue "FIFO — first in first out, enqueue/dequeue O(1)") <0.99, 0.99>
+(cs-fact hash-table "key→value, O(1) average lookup/insert, O(n) worst case") <0.99, 0.99>
+(cs-fact binary-tree "each node has ≤2 children") <0.99, 0.99>
+(cs-fact bst "binary search tree: left < parent < right, O(log n) search if balanced") <0.99, 0.99>
+(cs-fact heap "complete binary tree, parent ≥ children (max-heap), O(log n) insert/extract") <0.99, 0.99>
+(cs-fact graph "nodes + edges, can be directed/undirected, weighted/unweighted") <0.99, 0.99>
+(cs-fact trie "prefix tree, O(k) lookup where k = key length") <0.99, 0.99>
+(cs-fact b-tree "balanced tree for databases, O(log n) operations, optimized for disk") <0.99, 0.99>
+
+;; ─── 3. SORTING ALGORITHMS ──────────────────────────────────────────
+
+(cs-fact bubble-sort "O(n²) average/worst, O(1) space, stable") <0.99, 0.99>
+(cs-fact selection-sort "O(n²) always, O(1) space, unstable") <0.99, 0.99>
+(cs-fact insertion-sort "O(n²) average/worst, O(n) best, O(1) space, stable") <0.99, 0.99>
+(cs-fact merge-sort "O(n log n) always, O(n) space, stable, divide and conquer") <0.99, 0.99>
+(cs-fact quick-sort "O(n log n) average, O(n²) worst, O(log n) space, unstable") <0.99, 0.99>
+(cs-fact heap-sort "O(n log n) always, O(1) space, unstable") <0.99, 0.99>
+(cs-fact counting-sort "O(n+k), O(k) space, non-comparison, integers only") <0.99, 0.99>
+(cs-fact radix-sort "O(d*(n+k)), non-comparison, digit by digit") <0.99, 0.99>
+(cs-law comparison-sort-lower-bound "no comparison sort can do better than O(n log n) worst case") <0.99, 0.99>
+
+;; ─── 4. SEARCH AND GRAPH ALGORITHMS ─────────────────────────────────
+
+(cs-fact linear-search "O(n), check each element") <0.99, 0.99>
+(cs-fact binary-search "O(log n), requires sorted array, divide in half") <0.99, 0.99>
+(cs-fact bfs "breadth-first search: level by level, uses queue, O(V+E)") <0.99, 0.99>
+(cs-fact dfs "depth-first search: go deep then backtrack, uses stack, O(V+E)") <0.99, 0.99>
+(cs-fact dijkstra "shortest path, non-negative weights, O((V+E)log V) with heap") <0.99, 0.99>
+(cs-fact bellman-ford "shortest path, handles negative weights, O(VE)") <0.99, 0.99>
+(cs-fact a-star "shortest path with heuristic, optimal if heuristic admissible") <0.99, 0.99>
+(cs-fact floyd-warshall "all-pairs shortest path, O(V³)") <0.99, 0.99>
+(cs-fact kruskal "minimum spanning tree, sort edges, use union-find, O(E log E)") <0.99, 0.99>
+(cs-fact prim "minimum spanning tree, grow from vertex, O((V+E)log V)") <0.99, 0.99>
+(cs-fact topological-sort "linear ordering of DAG vertices, O(V+E)") <0.99, 0.99>
+
+;; ─── 5. ALGORITHM PARADIGMS ─────────────────────────────────────────
+
+(cs-fact divide-conquer "split problem, solve subproblems, combine (merge sort, quicksort)") <0.99, 0.99>
+(cs-fact dynamic-programming "store solutions to overlapping subproblems (fibonacci, knapsack)") <0.99, 0.99>
+(cs-fact greedy "make locally optimal choice at each step (Dijkstra, Huffman)") <0.99, 0.99>
+(cs-fact backtracking "try choices, undo if dead end (N-queens, sudoku)") <0.99, 0.99>
+(cs-fact branch-and-bound "like backtracking but with pruning using bounds") <0.99, 0.99>
+(cs-fact recursion "function calls itself, needs base case to terminate") <0.99, 0.99>
+(cs-formula master-theorem "T(n) = aT(n/b) + O(n^d): compare log_b(a) with d") <0.99, 0.99>
+
+;; ─── 6. INFORMATION THEORY ──────────────────────────────────────────
+
+(cs-formula shannon-entropy "H = -Σ p(x)*log₂(p(x)) bits") <0.99, 0.99>
+(cs-fact bit "binary digit, 0 or 1, fundamental unit of information") <0.99, 0.99>
+(cs-fact byte "8 bits, 256 possible values") <0.99, 0.99>
+(cs-formula information-content "I(x) = -log₂(p(x)) bits") <0.99, 0.99>
+(cs-fact data-compression "cannot compress below entropy (Shannon limit)") <0.99, 0.99>
+(cs-fact huffman-coding "optimal prefix code based on symbol frequencies") <0.99, 0.99>
+(cs-formula channel-capacity "C = B*log₂(1 + S/N) (Shannon-Hartley)") <0.99, 0.99>
+(cs-fact kolmogorov-complexity "shortest program that produces a string") <0.99, 0.99>
+
+;; ─── 7. COMPUTABILITY ───────────────────────────────────────────────
+
+(cs-fact turing-machine "abstract model of computation: tape + head + states") <0.99, 0.99>
+(cs-law church-turing "anything computable can be computed by a Turing machine") <0.99, 0.99>
+(cs-fact halting-problem "undecidable: no program can determine if any program halts") <0.99, 0.99>
+(cs-fact turing-complete "system that can simulate any Turing machine") <0.99, 0.99>
+(cs-fact decidable "problem where algorithm always gives yes/no answer") <0.99, 0.99>
+(cs-fact undecidable "no algorithm exists that always solves it") <0.99, 0.99>
+(cs-fact godel-incompleteness "any consistent formal system has true but unprovable statements") <0.99, 0.99>
+
+;; ─── 8. BOOLEAN ALGEBRA & DIGITAL LOGIC ─────────────────────────────
+
+(cs-fact and-gate "output 1 only if all inputs 1") <0.99, 0.99>
+(cs-fact or-gate "output 1 if any input 1") <0.99, 0.99>
+(cs-fact not-gate "inverts input") <0.99, 0.99>
+(cs-fact nand-gate "NOT AND — universal gate, can build any circuit") <0.99, 0.99>
+(cs-fact xor-gate "output 1 if inputs differ") <0.99, 0.99>
+(cs-formula twos-complement "-x = flip all bits + 1 (for n-bit integers)") <0.99, 0.99>
+(cs-formula ieee-float "(-1)^s × 1.mantissa × 2^(exponent-bias)") <0.99, 0.99>
+(cs-fact binary-addition "0+0=0, 0+1=1, 1+1=10 (carry)") <0.99, 0.99>
+
+;; ─── 9. NETWORKING & SECURITY ───────────────────────────────────────
+
+(cs-fact osi-model "Physical→DataLink→Network→Transport→Session→Presentation→Application") <0.99, 0.99>
+(cs-fact tcp "reliable, ordered, connection-oriented (HTTP, email)") <0.99, 0.99>
+(cs-fact udp "unreliable, fast, connectionless (video, games)") <0.99, 0.99>
+(cs-fact ip-address "unique network identifier, IPv4=32bit, IPv6=128bit") <0.99, 0.99>
+(cs-fact dns "domain name → IP address translation") <0.99, 0.99>
+(cs-fact http "HyperText Transfer Protocol, request-response, stateless") <0.99, 0.99>
+(cs-fact encryption-symmetric "same key encrypts and decrypts (AES)") <0.99, 0.99>
+(cs-fact encryption-asymmetric "public key encrypts, private key decrypts (RSA)") <0.99, 0.99>
+(cs-fact hash-function "maps data to fixed-size output, one-way, deterministic (SHA-256)") <0.99, 0.99>
+(cs-fact rsa "security based on difficulty of factoring large numbers") <0.99, 0.99>
+
+;; ─── 10. AI & MACHINE LEARNING FUNDAMENTALS ─────────────────────────
+
+(cs-fact supervised-learning "learn from labeled input→output pairs") <0.99, 0.99>
+(cs-fact unsupervised-learning "find patterns in unlabeled data") <0.99, 0.99>
+(cs-fact reinforcement-learning "learn by trial and reward/punishment") <0.99, 0.99>
+(cs-fact neural-network "layers of connected nodes with weights, learns by backpropagation") <0.99, 0.99>
+(cs-formula gradient-descent "w = w - α*∂L/∂w (update weights to minimize loss)") <0.99, 0.99>
+(cs-fact overfitting "model memorizes training data, performs poorly on new data") <0.99, 0.99>
+(cs-fact bias-variance "high bias=underfitting, high variance=overfitting") <0.99, 0.99>
+(cs-fact decision-tree "if-then rules, splits data on features") <0.99, 0.99>
+(cs-fact k-nearest-neighbors "classify by majority of k closest training examples") <0.99, 0.99>
+(cs-fact bayesian-inference "P(model|data) ∝ P(data|model)*P(model)") <0.99, 0.99>
+
+
+;; ═══════════════════════════════════════════════════════════════════════
+;; ~120 computer science facts, formulas, and laws
+;; ═══════════════════════════════════════════════════════════════════════
+
+
+;; ═══════════════════════════════════════════════════════════════════════
+;; ACTIVE REASONING RULES — match on observations, produce CS insights
+;; ═══════════════════════════════════════════════════════════════════════
+
+;; Compression = output smaller
+(cs-insight compression) if (obs-consistent output-smaller) <0.90, 0.85>
+
+;; Expansion/decompression
+(cs-insight decompression) if (obs-consistent output-larger) <0.90, 0.85>
+
+;; Lossless transform = same size, geometric
+(cs-insight lossless-transform) if (obs-consistent same-size) (has-geometric-transform) <0.92, 0.90>
+
+;; Filter operation = selective removal
+(cs-insight filter) if (selective-removal $in $out) <0.90, 0.85>
+
+;; Map operation = consistent remap
+(cs-insight map-transform $from $to) if (consistent-remap $from $to) <0.90, 0.88>
+
+;; Template matching = marker triggers pattern
+(cs-insight template-match) if (marker-driven $in $out) <0.90, 0.85>
+
+;; Crop = extract subarray
+(cs-insight subarray-extraction) if (detected-crop-to-bbox) <0.93, 0.90>
+
+;; Scaling = interpolation
+(cs-insight interpolation $f) if (detected-scale-up $f) <0.90, 0.85>
+
+;; ─── UNIVERSAL RULES — fire on ANY data, not just puzzles ────────────
+
+;; Frequency analysis from learning
+(cs-insight frequency-analysis $pattern $count) if (pattern-rate $pattern $count $total) <0.88, 0.85>
+;; Association rule mining — co-occurrence = rule
+(cs-insight association-rule $a $b) if (co-occur $a $b $both $base) <0.90, 0.88>
+;; Decision boundary — threshold for classification
+(cs-insight decision-boundary $indicator $value) if (threshold $indicator $pattern $value) <0.90, 0.88>
+;; Type hierarchy — is-a = inheritance
+(cs-insight type-hierarchy $sub $super) if (is-a $sub $super) <0.90, 0.88>
+;; Object property — has = field/attribute
+(cs-insight object-property $obj $prop) if (has $obj $prop) <0.88, 0.85>
+;; Interface capability — can = method
+(cs-insight interface-method $obj $method) if (can $obj $method) <0.88, 0.85>
+;; Feature detection
+(cs-insight feature $name) if (indicator $name $desc) <0.85, 0.80>
+;; Graph traversal — edge detection
+(cs-insight graph-node $src $tgt) if (dna-edge $src $rel $tgt) <0.85, 0.80>

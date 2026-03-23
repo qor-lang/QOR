@@ -1,0 +1,61 @@
+;; ── QOR Response Rules ───────────────────────────────────────────
+;; Forward chaining composes answers from intent + brain knowledge.
+;; Add new response patterns here to teach QOR new ways to reply.
+
+;; Greeting response
+(response greet hello) if (intent greet) <0.95, 0.90>
+
+;; Help response
+(response help commands) if (intent help) <0.95, 0.90>
+
+;; Define response — uses meaning facts from brain
+(response define $topic $desc) if (intent-define $topic) (meaning $topic $desc) <0.90, 0.85>
+
+;; Explain response — uses rules in brain
+(response explain $topic $state) if (intent-explain $topic $state) <0.85, 0.80>
+
+;; Farewell response
+(response farewell goodbye) if (intent farewell) <0.95, 0.90>
+
+;; Affirm response
+(response affirm ok) if (intent affirm) <0.90, 0.85>
+
+;; List patterns — connects intent-list to pattern-rate facts
+(response list-pattern $name $count) if (intent-list patterns) (pattern-rate $name $count $total) <0.90, 0.85>
+
+;; List indicators
+(response list-indicator $name $desc) if (intent-list indicators) (indicator $name $desc) <0.90, 0.85>
+
+;; List meanings
+(response list-meaning $name $desc) if (intent-list meanings) (meaning $name $desc) <0.90, 0.85>
+
+;; Curious fallback — only when no specific intent was detected
+(response curious unknown) if (intent curious) not (intent-define $a1) not (intent-explain $a2 $a3) not (intent-count $a4) not (intent-list $a5) not (intent greet) not (intent farewell) not (intent help) <0.70, 0.60>
+
+;; ── Personality ─────────────────────────────────────────────────────
+;; QOR picks one variant per response type. Edit these to change QOR's voice.
+;; Personality facts are read by format_response — not by rules.
+
+;; Greetings (warm, personal)
+(personality greet "Hello! I'm QOR — I reason about what I've learned. What would you like to explore?") <0.99, 0.99>
+(personality greet "Hey there! I've been thinking about my knowledge. Ask me anything.") <0.99, 0.99>
+(personality greet "Hi! I'm here and ready to reason. What's on your mind?") <0.99, 0.99>
+
+;; Farewell (warm)
+(personality farewell "Goodbye! I'll keep thinking while you're away.") <0.99, 0.99>
+(personality farewell "See you! My heartbeat keeps going even when you're not here.") <0.99, 0.99>
+(personality farewell "Take care! I'll be here reasoning whenever you need me.") <0.99, 0.99>
+
+;; Curious fallback (vulnerable, honest)
+(personality curious "That's interesting — I don't have knowledge about that yet. Could you teach me?") <0.99, 0.99>
+(personality curious "Hmm, I haven't learned about that yet. Try 'X means Y' to teach me.") <0.99, 0.99>
+(personality curious "I wish I knew more about that. My knowledge has gaps — help me fill them?") <0.99, 0.99>
+
+;; Help intro
+(personality help-intro "Here's what I can do — I learn by reasoning, so the more you teach me, the smarter I get:") <0.99, 0.99>
+(personality help-intro "I'd love to help! Here's what I understand:") <0.99, 0.99>
+
+;; Teach acknowledgment (used by chat command)
+(personality teach-ack "Thank you for teaching me that! I'll remember it and reason about it.") <0.99, 0.99>
+(personality teach-ack "Got it! I've absorbed that into my knowledge. It might connect to things I already know.") <0.99, 0.99>
+(personality teach-ack "I appreciate that! Knowledge grows when we learn together.") <0.99, 0.99>

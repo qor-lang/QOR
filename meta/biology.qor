@@ -1,0 +1,230 @@
+;; ═══════════════════════════════════════════════════════════════════════
+;; BIOLOGY KNOWLEDGE DNA — biology.qor
+;; ═══════════════════════════════════════════════════════════════════════
+
+
+;; ─── 1. CELL BIOLOGY ────────────────────────────────────────────────
+
+(bio-fact cell-theory "all living things made of cells; cells from existing cells") <0.99, 0.99>
+(bio-fact prokaryote "no nucleus, no membrane organelles (bacteria, archaea)") <0.99, 0.99>
+(bio-fact eukaryote "has nucleus and membrane organelles (animals, plants, fungi)") <0.99, 0.99>
+
+;; Organelles
+(bio-fact nucleus "contains DNA, controls cell activities") <0.99, 0.99>
+(bio-fact mitochondria "powerhouse — cellular respiration, produces ATP") <0.99, 0.99>
+(bio-fact ribosome "protein synthesis from mRNA") <0.99, 0.99>
+(bio-fact endoplasmic-reticulum "rough ER (ribosomes) makes proteins; smooth ER makes lipids") <0.99, 0.99>
+(bio-fact golgi "packages and ships proteins") <0.99, 0.99>
+(bio-fact lysosome "digestion — breaks down waste and old organelles") <0.99, 0.99>
+(bio-fact cell-membrane "phospholipid bilayer, selectively permeable") <0.99, 0.99>
+(bio-fact chloroplast "photosynthesis (plant cells only)") <0.99, 0.99>
+(bio-fact cell-wall "rigid outer layer (plant, fungal, bacterial cells)") <0.99, 0.99>
+(bio-fact vacuole "storage; large central vacuole in plant cells") <0.99, 0.99>
+
+;; Cell division
+(bio-fact mitosis "cell division → 2 identical diploid daughter cells") <0.99, 0.99>
+(bio-fact mitosis-phases "prophase → metaphase → anaphase → telophase") <0.99, 0.99>
+(bio-fact meiosis "produces 4 haploid gametes (sex cells), genetic variation") <0.99, 0.99>
+(bio-fact crossing-over "homologous chromosomes exchange DNA in meiosis I") <0.99, 0.99>
+(bio-fact diploid "2n — two sets of chromosomes (body cells)") <0.99, 0.99>
+(bio-fact haploid "n — one set of chromosomes (gametes)") <0.99, 0.99>
+(bio-fact human-chromosomes "46 chromosomes = 23 pairs") <0.99, 0.99>
+
+;; Transport
+(bio-fact diffusion "movement from high to low concentration") <0.99, 0.99>
+(bio-fact osmosis "water diffusion across semipermeable membrane") <0.99, 0.99>
+(bio-fact active-transport "movement against gradient, requires ATP") <0.99, 0.99>
+
+
+;; ─── 2. MOLECULAR BIOLOGY / DNA ─────────────────────────────────────
+
+(bio-fact dna-structure "double helix, sugar-phosphate backbone, base pairs") <0.99, 0.99>
+(bio-fact base-pairs "A-T (adenine-thymine), G-C (guanine-cytosine)") <0.99, 0.99>
+(bio-fact rna-bases "A, U(uracil), G, C — single stranded") <0.99, 0.99>
+(bio-fact central-dogma "DNA → (transcription) → mRNA → (translation) → protein") <0.99, 0.99>
+(bio-fact transcription "DNA to mRNA in nucleus, by RNA polymerase") <0.99, 0.99>
+(bio-fact translation "mRNA to protein at ribosome, using tRNA") <0.99, 0.99>
+(bio-fact codon "3 mRNA bases code for 1 amino acid") <0.99, 0.99>
+(bio-fact start-codon "AUG = methionine = start") <0.99, 0.99>
+(bio-fact stop-codons "UAA, UAG, UGA = stop translation") <0.99, 0.99>
+(bio-fact genetic-code "64 codons code for 20 amino acids (redundant)") <0.99, 0.99>
+(bio-fact dna-replication "semiconservative — each strand serves as template") <0.99, 0.99>
+
+;; Mutations
+(bio-fact point-mutation "single base change — substitution") <0.99, 0.99>
+(bio-fact insertion "extra base(s) added — frameshift") <0.99, 0.99>
+(bio-fact deletion "base(s) removed — frameshift") <0.99, 0.99>
+(bio-fact silent-mutation "no change in amino acid (codon redundancy)") <0.99, 0.99>
+(bio-fact missense "different amino acid") <0.99, 0.99>
+(bio-fact nonsense "premature stop codon") <0.99, 0.99>
+
+
+;; ─── 3. GENETICS ────────────────────────────────────────────────────
+
+(bio-fact gene "segment of DNA that codes for a protein") <0.99, 0.99>
+(bio-fact allele "version of a gene (e.g., blue vs brown eyes)") <0.99, 0.99>
+(bio-fact genotype "genetic makeup (e.g., Bb)") <0.99, 0.99>
+(bio-fact phenotype "observable trait (e.g., brown eyes)") <0.99, 0.99>
+(bio-fact homozygous "two same alleles (BB or bb)") <0.99, 0.99>
+(bio-fact heterozygous "two different alleles (Bb)") <0.99, 0.99>
+(bio-fact dominant "expressed when heterozygous (B in Bb)") <0.99, 0.99>
+(bio-fact recessive "only expressed when homozygous (bb)") <0.99, 0.99>
+(bio-fact codominance "both alleles fully expressed (e.g., AB blood type)") <0.99, 0.99>
+(bio-fact incomplete-dominance "blended phenotype (red × white → pink)") <0.99, 0.99>
+
+;; Mendel's laws
+(bio-law segregation "two alleles separate during gamete formation") <0.99, 0.99>
+(bio-law independent-assortment "genes on different chromosomes sort independently") <0.99, 0.99>
+
+;; Punnett square ratios
+(bio-fact monohybrid-ratio "Bb × Bb → 3:1 phenotype, 1:2:1 genotype") <0.99, 0.99>
+(bio-fact dihybrid-ratio "BbCc × BbCc → 9:3:3:1 phenotype ratio") <0.99, 0.99>
+(bio-fact sex-linked "genes on X chromosome, males more affected") <0.99, 0.99>
+
+;; Modern genetics
+(bio-fact pcr "polymerase chain reaction — amplifies DNA") <0.99, 0.99>
+(bio-fact crispr "gene editing tool — cut DNA at specific location") <0.99, 0.99>
+(bio-fact gel-electrophoresis "separates DNA fragments by size") <0.99, 0.99>
+
+
+;; ─── 4. EVOLUTION ───────────────────────────────────────────────────
+
+(bio-law natural-selection "organisms with favorable traits survive and reproduce more") <0.99, 0.99>
+(bio-fact darwin "proposed natural selection as mechanism of evolution") <0.99, 0.99>
+(bio-fact variation "individuals in population differ genetically") <0.99, 0.99>
+(bio-fact fitness "reproductive success — passing genes to next generation") <0.99, 0.99>
+(bio-fact adaptation "trait that improves survival in environment") <0.99, 0.99>
+(bio-fact speciation "formation of new species from divergent populations") <0.99, 0.99>
+(bio-fact genetic-drift "random changes in allele frequency, stronger in small populations") <0.99, 0.99>
+(bio-fact gene-flow "movement of alleles between populations via migration") <0.99, 0.99>
+(bio-fact convergent-evolution "unrelated species develop similar traits (wings in bats and birds)") <0.99, 0.99>
+(bio-fact divergent-evolution "related species develop different traits") <0.99, 0.99>
+(bio-fact homologous-structures "similar anatomy from common ancestor") <0.99, 0.99>
+(bio-fact analogous-structures "similar function, different origin (convergent)") <0.99, 0.99>
+(bio-fact hardy-weinberg "p² + 2pq + q² = 1 (genotype frequencies if no evolution)") <0.99, 0.99>
+
+;; Classification
+(bio-fact taxonomy "domain → kingdom → phylum → class → order → family → genus → species") <0.99, 0.99>
+(bio-fact three-domains "Bacteria, Archaea, Eukarya") <0.99, 0.99>
+(bio-fact six-kingdoms "Bacteria Archaea Protista Fungi Plantae Animalia") <0.99, 0.99>
+(bio-fact binomial-nomenclature "genus + species (e.g., Homo sapiens)") <0.99, 0.99>
+
+
+;; ─── 5. ECOLOGY ─────────────────────────────────────────────────────
+
+(bio-fact ecosystem "community of organisms + their physical environment") <0.99, 0.99>
+(bio-fact biome "large region with characteristic climate and organisms") <0.99, 0.99>
+(bio-fact food-chain "producer → primary consumer → secondary → tertiary") <0.99, 0.99>
+(bio-fact food-web "interconnected food chains") <0.99, 0.99>
+(bio-fact trophic-levels "each step in food chain, ~10% energy transfer") <0.99, 0.99>
+(bio-fact producer "autotroph — makes own food (plants, algae)") <0.99, 0.99>
+(bio-fact consumer "heterotroph — eats other organisms") <0.99, 0.99>
+(bio-fact decomposer "breaks down dead matter, recycles nutrients") <0.99, 0.99>
+
+;; Cycles
+(bio-fact carbon-cycle "CO₂ ↔ photosynthesis ↔ respiration ↔ decomposition ↔ fossil fuels") <0.99, 0.99>
+(bio-fact nitrogen-cycle "N₂ → fixation → NH₃ → nitrification → NO₃⁻ → denitrification → N₂") <0.99, 0.99>
+(bio-fact water-cycle "evaporation → condensation → precipitation → runoff → repeat") <0.99, 0.99>
+
+;; Population ecology
+(bio-formula exponential-growth "dN/dt = rN (unlimited resources)") <0.99, 0.99>
+(bio-formula logistic-growth "dN/dt = rN(1 - N/K) where K=carrying capacity") <0.99, 0.99>
+(bio-fact carrying-capacity "maximum population environment can sustain") <0.99, 0.99>
+
+;; Symbiosis
+(bio-fact mutualism "both species benefit") <0.99, 0.99>
+(bio-fact parasitism "one benefits, other harmed") <0.99, 0.99>
+(bio-fact commensalism "one benefits, other unaffected") <0.99, 0.99>
+(bio-fact competition "both species harmed by sharing resources") <0.99, 0.99>
+(bio-fact predation "predator kills and eats prey") <0.99, 0.99>
+
+
+;; ─── 6. BIOCHEMISTRY ────────────────────────────────────────────────
+
+;; Photosynthesis
+(bio-formula photosynthesis "6CO₂ + 6H₂O + light → C₆H₁₂O₆ + 6O₂") <0.99, 0.99>
+(bio-fact light-reactions "in thylakoids: water split, ATP and NADPH made, O₂ released") <0.99, 0.99>
+(bio-fact calvin-cycle "in stroma: CO₂ fixed into glucose using ATP and NADPH") <0.99, 0.99>
+
+;; Cellular respiration
+(bio-formula respiration "C₆H₁₂O₆ + 6O₂ → 6CO₂ + 6H₂O + ~36-38 ATP") <0.99, 0.99>
+(bio-fact glycolysis "glucose → 2 pyruvate + 2 ATP + 2 NADH (cytoplasm)") <0.99, 0.99>
+(bio-fact krebs-cycle "pyruvate oxidized, CO₂ released, NADH/FADH₂ made (mitochondria matrix)") <0.99, 0.99>
+(bio-fact electron-transport "NADH/FADH₂ → ATP via chemiosmosis (~34 ATP, inner membrane)") <0.99, 0.99>
+(bio-fact anaerobic-respiration "without O₂: fermentation (alcohol or lactic acid)") <0.99, 0.99>
+(bio-formula atp "ATP → ADP + P + energy (adenosine triphosphate)") <0.99, 0.99>
+
+;; Macromolecules
+(bio-fact carbohydrates "C,H,O — sugars/starches/cellulose — energy/structure") <0.99, 0.99>
+(bio-fact lipids "fats/oils/phospholipids/steroids — energy/membranes/hormones") <0.99, 0.99>
+(bio-fact proteins "amino acid chains — enzymes/structure/transport/immunity") <0.99, 0.99>
+(bio-fact nucleic-acids "DNA and RNA — genetic information") <0.99, 0.99>
+(bio-fact enzymes "biological catalysts, lower activation energy, substrate-specific") <0.99, 0.99>
+(bio-fact enzyme-lock-key "substrate fits enzyme active site like lock and key") <0.99, 0.99>
+(bio-fact denaturation "extreme pH/temp destroys enzyme shape → loses function") <0.99, 0.99>
+
+
+;; ─── 7. HUMAN BODY SYSTEMS ──────────────────────────────────────────
+
+(bio-fact circulatory "heart + blood vessels — transports O₂, nutrients, waste") <0.99, 0.99>
+(bio-fact respiratory "lungs — gas exchange: O₂ in, CO₂ out") <0.99, 0.99>
+(bio-fact digestive "mouth→esophagus→stomach→small intestine→large intestine — breaks down food") <0.99, 0.99>
+(bio-fact nervous "brain + spinal cord + nerves — electrical signals, coordination") <0.99, 0.99>
+(bio-fact endocrine "glands + hormones — chemical signals, slow but long-lasting") <0.99, 0.99>
+(bio-fact immune "white blood cells + antibodies — defense against pathogens") <0.99, 0.99>
+(bio-fact skeletal "bones — support, protection, movement, blood cell production") <0.99, 0.99>
+(bio-fact muscular "muscles — movement, 3 types: skeletal, smooth, cardiac") <0.99, 0.99>
+(bio-fact excretory "kidneys — filter blood, remove waste as urine") <0.99, 0.99>
+(bio-fact reproductive "produces gametes and offspring") <0.99, 0.99>
+(bio-fact integumentary "skin — protection, temperature regulation, sensation") <0.99, 0.99>
+
+
+;; ═══════════════════════════════════════════════════════════════════════
+;; ~170 biology facts, formulas, and laws
+;; ═══════════════════════════════════════════════════════════════════════
+
+
+;; ═══════════════════════════════════════════════════════════════════════
+;; ACTIVE REASONING RULES — match on observations, produce biology insights
+;; ═══════════════════════════════════════════════════════════════════════
+
+;; Growth
+(bio-insight growth) if (obs-consistent output-larger) <0.90, 0.85>
+
+;; Apoptosis (programmed cell death)
+(bio-insight apoptosis) if (obs-consistent output-smaller) <0.90, 0.85>
+
+;; Homeostasis (size preserved)
+(bio-insight homeostasis) if (obs-consistent same-size) <0.92, 0.90>
+
+;; Natural selection (some survive, some don't)
+(bio-insight natural-selection) if (selective-removal $in $out) <0.88, 0.85>
+
+;; Mitosis (objects multiply by scaling)
+(bio-insight mitosis $f) if (detected-scale-up $f) <0.88, 0.85>
+
+;; Mutation (color change)
+(bio-insight mutation $from $to) if (consistent-remap $from $to) <0.88, 0.85>
+
+;; Stimulus-response
+(bio-insight stimulus-response) if (marker-driven $in $out) <0.90, 0.85>
+
+;; Differentiation (new colors appear)
+(bio-insight differentiation $color) if (color-introduced $in $out $color) <0.88, 0.85>
+
+;; ─── UNIVERSAL RULES — fire on ANY data, not just puzzles ────────────
+
+;; Trait prevalence from learning
+(bio-insight trait-prevalence $trait $count) if (pattern-rate $trait $count $total) <0.88, 0.85>
+;; Symbiosis — co-occurring patterns = ecological coupling
+(bio-insight symbiosis $a $b) if (co-occur $a $b $both $base) <0.90, 0.85>
+;; Survival threshold — critical level for organism
+(bio-insight survival-threshold $indicator $value) if (threshold $indicator $pattern $value) <0.88, 0.85>
+;; Taxonomy — is-a = classification hierarchy
+(bio-insight taxonomy $organism $taxon) if (is-a $organism $taxon) <0.90, 0.88>
+;; Phenotype — has = observable trait
+(bio-insight phenotype $organism $trait) if (has $organism $trait) <0.88, 0.85>
+;; Capability = adaptation
+(bio-insight adaptation $organism $ability) if (can $organism $ability) <0.88, 0.85>
+;; Ecological role
+(bio-insight ecological-role $x $role) if (dna-edge $x role $role) <0.85, 0.80>

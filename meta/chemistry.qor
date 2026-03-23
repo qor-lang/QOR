@@ -1,0 +1,256 @@
+;; ═══════════════════════════════════════════════════════════════════════
+;; CHEMISTRY KNOWLEDGE DNA — chemistry.qor
+;; ═══════════════════════════════════════════════════════════════════════
+
+
+;; ─── 1. ATOMIC STRUCTURE ────────────────────────────────────────────
+
+(chem-fact atom-structure "atom = protons + neutrons (nucleus) + electrons (orbitals)") <0.99, 0.99>
+(chem-fact atomic-number "Z = number of protons = defines element") <0.99, 0.99>
+(chem-fact mass-number "A = protons + neutrons") <0.99, 0.99>
+(chem-fact isotope "same Z, different number of neutrons") <0.99, 0.99>
+(chem-fact ion "atom with different electrons than protons, has net charge") <0.99, 0.99>
+(chem-fact cation "positive ion, lost electrons") <0.99, 0.99>
+(chem-fact anion "negative ion, gained electrons") <0.99, 0.99>
+
+;; Electron configuration
+(chem-law aufbau "electrons fill lowest energy orbitals first") <0.99, 0.99>
+(chem-law pauli "max 2 electrons per orbital, opposite spins") <0.99, 0.99>
+(chem-law hund "electrons fill degenerate orbitals singly before pairing") <0.99, 0.99>
+(chem-fact orbital-order "1s 2s 2p 3s 3p 4s 3d 4p 5s 4d 5p 6s 4f 5d 6p 7s") <0.99, 0.99>
+(chem-fact orbital-capacity "s=2, p=6, d=10, f=14 electrons") <0.99, 0.99>
+(chem-fact valence-electrons "outermost shell electrons, determine chemistry") <0.99, 0.99>
+
+;; Periodic table groups
+(chem-fact group-1 "alkali metals: Li Na K Rb Cs Fr — 1 valence electron") <0.99, 0.99>
+(chem-fact group-2 "alkaline earth: Be Mg Ca Sr Ba Ra — 2 valence electrons") <0.99, 0.99>
+(chem-fact group-17 "halogens: F Cl Br I At — 7 valence electrons, very reactive") <0.99, 0.99>
+(chem-fact group-18 "noble gases: He Ne Ar Kr Xe Rn — full outer shell, inert") <0.99, 0.99>
+(chem-fact transition-metals "groups 3-12: d-block, variable oxidation states") <0.99, 0.99>
+
+;; Periodic trends
+(chem-law trend-atomic-radius "increases down group, decreases across period") <0.99, 0.99>
+(chem-law trend-ionization-energy "decreases down group, increases across period") <0.99, 0.99>
+(chem-law trend-electronegativity "decreases down group, increases across period") <0.99, 0.99>
+(chem-law trend-electron-affinity "generally increases across period") <0.99, 0.99>
+(chem-fact most-electronegative "fluorine is most electronegative element") <0.99, 0.99>
+
+
+;; ─── 2. CHEMICAL BONDING ────────────────────────────────────────────
+
+;; Types of bonds
+(chem-fact ionic-bond "transfer of electrons, metal + nonmetal") <0.99, 0.99>
+(chem-fact covalent-bond "sharing of electrons, nonmetal + nonmetal") <0.99, 0.99>
+(chem-fact metallic-bond "sea of delocalized electrons, metal + metal") <0.99, 0.99>
+(chem-fact polar-covalent "unequal sharing due to electronegativity difference") <0.99, 0.99>
+(chem-fact hydrogen-bond "weak bond: H bonded to F/O/N attracted to lone pair on F/O/N") <0.99, 0.99>
+(chem-fact van-der-waals "weak intermolecular forces, temporary dipoles") <0.99, 0.99>
+
+;; Bond properties
+(chem-law octet-rule "atoms tend to gain/lose/share to get 8 valence electrons") <0.99, 0.99>
+(chem-fact duet-rule "hydrogen and helium: 2 electrons for stability") <0.99, 0.99>
+(chem-fact bond-energy "energy required to break a bond") <0.99, 0.99>
+(chem-fact bond-length "distance between bonded nuclei") <0.99, 0.99>
+(chem-fact single-bond "1 shared pair, longest, weakest") <0.99, 0.99>
+(chem-fact double-bond "2 shared pairs, shorter, stronger") <0.99, 0.99>
+(chem-fact triple-bond "3 shared pairs, shortest, strongest") <0.99, 0.99>
+
+;; Molecular geometry (VSEPR)
+(chem-fact vsepr "electron pairs around central atom repel, determine shape") <0.99, 0.99>
+(chem-fact linear "2 bonding groups, 0 lone pairs → 180°") <0.99, 0.99>
+(chem-fact trigonal-planar "3 bonding groups, 0 lone pairs → 120°") <0.99, 0.99>
+(chem-fact tetrahedral "4 bonding groups, 0 lone pairs → 109.5°") <0.99, 0.99>
+(chem-fact bent "2 bonding + 1-2 lone pairs → <120° or <109.5°") <0.99, 0.99>
+(chem-fact trigonal-pyramidal "3 bonding + 1 lone pair → ~107°") <0.99, 0.99>
+
+
+;; ─── 3. CHEMICAL REACTIONS ──────────────────────────────────────────
+
+;; Reaction types
+(chem-fact synthesis "A + B → AB") <0.99, 0.99>
+(chem-fact decomposition "AB → A + B") <0.99, 0.99>
+(chem-fact single-replacement "A + BC → AC + B") <0.99, 0.99>
+(chem-fact double-replacement "AB + CD → AD + CB") <0.99, 0.99>
+(chem-fact combustion "fuel + O₂ → CO₂ + H₂O + energy") <0.99, 0.99>
+(chem-fact redox "electron transfer: oxidation (lose e⁻) + reduction (gain e⁻)") <0.99, 0.99>
+(chem-fact acid-base-neutralization "acid + base → salt + water") <0.99, 0.99>
+
+;; Balancing
+(chem-law conservation-of-mass "atoms in = atoms out in balanced equation") <0.99, 0.99>
+(chem-law conservation-of-charge "charges balance in ionic equations") <0.99, 0.99>
+
+;; Stoichiometry
+(chem-formula molar-mass "mass (g) = moles × molar mass (g/mol)") <0.99, 0.99>
+(chem-formula moles "n = mass / molar_mass") <0.99, 0.99>
+(chem-constant avogadro "1 mol = 6.022×10²³ particles") <0.99, 0.99>
+(chem-formula molarity "M = moles of solute / liters of solution") <0.99, 0.99>
+(chem-formula dilution "M₁V₁ = M₂V₂") <0.99, 0.99>
+(chem-formula percent-yield "% yield = (actual/theoretical) × 100") <0.99, 0.99>
+(chem-fact limiting-reagent "reactant that runs out first, determines product amount") <0.99, 0.99>
+
+;; Gas laws
+(chem-formula ideal-gas "PV = nRT") <0.99, 0.99>
+(chem-formula boyle "P₁V₁ = P₂V₂ (constant T)") <0.99, 0.99>
+(chem-formula charles "V₁/T₁ = V₂/T₂ (constant P)") <0.99, 0.99>
+(chem-formula gay-lussac "P₁/T₁ = P₂/T₂ (constant V)") <0.99, 0.99>
+(chem-formula avogadro-gas "V₁/n₁ = V₂/n₂ (constant T,P)") <0.99, 0.99>
+(chem-formula dalton-partial "P_total = P₁ + P₂ + P₃ + ...") <0.99, 0.99>
+(chem-fact stp "STP: 0°C (273.15K) and 1 atm, 1 mol gas = 22.4 L") <0.99, 0.99>
+
+
+;; ─── 4. THERMOCHEMISTRY ─────────────────────────────────────────────
+
+(chem-fact endothermic "absorbs heat, ΔH > 0") <0.99, 0.99>
+(chem-fact exothermic "releases heat, ΔH < 0") <0.99, 0.99>
+(chem-formula enthalpy "ΔH = H_products - H_reactants") <0.99, 0.99>
+(chem-formula hess-law "ΔH_total = sum of ΔH for each step") <0.99, 0.99>
+(chem-formula heat-reaction "ΔH = Σ(ΔH_f products) - Σ(ΔH_f reactants)") <0.99, 0.99>
+(chem-formula gibbs-free-energy "ΔG = ΔH - TΔS") <0.99, 0.99>
+(chem-fact spontaneous "reaction spontaneous when ΔG < 0") <0.99, 0.99>
+(chem-fact equilibrium-thermo "at equilibrium ΔG = 0") <0.99, 0.99>
+(chem-formula gibbs-equilibrium "ΔG° = -RT*ln(K)") <0.99, 0.99>
+
+
+;; ─── 5. ACIDS AND BASES ─────────────────────────────────────────────
+
+(chem-fact arrhenius-acid "produces H⁺ in water") <0.99, 0.99>
+(chem-fact arrhenius-base "produces OH⁻ in water") <0.99, 0.99>
+(chem-fact bronsted-acid "proton (H⁺) donor") <0.99, 0.99>
+(chem-fact bronsted-base "proton (H⁺) acceptor") <0.99, 0.99>
+(chem-fact lewis-acid "electron pair acceptor") <0.99, 0.99>
+(chem-fact lewis-base "electron pair donor") <0.99, 0.99>
+(chem-formula ph "pH = -log₁₀[H⁺]") <0.99, 0.99>
+(chem-formula poh "pOH = -log₁₀[OH⁻]") <0.99, 0.99>
+(chem-formula ph-poh "pH + pOH = 14 (at 25°C)") <0.99, 0.99>
+(chem-formula kw "K_w = [H⁺][OH⁻] = 1.0×10⁻¹⁴ at 25°C") <0.99, 0.99>
+(chem-fact ph-scale "pH 0-6 acid, 7 neutral, 8-14 base") <0.99, 0.99>
+(chem-fact strong-acids "HCl HBr HI HNO₃ H₂SO₄ HClO₄ — fully dissociate") <0.99, 0.99>
+(chem-fact strong-bases "NaOH KOH Ca(OH)₂ — fully dissociate") <0.99, 0.99>
+(chem-formula henderson-hasselbalch "pH = pKa + log([A⁻]/[HA])") <0.99, 0.99>
+
+
+;; ─── 6. CHEMICAL EQUILIBRIUM ────────────────────────────────────────
+
+(chem-formula equilibrium-constant "K = [products]^coeff / [reactants]^coeff") <0.99, 0.99>
+(chem-fact K-large "K >> 1 means products favored") <0.99, 0.99>
+(chem-fact K-small "K << 1 means reactants favored") <0.99, 0.99>
+(chem-law le-chatelier "system shifts to oppose applied stress") <0.99, 0.99>
+(chem-formula reaction-quotient "Q = same formula as K but not at equilibrium") <0.99, 0.99>
+(chem-fact Q-vs-K "Q < K → forward reaction; Q > K → reverse; Q = K → equilibrium") <0.99, 0.99>
+(chem-formula ksp "K_sp = [cation]^m[anion]^n for slightly soluble salt") <0.99, 0.99>
+
+
+;; ─── 7. ELECTROCHEMISTRY ────────────────────────────────────────────
+
+(chem-fact oxidation "loss of electrons, increase in oxidation number") <0.99, 0.99>
+(chem-fact reduction "gain of electrons, decrease in oxidation number") <0.99, 0.99>
+(chem-fact oilrig "OIL=Oxidation Is Loss, RIG=Reduction Is Gain (of electrons)") <0.99, 0.99>
+(chem-formula cell-potential "E°_cell = E°_cathode - E°_anode") <0.99, 0.99>
+(chem-formula nernst "E = E° - (RT/nF)*ln(Q)") <0.99, 0.99>
+(chem-formula gibbs-cell "ΔG° = -nFE°") <0.99, 0.99>
+(chem-constant faraday "F = 96485 C/mol") <0.99, 0.99>
+(chem-formula faraday-electrolysis "m = (MIt)/(nF)") <0.99, 0.99>
+
+
+;; ─── 8. KINETICS ────────────────────────────────────────────────────
+
+(chem-formula rate-law "rate = k[A]^m[B]^n") <0.99, 0.99>
+(chem-formula arrhenius-equation "k = A*e^(-Ea/RT)") <0.99, 0.99>
+(chem-fact activation-energy "minimum energy needed for reaction to occur") <0.99, 0.99>
+(chem-fact catalyst "speeds up reaction by lowering activation energy") <0.99, 0.99>
+(chem-formula first-order-half-life "t½ = ln(2)/k") <0.99, 0.99>
+(chem-formula first-order-integrated "ln[A] = ln[A]₀ - kt") <0.99, 0.99>
+(chem-formula second-order-integrated "1/[A] = 1/[A]₀ + kt") <0.99, 0.99>
+(chem-formula zero-order-integrated "[A] = [A]₀ - kt") <0.99, 0.99>
+
+
+;; ─── 9. ORGANIC CHEMISTRY ───────────────────────────────────────────
+
+;; Hydrocarbons
+(chem-fact alkane "C_nH_(2n+2), single bonds only, saturated") <0.99, 0.99>
+(chem-fact alkene "C_nH_(2n), has C=C double bond") <0.99, 0.99>
+(chem-fact alkyne "C_nH_(2n-2), has C≡C triple bond") <0.99, 0.99>
+(chem-fact aromatic "contains benzene ring C₆H₆, delocalized electrons") <0.99, 0.99>
+
+;; First 10 alkanes
+(chem-fact methane "CH₄, 1 carbon") <0.99, 0.99>
+(chem-fact ethane "C₂H₆, 2 carbons") <0.99, 0.99>
+(chem-fact propane "C₃H₈, 3 carbons") <0.99, 0.99>
+(chem-fact butane "C₄H₁₀, 4 carbons") <0.99, 0.99>
+
+;; Functional groups
+(chem-fact hydroxyl "-OH → alcohol") <0.99, 0.99>
+(chem-fact carboxyl "-COOH → carboxylic acid") <0.99, 0.99>
+(chem-fact amino "-NH₂ → amine") <0.99, 0.99>
+(chem-fact carbonyl "C=O → aldehyde (terminal) or ketone (internal)") <0.99, 0.99>
+(chem-fact ester "-COO- → ester (fruity smells)") <0.99, 0.99>
+(chem-fact ether "-O- → ether") <0.99, 0.99>
+
+;; Isomers
+(chem-fact structural-isomers "same formula, different connectivity") <0.99, 0.99>
+(chem-fact stereoisomers "same connectivity, different spatial arrangement") <0.99, 0.99>
+(chem-fact enantiomers "mirror images, not superimposable (chirality)") <0.99, 0.99>
+
+;; Polymers
+(chem-fact polymer "large molecule made of repeating monomer units") <0.99, 0.99>
+(chem-fact addition-polymerization "monomers add together (e.g. polyethylene)") <0.99, 0.99>
+(chem-fact condensation-polymerization "monomers join losing small molecule like H₂O") <0.99, 0.99>
+
+
+;; ─── 10. NUCLEAR CHEMISTRY ──────────────────────────────────────────
+
+(chem-formula radioactive-decay "N = N₀ × (½)^(t/t½)") <0.99, 0.99>
+(chem-fact alpha-particle "⁴₂He, heavy, stopped by paper") <0.99, 0.99>
+(chem-fact beta-particle "electron or positron, stopped by aluminum") <0.99, 0.99>
+(chem-fact gamma-ray "high-energy photon, stopped by lead/concrete") <0.99, 0.99>
+(chem-formula mass-energy "E = mc² (mass converts to energy in nuclear reactions)") <0.99, 0.99>
+(chem-fact carbon-14-dating "t½ = 5730 years, used for organic material up to ~50000 years") <0.99, 0.99>
+
+
+;; ═══════════════════════════════════════════════════════════════════════
+;; ~180 chemistry facts, formulas, and laws
+;; ═══════════════════════════════════════════════════════════════════════
+
+
+;; ═══════════════════════════════════════════════════════════════════════
+;; ACTIVE REASONING RULES — match on observations, produce chemistry insights
+;; ═══════════════════════════════════════════════════════════════════════
+
+;; Chemical reaction = color transformation
+(chem-insight transmutation $from $to) if (consistent-remap $from $to) <0.90, 0.88>
+
+;; Catalysis = small object triggers change
+(chem-insight catalysis) if (marker-driven $in $out) <0.88, 0.85>
+
+;; Elimination reaction = color removed
+(chem-insight elimination $color) if (color-eliminated $in $out $color) <0.90, 0.88>
+
+;; Synthesis = new color introduced
+(chem-insight synthesis $color) if (color-introduced $in $out $color) <0.90, 0.88>
+
+;; Selective reaction = some cells change, others don't
+(chem-insight selective-reaction) if (selective-removal $in $out) <0.88, 0.85>
+
+;; Conservation of mass
+(chem-insight mass-conserved) if (obs-consistent same-size) (objects-preserved $in $out) <0.93, 0.90>
+
+;; Decomposition (objects removed)
+(chem-insight decomposition) if (objects-removed $in $out) <0.88, 0.85>
+
+;; Precipitation (objects added)
+(chem-insight precipitation) if (objects-added $in $out) <0.88, 0.85>
+
+;; ─── UNIVERSAL RULES — fire on ANY data, not just puzzles ────────────
+
+;; Reaction rate from learning
+(chem-insight reaction-rate $pattern $count) if (pattern-rate $pattern $count $total) <0.88, 0.85>
+;; Reaction pair — co-occurring patterns = reagents
+(chem-insight reagent-pair $a $b) if (co-occur $a $b $both $base) <0.88, 0.85>
+;; Activation energy — threshold to trigger change
+(chem-insight activation-threshold $indicator $value) if (threshold $indicator $pattern $value) <0.90, 0.88>
+;; Molecular property
+(chem-insight substance-property $x $prop) if (has $x $prop) <0.88, 0.85>
+;; Classification — element/compound type
+(chem-insight substance-class $x $class) if (is-a $x $class) <0.85, 0.80>
+;; Compositional semantics
+(chem-insight composition $key) if (meaning $key $val) <0.85, 0.80>

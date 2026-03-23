@@ -1,0 +1,185 @@
+;; ═══════════════════════════════════════════════════════════════════════
+;; ASTRONOMY & EARTH SCIENCE KNOWLEDGE DNA — astronomy_earth.qor
+;; ═══════════════════════════════════════════════════════════════════════
+
+
+;; ─── 1. SOLAR SYSTEM ────────────────────────────────────────────────
+
+(astro-fact planets-order "Mercury Venus Earth Mars Jupiter Saturn Uranus Neptune") <0.99, 0.99>
+(astro-fact terrestrial "Mercury Venus Earth Mars — rocky, small, dense") <0.99, 0.99>
+(astro-fact gas-giants "Jupiter Saturn — hydrogen/helium, huge, low density") <0.99, 0.99>
+(astro-fact ice-giants "Uranus Neptune — water/ammonia/methane ices") <0.99, 0.99>
+(astro-fact asteroid-belt "between Mars and Jupiter") <0.99, 0.99>
+(astro-fact kuiper-belt "beyond Neptune, contains Pluto and comets") <0.99, 0.99>
+(astro-fact oort-cloud "spherical shell of icy objects, outer solar system") <0.99, 0.99>
+
+;; Sun
+(astro-fact sun-type "G-type main sequence star (yellow dwarf)") <0.99, 0.99>
+(astro-fact sun-composition "~73% hydrogen, ~25% helium by mass") <0.99, 0.99>
+(astro-fact sun-energy "fusion: 4H → He + energy (pp chain)") <0.99, 0.99>
+(astro-fact sun-temp-core "~15 million K") <0.99, 0.99>
+(astro-fact sun-temp-surface "~5778 K") <0.99, 0.99>
+(astro-fact sun-age "~4.6 billion years") <0.99, 0.99>
+(astro-fact earth-sun-distance "1 AU ≈ 150 million km") <0.99, 0.99>
+
+;; Earth
+(astro-fact earth-age "~4.54 billion years") <0.99, 0.99>
+(astro-fact earth-tilt "23.5° axial tilt → seasons") <0.99, 0.99>
+(astro-fact earth-rotation "24 hours → day/night") <0.99, 0.99>
+(astro-fact earth-revolution "365.25 days → year") <0.99, 0.99>
+(astro-fact moon-phases "new→waxing crescent→first quarter→waxing gibbous→full→waning") <0.99, 0.99>
+(astro-fact tides "caused by Moon's (and Sun's) gravitational pull") <0.99, 0.99>
+(astro-fact eclipse-solar "Moon between Earth and Sun") <0.99, 0.99>
+(astro-fact eclipse-lunar "Earth between Moon and Sun") <0.99, 0.99>
+
+
+;; ─── 2. STARS AND STELLAR EVOLUTION ─────────────────────────────────
+
+(astro-fact star-formation "gas cloud collapses → protostar → main sequence") <0.99, 0.99>
+(astro-fact main-sequence "star fuses H→He, stable, where stars spend most time") <0.99, 0.99>
+(astro-fact hr-diagram "plots luminosity vs temperature, main sequence is diagonal") <0.99, 0.99>
+(astro-fact red-giant "low-mass star exhausts H, expands and cools") <0.99, 0.99>
+(astro-fact white-dwarf "remnant of low-mass star after shedding outer layers") <0.99, 0.99>
+(astro-fact supernova "massive star explodes when core collapses") <0.99, 0.99>
+(astro-fact neutron-star "ultra-dense remnant of supernova, ~20km diameter") <0.99, 0.99>
+(astro-fact black-hole "remnant if core > ~3 solar masses, infinite density singularity") <0.99, 0.99>
+(astro-fact pulsar "rotating neutron star emitting beams of radiation") <0.99, 0.99>
+(astro-formula luminosity "L = 4πR²σT⁴ (Stefan-Boltzmann for stars)") <0.99, 0.99>
+(astro-formula stellar-magnitude "m₁-m₂ = -2.5*log₁₀(F₁/F₂)") <0.99, 0.99>
+(astro-formula parallax "d(parsec) = 1/p(arcseconds)") <0.99, 0.99>
+(astro-fact light-year "distance light travels in 1 year ≈ 9.46×10¹² km") <0.99, 0.99>
+(astro-fact parsec "3.26 light-years") <0.99, 0.99>
+
+
+;; ─── 3. COSMOLOGY ───────────────────────────────────────────────────
+
+(astro-fact big-bang "universe began ~13.8 billion years ago from singularity") <0.99, 0.99>
+(astro-fact expansion "universe is expanding, galaxies moving apart") <0.99, 0.99>
+(astro-formula hubble-law "v = H₀ × d (recession velocity = Hubble constant × distance)") <0.99, 0.99>
+(astro-fact hubble-constant "H₀ ≈ 70 km/s/Mpc") <0.99, 0.99>
+(astro-fact cmb "cosmic microwave background — afterglow of Big Bang, 2.725 K") <0.99, 0.99>
+(astro-fact dark-matter "~27% of universe, doesn't emit light, detected by gravity") <0.99, 0.99>
+(astro-fact dark-energy "~68% of universe, accelerating expansion") <0.99, 0.99>
+(astro-fact normal-matter "~5% of universe is ordinary baryonic matter") <0.99, 0.99>
+(astro-fact redshift "light stretched as universe expands, z = Δλ/λ") <0.99, 0.99>
+(astro-fact galaxy-types "spiral (Milky Way), elliptical, irregular") <0.99, 0.99>
+(astro-fact milky-way "spiral galaxy, ~100,000 light-years across, ~200 billion stars") <0.99, 0.99>
+(astro-fact observable-universe "~93 billion light-years diameter, ~2 trillion galaxies") <0.99, 0.99>
+
+
+;; ─── 4. GEOLOGY — EARTH STRUCTURE ───────────────────────────────────
+
+(geo-fact earth-layers "crust → mantle → outer core (liquid) → inner core (solid)") <0.99, 0.99>
+(geo-fact crust "thin outer layer: oceanic (~7km) and continental (~35km)") <0.99, 0.99>
+(geo-fact mantle "thick layer, mostly solid but flows slowly (convection)") <0.99, 0.99>
+(geo-fact outer-core "liquid iron/nickel, generates magnetic field") <0.99, 0.99>
+(geo-fact inner-core "solid iron/nickel, ~5400°C, pressure keeps it solid") <0.99, 0.99>
+(geo-fact lithosphere "crust + upper mantle, rigid, broken into tectonic plates") <0.99, 0.99>
+(geo-fact asthenosphere "partially molten upper mantle, plates float on it") <0.99, 0.99>
+
+;; Plate tectonics
+(geo-fact plate-tectonics "lithosphere divided into plates that move on asthenosphere") <0.99, 0.99>
+(geo-fact divergent-boundary "plates move apart → mid-ocean ridges, rift valleys, new crust") <0.99, 0.99>
+(geo-fact convergent-boundary "plates collide → subduction, mountains, trenches, volcanoes") <0.99, 0.99>
+(geo-fact transform-boundary "plates slide past → earthquakes (e.g., San Andreas)") <0.99, 0.99>
+(geo-fact continental-drift "Wegener: continents were once joined (Pangaea)") <0.99, 0.99>
+(geo-fact seafloor-spreading "new oceanic crust formed at mid-ocean ridges") <0.99, 0.99>
+(geo-fact subduction "oceanic plate dives under continental plate") <0.99, 0.99>
+(geo-fact ring-of-fire "Pacific rim — most earthquakes and volcanoes") <0.99, 0.99>
+
+;; Rocks and minerals
+(geo-fact rock-cycle "igneous → sedimentary → metamorphic → (melting) → igneous") <0.99, 0.99>
+(geo-fact igneous "formed from cooled magma/lava (granite, basalt)") <0.99, 0.99>
+(geo-fact sedimentary "formed from compressed sediments (sandstone, limestone)") <0.99, 0.99>
+(geo-fact metamorphic "formed from heat/pressure changing existing rock (marble, slate)") <0.99, 0.99>
+(geo-fact mineral "naturally occurring, inorganic, crystalline solid, definite composition") <0.99, 0.99>
+(geo-fact mohs-scale "hardness 1(talc) to 10(diamond)") <0.99, 0.99>
+
+;; Earthquakes and volcanoes
+(geo-fact earthquake "sudden release of energy from fault movement") <0.99, 0.99>
+(geo-fact seismic-waves "P-waves (fastest, compressional) S-waves (slower, shear) Surface (most damage)") <0.99, 0.99>
+(geo-fact richter-scale "logarithmic — each whole number = 10× more amplitude, 32× more energy") <0.99, 0.99>
+(geo-fact volcano-types "shield (gentle, basalt), composite (steep, explosive), cinder cone") <0.99, 0.99>
+
+;; Geologic time
+(geo-fact eons "Hadean → Archean → Proterozoic → Phanerozoic") <0.99, 0.99>
+(geo-fact phanerozoic-eras "Paleozoic → Mesozoic → Cenozoic") <0.99, 0.99>
+(geo-fact mass-extinctions "5 major: Ordovician, Devonian, Permian(worst), Triassic, Cretaceous(dinosaurs)") <0.99, 0.99>
+(geo-fact fossil "preserved remains of ancient organisms") <0.99, 0.99>
+(geo-fact radiometric-dating "uses radioactive decay to determine age of rocks") <0.99, 0.99>
+(geo-fact stratigraphy "older layers on bottom, younger on top (law of superposition)") <0.99, 0.99>
+
+
+;; ─── 5. ATMOSPHERE AND WEATHER ──────────────────────────────────────
+
+(geo-fact atmosphere-layers "troposphere → stratosphere → mesosphere → thermosphere → exosphere") <0.99, 0.99>
+(geo-fact troposphere "0-12km, where weather happens, temperature decreases with altitude") <0.99, 0.99>
+(geo-fact stratosphere "12-50km, contains ozone layer, temperature increases") <0.99, 0.99>
+(geo-fact ozone-layer "O₃ in stratosphere, absorbs UV radiation") <0.99, 0.99>
+(geo-fact atmosphere-composition "78% N₂, 21% O₂, ~1% Ar, ~0.04% CO₂") <0.99, 0.99>
+(geo-fact greenhouse-effect "CO₂ H₂O CH₄ trap heat → warms surface") <0.99, 0.99>
+(geo-fact coriolis-effect "Earth's rotation deflects moving air/water (right in N, left in S)") <0.99, 0.99>
+(geo-fact pressure-systems "high pressure → clear skies; low pressure → storms") <0.99, 0.99>
+(geo-fact fronts "cold front (cold replaces warm), warm front (warm replaces cold)") <0.99, 0.99>
+(geo-fact hurricane "tropical cyclone, warm ocean water, low pressure, spiral winds") <0.99, 0.99>
+
+;; Climate
+(geo-fact climate-zones "tropical, temperate, polar — based on latitude") <0.99, 0.99>
+(geo-fact climate-change "increasing CO₂ → global warming → ice melt, sea rise, weather extremes") <0.99, 0.99>
+(geo-fact ice-ages "periodic glacial periods caused by Milankovitch cycles") <0.99, 0.99>
+(geo-fact milankovitch "orbital variations: eccentricity(100k yr), obliquity(41k yr), precession(26k yr)") <0.99, 0.99>
+
+;; Oceanography
+(geo-fact ocean-currents "driven by wind, temperature, salinity, Coriolis effect") <0.99, 0.99>
+(geo-fact thermohaline "global conveyor belt driven by temperature and salinity differences") <0.99, 0.99>
+(geo-fact ocean-zones "epipelagic(sunlit)→mesopelagic(twilight)→bathypelagic(midnight)→abyssopelagic→hadal") <0.99, 0.99>
+(geo-fact salinity "average ocean salinity ~35 parts per thousand") <0.99, 0.99>
+
+
+;; ═══════════════════════════════════════════════════════════════════════
+;; ~130 astronomy/earth science facts and formulas
+;; ═══════════════════════════════════════════════════════════════════════
+
+
+;; ═══════════════════════════════════════════════════════════════════════
+;; ACTIVE REASONING RULES — match on observations, produce astro/geo insights
+;; ═══════════════════════════════════════════════════════════════════════
+
+;; Orbital motion = rotation
+(astro-insight orbital-motion) if (detected-rotate-90) <0.90, 0.85>
+(astro-insight orbital-motion) if (detected-rotate-180) <0.90, 0.85>
+
+;; Displacement field
+(astro-insight displacement-field $dr $dc) if (detected-shift $dr $dc) <0.90, 0.85>
+
+;; Stellar evolution (size change)
+(astro-insight expansion) if (obs-consistent output-larger) <0.88, 0.85>
+(astro-insight contraction) if (obs-consistent output-smaller) <0.88, 0.85>
+
+;; Spectral shift (color change)
+(astro-insight spectral-shift $from $to) if (consistent-remap $from $to) <0.88, 0.85>
+
+;; Geological erosion = selective removal
+(astro-insight erosion) if (selective-removal $in $out) <0.88, 0.85>
+
+;; Accretion = objects added
+(astro-insight accretion) if (objects-added $in $out) <0.88, 0.85>
+
+;; Mirror symmetry in nature
+(astro-insight bilateral-symmetry) if (detected-reflect-h) <0.90, 0.85>
+(astro-insight bilateral-symmetry) if (detected-reflect-v) <0.90, 0.85>
+
+;; ─── UNIVERSAL RULES — fire on ANY data, not just puzzles ────────────
+
+;; Periodic phenomena from learning
+(astro-insight periodicity $pattern $count) if (pattern-rate $pattern $count $total) <0.88, 0.85>
+;; Conjunction — co-occurring events
+(astro-insight conjunction $a $b) if (co-occur $a $b $both $base) <0.88, 0.85>
+;; Critical mass — threshold for phase change
+(astro-insight critical-mass $indicator $value) if (threshold $indicator $pattern $value) <0.88, 0.85>
+;; Celestial classification
+(astro-insight celestial-class $body $type) if (is-a $body $type) <0.85, 0.80>
+;; Stellar property
+(astro-insight property $body $prop) if (has $body $prop) <0.85, 0.80>
+;; Domain awareness
+(astro-insight field $d) if (domain $d) <0.85, 0.80>

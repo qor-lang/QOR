@@ -1,0 +1,110 @@
+;; ── QOR Core Vocabulary ──────────────────────────────────────────
+;; These are the structural words QOR knows about English.
+;; Add new words here and QOR will learn them on next startup.
+;; To add a new language, create a new file (e.g. vocabulary-es.qor)
+;; and add (language spanish) <0.99, 0.99>
+
+;; Language identity
+(language english) <0.99, 0.99>
+
+;; Greetings & Farewells
+(vocab hello greeting) <0.99, 0.99>
+(vocab hi greeting) <0.99, 0.99>
+(vocab hey greeting) <0.99, 0.99>
+(vocab greetings greeting) <0.99, 0.99>
+(vocab bye farewell) <0.99, 0.99>
+(vocab goodbye farewell) <0.99, 0.99>
+(vocab later farewell) <0.99, 0.99>
+
+;; Question Words
+(vocab what question-word) <0.99, 0.99>
+(vocab why question-word) <0.99, 0.99>
+(vocab how question-word) <0.99, 0.99>
+(vocab who question-word) <0.99, 0.99>
+(vocab where question-word) <0.99, 0.99>
+(vocab when question-word) <0.99, 0.99>
+(vocab which question-word) <0.99, 0.99>
+
+;; Copulas (linking verbs)
+(vocab is copula) <0.99, 0.99>
+(vocab are copula) <0.99, 0.99>
+(vocab was copula) <0.99, 0.99>
+(vocab were copula) <0.99, 0.99>
+
+;; Command Words
+(vocab show command-word) <0.99, 0.99>
+(vocab list command-word) <0.99, 0.99>
+(vocab help command-word) <0.99, 0.99>
+(vocab tell command-word) <0.99, 0.99>
+(vocab describe command-word) <0.99, 0.99>
+(vocab explain command-word) <0.99, 0.99>
+(vocab find command-word) <0.99, 0.99>
+
+;; Articles
+(vocab the article) <0.99, 0.99>
+(vocab a article) <0.99, 0.99>
+(vocab an article) <0.99, 0.99>
+
+;; Prepositions
+(vocab about preposition) <0.99, 0.99>
+(vocab of preposition) <0.99, 0.99>
+(vocab in preposition) <0.99, 0.99>
+(vocab for preposition) <0.99, 0.99>
+(vocab with preposition) <0.99, 0.99>
+(vocab from preposition) <0.99, 0.99>
+(vocab to preposition) <0.99, 0.99>
+(vocab by preposition) <0.99, 0.99>
+(vocab at preposition) <0.99, 0.99>
+
+;; Pronouns
+(vocab me pronoun) <0.99, 0.99>
+(vocab my pronoun) <0.99, 0.99>
+(vocab your pronoun) <0.99, 0.99>
+(vocab you pronoun) <0.99, 0.99>
+(vocab i pronoun) <0.99, 0.99>
+(vocab it pronoun) <0.99, 0.99>
+(vocab they pronoun) <0.99, 0.99>
+(vocab we pronoun) <0.99, 0.99>
+
+;; Auxiliaries
+(vocab do auxiliary) <0.99, 0.99>
+(vocab does auxiliary) <0.99, 0.99>
+(vocab did auxiliary) <0.99, 0.99>
+(vocab can auxiliary) <0.99, 0.99>
+(vocab could auxiliary) <0.99, 0.99>
+(vocab will auxiliary) <0.99, 0.99>
+(vocab would auxiliary) <0.99, 0.99>
+
+;; Quantifiers
+(vocab many quantifier) <0.99, 0.99>
+(vocab some quantifier) <0.99, 0.99>
+(vocab all quantifier) <0.99, 0.99>
+(vocab any quantifier) <0.99, 0.99>
+(vocab every quantifier) <0.99, 0.99>
+
+;; Conjunctions
+(vocab and conjunction) <0.99, 0.99>
+(vocab or conjunction) <0.99, 0.99>
+(vocab but conjunction) <0.99, 0.99>
+
+;; Negation
+(vocab not negation) <0.99, 0.99>
+(vocab no negation) <0.99, 0.99>
+(vocab never negation) <0.99, 0.99>
+
+;; Common Verbs
+(vocab know verb) <0.99, 0.99>
+(vocab think verb) <0.99, 0.99>
+(vocab mean verb) <0.99, 0.99>
+(vocab means verb) <0.99, 0.99>
+(vocab have verb) <0.99, 0.99>
+(vocab has verb) <0.99, 0.99>
+(vocab like verb) <0.99, 0.99>
+(vocab want verb) <0.99, 0.99>
+(vocab need verb) <0.99, 0.99>
+
+;; Affirmative
+(vocab yes affirmative) <0.99, 0.99>
+(vocab yeah affirmative) <0.99, 0.99>
+(vocab ok affirmative) <0.99, 0.99>
+(vocab sure affirmative) <0.99, 0.99>

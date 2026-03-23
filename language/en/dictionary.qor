@@ -1,0 +1,12 @@
+;; ── QOR Dictionary ──────────────────────────────────────────────
+;; Learned vocabulary — QOR adds new words here during chat.
+;; You can also add definitions manually.
+;;
+;; Format: (meaning <word> <description>) <strength, confidence>
+;;
+;; Examples:
+;;   (meaning overbought buying-pressure-extreme) <0.99, 0.90>
+;;   (meaning rsi relative-strength-index) <0.99, 0.90>
+;;   (meaning bullish expecting-price-increase) <0.99, 0.90>
+(meaning bitcoin digital-currency-invented-by-satoshi) <0.99, 0.90>
+(meaning bitcoin decentralized-digital-currency) <0.99, 0.90>

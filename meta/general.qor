@@ -1,0 +1,135 @@
+;; ══════════════════════════════════════════════════════════════
+;; ── History Rules
+;; ══════════════════════════════════════════════════════════════
+
+(preceded $event2 $event1) if
+    (date $event1 $d1)
+    (date $event2 $d2)
+    (less_than $d1 $d2) <0.95, 0.95>
+
+(contemporary $person1 $person2) if
+    (birth_date $person1 $b1)
+    (death_date $person1 $d1)
+    (birth_date $person2 $b2)
+    (death_date $person2 $d2)
+    (overlaps $b1 $d1 $b2 $d2) <0.85, 0.85>
+
+(same_era $a $b) if
+    (date $a $d1)
+    (date $b $d2)
+    (within_years $d1 $d2 50) <0.75, 0.75>
+
+(colonial_power $country) if
+    (instance_of $colony colony)
+    (country $colony $country) <0.85, 0.85>
+
+;; ══════════════════════════════════════════════════════════════
+;; ── General Reasoning Rules
+;; ══════════════════════════════════════════════════════════════
+
+;; Transitivity
+(located_in $a $c) if
+    (located_in $a $b)
+    (located_in $b $c) <0.85, 0.85>
+
+(subclass_of $a $c) if
+    (subclass_of $a $b)
+    (subclass_of $b $c) <0.90, 0.90>
+
+;; Symmetry
+(spouse $b $a) if
+    (spouse $a $b) <0.99, 0.99>
+
+(shares_border $b $a) if
+    (shares_border $a $b) <0.99, 0.99>
+
+(related_to $b $a) if
+    (related_to $a $b) <0.90, 0.90>
+
+;; Person classification
+(scientist $x) if
+    (occupation $x physicist) <0.90, 0.90>
+
+(scientist $x) if
+    (occupation $x chemist) <0.90, 0.90>
+
+(scientist $x) if
+    (occupation $x biologist) <0.90, 0.90>
+
+(artist $x) if
+    (occupation $x painter) <0.90, 0.90>
+
+(artist $x) if
+    (occupation $x musician) <0.90, 0.90>
+
+(artist $x) if
+    (occupation $x sculptor) <0.90, 0.90>
+
+(alive $x) if
+    (birth_date $x $d)
+    not (death_date $x $any) <0.80, 0.80>
+
+(dead $x) if
+    (death_date $x $d) <0.99, 0.99>
+
+;; Geographic reasoning
+(european $x) if
+    (continent $x europe) <0.95, 0.95>
+
+(asian $x) if
+    (continent $x asia) <0.95, 0.95>
+
+(island_nation $x) if
+    (instance_of $x country)
+    (instance_of $x island) <0.85, 0.85>
+
+;; Knowledge gaps — flag when info is missing
+(needs_birth_date $x) if
+    (instance_of $x human)
+    not (birth_date $x $any) <0.70, 0.70>
+
+(needs_description $x) if
+    (label $x $name)
+    not (abstract $x $any) <0.60, 0.60>
+
+
+;; ═══════════════════════════════════════════════════════════════════════
+;; KB GRAPH REASONING — derive facts from binary knowledge graph
+;; ═══════════════════════════════════════════════════════════════════════
+
+;; Formula type hierarchy (OEIS graph predicates)
+(subtype formula_recurrence formula) <1.00, 1.00>
+(subtype formula_closed formula) <1.00, 1.00>
+(subtype formula_gf formula) <1.00, 1.00>
+(subtype formula_sum formula) <1.00, 1.00>
+(subtype formula_mod formula) <1.00, 1.00>
+(subtype formula_bound formula) <1.00, 1.00>
+
+;; Computability from formulas
+(computable $seq) if (lookup "formula_recurrence" $seq $f) <0.95, 0.95>
+(computable $seq) if (lookup "formula_closed" $seq $f) <0.98, 0.98>
+
+;; Core sequences (marked in OEIS with "core" keyword)
+(core-sequence $seq) if (lookup "keyword" $seq $kw) (== $kw core) <0.99, 0.99>
+
+;; ═══════════════════════════════════════════════════════════════════════
+;; ACTIVE REASONING RULES — bridge to observation predicates
+;; ═══════════════════════════════════════════════════════════════════════
+
+(general-insight transform-detected) if (has-geometric-transform) <0.90, 0.85>
+(general-insight size-change) if (obs-consistent output-larger) <0.88, 0.85>
+(general-insight size-change) if (obs-consistent output-smaller) <0.88, 0.85>
+
+;; ─── UNIVERSAL RULES — fire on ANY data ────────────
+
+;; Ontological links
+(general-insight classification $x $type) if (is-a $x $type) <0.90, 0.85>
+(general-insight attribute $x $prop) if (has $x $prop) <0.88, 0.85>
+(general-insight ability $x $act) if (can $x $act) <0.88, 0.85>
+;; Semantic knowledge
+(general-insight semantic $key) if (meaning $key $val) <0.85, 0.80>
+;; Pattern recognition
+(general-insight pattern $p $count) if (pattern-rate $p $count $total) <0.88, 0.85>
+(general-insight co-pattern $a $b) if (co-occur $a $b $both $base) <0.88, 0.85>
+;; Context
+(general-insight domain-active $d) if (domain $d) <0.85, 0.80>
