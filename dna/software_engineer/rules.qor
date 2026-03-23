@@ -1,0 +1,203 @@
+;; ── Software Engineer DNA — Architecture & Systems Reasoning Rules ────
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── CODE QUALITY ────────────────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+
+;; Complexity
+(high-complexity $module) if (cyclomatic-complexity $module $cc) (> $cc 20) <0.85, 0.85>
+(low-complexity $module) if (cyclomatic-complexity $module $cc) (< $cc 5) <0.85, 0.85>
+(god-class $class) if (method-count $class $mc) (> $mc 30) (loc $class $l) (> $l 1000) <0.80, 0.80>
+(god-function $fn) if (loc $fn $l) (> $l 100) (parameter-count $fn $p) (> $p 5) <0.80, 0.80>
+(deep-nesting $fn) if (max-nesting $fn $n) (> $n 4) <0.80, 0.80>
+
+;; Test coverage
+(well-tested $module) if (test-coverage $module $cov) (> $cov 80) <0.85, 0.85>
+(undertested $module) if (test-coverage $module $cov) (< $cov 50) <0.85, 0.85>
+(untested $module) if (test-coverage $module $cov) (< $cov 10) <0.90, 0.90>
+(test-quality-poor $module) if (mutation-score $module $ms) (< $ms 50) <0.80, 0.80>
+
+;; Coupling and cohesion
+(tightly-coupled $a $b) if (dependency-count $a $b $n) (> $n 5) <0.80, 0.80>
+(circular-dependency $a $b) if (depends-on $a $b) (depends-on $b $a) <0.85, 0.85>
+(low-cohesion $module) if (responsibility-count $module $r) (> $r 3) <0.80, 0.80>
+(high-cohesion $module) if (responsibility-count $module $r) (< $r 2) <0.85, 0.85>
+
+;; Code smells
+(duplicate-code $a $b) if (similarity $a $b $pct) (> $pct 80) <0.80, 0.80>
+(dead-code $fn) if (call-count $fn $c) (< $c 1) (exported $fn) <0.80, 0.80>
+(magic-number $fn) if (literal-count $fn $n) (> $n 3) <0.75, 0.75>
+(feature-envy $method $class) if (external-calls $method $class $n) (> $n 5) <0.75, 0.75>
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── ARCHITECTURE ────────────────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+
+;; Design pattern suggestions
+(observer-needed $system) if (event-driven $system) (subscriber-count $system $n) (> $n 3) <0.75, 0.75>
+(strategy-needed $system) if (algorithm-variants $system $n) (> $n 2) (runtime-selection $system) <0.75, 0.75>
+(factory-needed $system) if (object-types $system $n) (> $n 3) (creation-logic-complex $system) <0.75, 0.75>
+(singleton-antipattern $class) if (global-state $class) (testability-issue $class) <0.80, 0.80>
+
+;; Architecture style
+(monolith-appropriate $system) if (team-size $system $t) (< $t 8) (domain-count $system $d) (< $d 3) <0.75, 0.75>
+(microservice-appropriate $system) if (team-size $system $t) (> $t 20) (independent-deploy $system) (domain-count $system $d) (> $d 4) <0.75, 0.75>
+(modular-monolith-appropriate $system) if (team-size $system $t) (> $t 8) (< $t 20) <0.75, 0.75>
+(serverless-appropriate $system) if (event-driven $system) (variable-load $system) (stateless $system) <0.75, 0.75>
+
+;; Layer violations
+(layer-violation $caller $callee) if (layer $caller $l1) (layer $callee $l2) (lower-layer $l1 $l2) <0.85, 0.85>
+(domain-leak $module) if (infrastructure-import $module) (domain-layer $module) <0.80, 0.80>
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── PERFORMANCE ─────────────────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+
+;; Response time
+(latency-ok $endpoint) if (p99-latency $endpoint $l) (< $l 200) <0.85, 0.85>
+(latency-slow $endpoint) if (p99-latency $endpoint $l) (> $l 500) <0.85, 0.85>
+(latency-critical $endpoint) if (p99-latency $endpoint $l) (> $l 2000) <0.90, 0.90>
+
+;; Database
+(n-plus-one $query) if (query-count $query $n) (result-count $query $r) (> $n $r) <0.85, 0.85>
+(missing-index $query) if (full-table-scan $query) (row-count $query $r) (> $r 10000) <0.85, 0.85>
+(slow-query $query) if (execution-time $query $t) (> $t 100) <0.85, 0.85>
+(connection-pool-exhausted $db) if (connection-utilization $db $pct) (> $pct 90) <0.85, 0.85>
+
+;; Memory
+(memory-leak $process) if (heap-growth $process $rate) (> $rate 0) (gc-ineffective $process) <0.85, 0.85>
+(memory-pressure $process) if (heap-utilization $process $pct) (> $pct 85) <0.85, 0.85>
+(gc-pressure $process) if (gc-time-pct $process $pct) (> $pct 10) <0.80, 0.80>
+
+;; CPU
+(cpu-bound $process) if (cpu-usage $process $cpu) (> $cpu 90) (io-wait $process $iow) (< $iow 10) <0.85, 0.85>
+(io-bound $process) if (io-wait $process $iow) (> $iow 30) (cpu-usage $process $cpu) (< $cpu 50) <0.85, 0.85>
+
+;; Caching
+(cache-needed $endpoint) if (latency-slow $endpoint) (read-heavy $endpoint) (cache-hit-rate $endpoint $chr) (< $chr 50) <0.80, 0.75>
+(cache-thrashing $cache) if (eviction-rate $cache $er) (> $er 50) <0.80, 0.80>
+(cache-stale-risk $cache) if (ttl $cache $t) (> $t 3600) (data-update-freq $cache $f) (> $f 10) <0.80, 0.80>
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── SECURITY ────────────────────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+
+;; Vulnerability types
+(sql-injection-risk $endpoint) if (user-input $endpoint) (raw-sql $endpoint) not (parameterized-query $endpoint) <0.90, 0.90>
+(xss-risk $endpoint) if (user-input $endpoint) (html-output $endpoint) not (output-encoding $endpoint) <0.90, 0.90>
+(csrf-risk $endpoint) if (state-changing $endpoint) not (csrf-token $endpoint) <0.85, 0.85>
+(ssrf-risk $endpoint) if (url-input $endpoint) (server-side-request $endpoint) not (url-whitelist $endpoint) <0.85, 0.85>
+(idor-risk $endpoint) if (user-resource $endpoint) not (authorization-check $endpoint) <0.85, 0.85>
+
+;; Authentication
+(auth-weak $system) if (password-policy $system $pp) (< $pp 8) <0.85, 0.85>
+(auth-missing $endpoint) if (sensitive-data $endpoint) not (auth-required $endpoint) <0.90, 0.90>
+(session-fixation-risk $system) if (session-regeneration $system none) <0.85, 0.85>
+(jwt-misconfigured $system) if (jwt-algorithm $system none) <0.85, 0.85>
+
+;; Data exposure
+(pii-exposed $endpoint) if (pii-field $endpoint $field) (response-includes $endpoint $field) not (encryption $endpoint) <0.90, 0.90>
+(secret-in-code $repo) if (credential-pattern $repo $file) <0.90, 0.90>
+(logging-sensitive-data $system) if (log-contains $system pii) <0.85, 0.85>
+
+;; Dependency security
+(vulnerable-dependency $dep) if (cve $dep $cve) (severity $cve critical) <0.90, 0.90>
+(outdated-dependency $dep) if (versions-behind $dep $n) (> $n 3) <0.80, 0.80>
+(supply-chain-risk $dep) if (unmaintained $dep) (> (days-since-update $dep) 365) <0.80, 0.80>
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── RELIABILITY ─────────────────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+
+;; Availability
+(sla-risk $service) if (uptime $service $u) (sla-target $service $target) (< $u $target) <0.90, 0.90>
+(error-rate-high $service) if (error-rate $service $er) (> $er 1) <0.85, 0.85>
+(error-budget-exhausted $service) if (error-budget-remaining $service $eb) (< $eb 10) <0.85, 0.85>
+
+;; Fault tolerance
+(single-point-failure $system $component) if (dependency $system $component) not (redundancy $component) <0.85, 0.85>
+(circuit-breaker-needed $service) if (downstream-failure-rate $service $fr) (> $fr 5) <0.80, 0.80>
+(retry-storm-risk $system) if (retry-enabled $system) (no-backoff $system) (no-jitter $system) <0.80, 0.80>
+(cascade-failure-risk $system) if (tightly-coupled $system $dep) (no-circuit-breaker $system) <0.80, 0.80>
+
+;; Data integrity
+(data-loss-risk $system) if (no-backup $system) (stateful $system) <0.90, 0.90>
+(inconsistency-risk $system) if (distributed-state $system) not (eventual-consistency $system) not (strong-consistency $system) <0.80, 0.80>
+(split-brain-risk $cluster) if (distributed $cluster) (partition-handling $cluster none) <0.85, 0.85>
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── SCALABILITY ─────────────────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+
+;; Capacity
+(approaching-capacity $service) if (capacity-utilization $service $pct) (> $pct 80) <0.85, 0.85>
+(scale-up-needed $service) if (cpu-usage $service $cpu) (> $cpu 80) <0.85, 0.85>
+(scale-out-needed $service) if (approaching-capacity $service) (stateless $service) <0.85, 0.80>
+(over-provisioned $service) if (cpu-usage $service $cpu) (< $cpu 15) (memory-usage $service $mem) (< $mem 20) <0.80, 0.80>
+
+;; Bottlenecks
+(db-bottleneck $system) if (latency-slow $system) (db-query-time $system $qt) (> $qt 100) <0.85, 0.85>
+(network-bottleneck $system) if (bandwidth-utilization $system $pct) (> $pct 80) <0.80, 0.80>
+(write-bottleneck $system) if (write-latency $system $wl) (> $wl 50) (read-latency $system $rl) (< $rl 10) <0.80, 0.80>
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── DEVOPS & CI/CD ──────────────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+
+;; Build health
+(build-broken $repo) if (build-status $repo failing) <0.95, 0.90>
+(flaky-test $test) if (pass-rate $test $pr) (> $pr 50) (< $pr 95) <0.80, 0.80>
+(slow-build $repo) if (build-time $repo $t) (> $t 600) <0.80, 0.80>
+(deploy-too-rare $service) if (deploy-frequency $service $df) (< $df 1) <0.80, 0.80>
+(deploy-risk-high $service) if (deploy-too-rare $service) (change-batch-size $service large) <0.80, 0.75>
+
+;; Container and infra
+(image-bloated $container) if (image-size $container $s) (> $s 1000) <0.80, 0.80>
+(resource-limit-missing $pod) if (no-cpu-limit $pod) <0.80, 0.80>
+(resource-limit-missing $pod) if (no-memory-limit $pod) <0.80, 0.80>
+(noisy-neighbor-risk $pod) if (resource-limit-missing $pod) (shared-node $pod) <0.80, 0.75>
+
+;; Observability
+(observability-gap $service) if not (structured-logging $service) <0.80, 0.80>
+(observability-gap $service) if not (metrics $service) <0.80, 0.80>
+(observability-gap $service) if not (tracing $service) <0.80, 0.80>
+(alert-fatigue $team) if (alert-count-daily $team $n) (> $n 50) <0.80, 0.80>
+(missing-dashboard $service) if (production $service) not (monitoring-dashboard $service) <0.80, 0.80>
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── API DESIGN ──────────────────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+
+(api-versioning-needed $api) if (breaking-change $api) (consumers $api $n) (> $n 1) <0.85, 0.85>
+(over-fetching $endpoint) if (field-usage-ratio $endpoint $ratio) (> $ratio 3) <0.80, 0.80>
+(under-fetching $endpoint) if (subsequent-calls $endpoint $n) (> $n 2) <0.80, 0.80>
+(graphql-candidate $api) if (over-fetching $api) (under-fetching $api) (varied-clients $api) <0.75, 0.75>
+(rate-limiting-needed $api) if (public-api $api) not (rate-limit $api) <0.85, 0.85>
+(pagination-needed $endpoint) if (max-result-count $endpoint $n) (> $n 100) <0.85, 0.85>
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── TECHNICAL DEBT ──────────────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+
+;; Debt assessment
+(high-tech-debt $module) if (undertested $module) (high-complexity $module) <0.80, 0.75>
+(tech-debt-accumulating $repo) if (pr-review-time $repo $t) (> $t 48) (open-pr-count $repo $n) (> $n 20) <0.80, 0.80>
+(refactor-needed $module) if (high-tech-debt $module) (change-frequency $module high) <0.80, 0.75>
+(legacy-risk $system) if (language-version $system $v) (eol $v) <0.85, 0.85>
+(migration-needed $system) if (legacy-risk $system) (security-risk $system) <0.85, 0.80>
+
+;; Multi-step: quality → reliability chain
+(incident-likely $service) if (undertested $service) (high-complexity $service) (deploy-frequency $service $df) (> $df 5) <0.75, 0.70>
+(incident-response-slow $team) if (observability-gap $service) (no-runbook $service) <0.80, 0.75>
+(reliability-concern $service) if (incident-likely $service) (incident-response-slow $team) <0.75, 0.70>
+(sre-investment-needed $org) if (reliability-concern $service) (sla-risk $service) <0.80, 0.75>
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── DATA ENGINEERING ────────────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+
+(schema-drift $table) if (column-added $table $col) not (migration $table $col) <0.80, 0.80>
+(data-freshness-issue $pipeline) if (last-run $pipeline $hours) (> $hours 24) (sla-freshness $pipeline $sla) (> $hours $sla) <0.85, 0.85>
+(pipeline-broken $pipeline) if (last-success $pipeline $hours) (> $hours 48) <0.85, 0.85>
+(data-quality-check-missing $pipeline) if (no-validation $pipeline) (production $pipeline) <0.80, 0.80>
+(warehouse-cost-concern $warehouse) if (monthly-cost $warehouse $c) (growth-rate $warehouse $gr) (> $gr 20) <0.80, 0.80>

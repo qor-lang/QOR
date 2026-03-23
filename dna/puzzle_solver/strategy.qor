@@ -1,0 +1,56 @@
+;; ══════════════════════════════════════════════════════════════════════
+;; STRATEGY — Memory-guided decision making
+;; ══════════════════════════════════════════════════════════════════════
+;;
+;; Uses structured memory (memory.qor) to guide solving:
+;;   - Skip strategies that already failed on this item
+;;   - Suggest strategies that worked on similar items
+;;   - Start from best partial result instead of scratch
+;;   - Give extra time to items that are improving
+;;
+;; Memory predicates (produced by Rust, consumed by QOR):
+;;   (solved ITEM STRATEGY)              — level 5: the gold
+;;   (item-feature ITEM FEATURE)         — level 2: trie-indexed searchable
+;;   (wrong-attempt ITEM N)              — level 1: attempt count
+;;   (tried-and-failed ITEM STRATEGY)    — level 3: skip these
+;;   (best-partial ITEM STRATEGY SCORE)  — level 4: start here
+;;
+;; ══════════════════════════════════════════════════════════════════════
+
+;; ── SKIP KNOWN FAILURES ──────────────────────────────────────────────
+;; If we tried a strategy on this item before and it failed, skip it
+(skip-strategy $item $strategy) if
+    (tried-and-failed $item $strategy) <0.95, 0.95>
+
+;; ── REUSE SOLUTIONS FOR SIMILAR ITEMS ────────────────────────────────
+;; If a solved item had the same feature, try its winning strategy
+(suggest-strategy $item $strategy) if
+    (item-feature $item $type)
+    (item-feature $other $type)
+    (solved $other $strategy) <0.80, 0.80>
+
+;; ── START FROM BEST PARTIAL ──────────────────────────────────────────
+;; If we had a partial match before, try that first and mutate from it
+(priority-strategy $item $strategy) if
+    (best-partial $item $strategy $score)
+    (> $score 0.3) <0.85, 0.85>
+
+;; ── SECOND ATTEMPT GETS MORE TIME ────────────────────────────────────
+;; If first attempt failed, signal that genesis should get more budget
+(extra-time $item) if
+    (wrong-attempt $item $n)
+    (> $n 0) <0.90, 0.90>
+
+;; ── TRACK IMPROVEMENT ────────────────────────────────────────────────
+;; If best partial score improved from last attempt, we're learning
+(improving $item) if
+    (best-partial $item $strategy $score)
+    (wrong-attempt $item $n)
+    (> $score 0.3)
+    (> $n 1) <0.80, 0.80>
+
+;; ── HARD ITEM DETECTION ──────────────────────────────────────────────
+;; Items that failed 3+ times are hard — consider skipping or special strategy
+(hard-item $item) if
+    (wrong-attempt $item $n)
+    (> $n 2) <0.90, 0.90>

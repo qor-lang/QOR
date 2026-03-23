@@ -1,0 +1,28 @@
+# CREATOR / INFLUENCER KNOWLEDGE CORE
+
+## Platform Algorithms (2024-2025)
+- YouTube: Watch time (total minutes) is primary ranking signal. CTR benchmark 4-8%, strong >10%. Shorts completion rate dominant. Consistency rewards.
+- TikTok: FYP tests to small cohort (200-500 users). Strong signals promote to larger cohorts. Signals ranked: completion > shares > comments > likes. Caption semantic content matters.
+- Instagram: Original content prioritised. Reels = 2-3x organic reach vs static. Saves = evergreen interest signal (undervalued). Broadcast channels bypass algorithm.
+- LinkedIn: Document posts (PDF carousels) = highest organic reach. First 60-90 minutes post-publish are critical. Native video > external links.
+- Podcast: Completion >60% = strong. Apple Podcasts chapters improve retention. Spotify engagement data influences placement.
+- Newsletter: Open rate 30-40% Substack benchmark. Click rate 3-5%. Subject line = primary hook. Beehiiv recommendations = referral growth mechanism.
+
+## Content Strategy
+- Hook (first 3 seconds determines 60-80% of completion): Pattern interrupt | Question | Identity | Controversy | Vulnerability | Story-in-progress
+- Content pillars: 3-5 recurring themes. Each post reinforces at least one pillar. Builds topical authority.
+- AIDA: Attention (hook) → Interest (why this matters to you) → Desire (what you get) → Action (clear CTA)
+- Repurposing: 1 long-form → 5-10 clips → 3-5 quote graphics → Twitter thread → LinkedIn essay → newsletter. Single research, max distribution.
+- Series: Pre-announces continuation, trains audience to return, lower per-episode cost, algorithmic series recommendation.
+
+## Monetisation
+- Sponsorship pricing: (Monthly views / 1000) * CPM rate = per-video value. CPM by niche: Finance/investing $40-100 | B2B software $30-60 | Tech $25-50 | Fitness $15-35 | Entertainment $10-25. Integration = 50-100% premium. Annual contracts = 20-30% premium.
+- Brand deal stages: Gifted → Affiliate → Paid flat → Hybrid → Ambassador. Build track record at each stage.
+- Digital products: Courses: 70-90% margins. Cohort = 3-5x price premium over evergreen. Email list = primary sales channel. Recurring affiliate commissions compound.
+- Creator economy data (2024): 200M+ identify as creators. 2M+ earn full-time income. Top 1% (100K+ subs) average $72K/year. Market $250B by 2027 (Goldman Sachs).
+
+## Brand Building
+- Email list: platform-independent, ~$1/subscriber/month revenue potential. Welcome sequence (5-7 emails over 2 weeks). Lead magnet: solve specific problem in exchange for email.
+- Personal brand: niche = expertise x audience pain x format you enjoy. Positioning: "I help [audience] achieve [outcome] through [mechanism]."
+- Media company model: hire editor first, then designer, then researcher. Creator becomes executive producer. Requires explicit brand guidelines.
+- Collaboration: guest appearances before collab requests. YouTube collab: each posts own version (double content, one shoot). Newsletter swap = high conversion, qualified audience.

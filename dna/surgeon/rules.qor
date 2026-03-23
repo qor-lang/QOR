@@ -1,0 +1,78 @@
+;; ── Surgeon DNA — Surgical Reasoning Rules ────────────────────────────
+;;
+;; Surgical decision-making, risk stratification, and procedure logic.
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── SURGICAL URGENCY ─────────────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+
+(emergency-surgery $patient) if (diagnosis $patient ruptured-aaa) <0.99, 0.95>
+(emergency-surgery $patient) if (diagnosis $patient bowel-perforation) <0.99, 0.95>
+(emergency-surgery $patient) if (diagnosis $patient ruptured-ectopic) <0.99, 0.95>
+(emergency-surgery $patient) if (diagnosis $patient tension-pneumothorax) <0.99, 0.95>
+(emergency-surgery $patient) if (diagnosis $patient acute-compartment-syndrome) <0.99, 0.95>
+(emergency-surgery $patient) if (diagnosis $patient epidural-hematoma) (symptom $patient deteriorating-gcs) <0.95, 0.95>
+
+(urgent-surgery $patient) if (diagnosis $patient appendicitis) <0.90, 0.90>
+(urgent-surgery $patient) if (diagnosis $patient strangulated-hernia) <0.95, 0.95>
+(urgent-surgery $patient) if (diagnosis $patient testicular-torsion) <0.95, 0.95>
+(urgent-surgery $patient) if (diagnosis $patient open-fracture) <0.90, 0.90>
+
+(elective-surgery $patient $proc) if (indication $patient $proc) not (emergency-surgery $patient) not (urgent-surgery $patient) <0.85, 0.80>
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── PRE-OPERATIVE ASSESSMENT ─────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+
+;; ASA classification
+(asa-1 $patient) if (comorbidity-count $patient $n) (== $n 0) <0.90, 0.85>
+(asa-2 $patient) if (condition $patient mild-systemic) <0.85, 0.85>
+(asa-3 $patient) if (condition $patient severe-systemic) <0.85, 0.85>
+
+;; Fitness for anesthesia
+(high-anesthetic-risk $patient) if (asa-3 $patient) (age $patient $a) (> $a 75) <0.85, 0.85>
+(high-anesthetic-risk $patient) if (condition $patient severe-copd) <0.85, 0.85>
+(high-anesthetic-risk $patient) if (condition $patient unstable-angina) <0.90, 0.90>
+
+;; Anticoagulation management
+(hold-anticoag $patient) if (medication $patient warfarin) (planned-surgery $patient $proc) <0.90, 0.85>
+(bridge-anticoag $patient) if (hold-anticoag $patient) (condition $patient mechanical-valve) <0.85, 0.85>
+(bridge-anticoag $patient) if (hold-anticoag $patient) (condition $patient recent-dvt) <0.85, 0.85>
+
+;; Pre-op investigations
+(needs-pre-op-ecg $patient) if (age $patient $a) (> $a 65) <0.80, 0.80>
+(needs-pre-op-ecg $patient) if (condition $patient cardiac-hx) <0.85, 0.85>
+(needs-crossmatch $patient) if (estimated-blood-loss $patient $ebl) (> $ebl 500) <0.90, 0.90>
+(needs-group-save $patient) if (planned-surgery $patient $proc) <0.85, 0.80>
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── WOUND & COMPLICATION ─────────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+
+;; Wound classification
+(clean-wound $patient) if (wound-type $patient elective) not (wound-contamination $patient) <0.90, 0.90>
+(contaminated-wound $patient) if (wound-type $patient traumatic) <0.85, 0.85>
+(dirty-wound $patient) if (wound-contamination $patient pus) <0.95, 0.90>
+
+;; Post-op complication detection
+(wound-infection $patient) if (post-op-day $patient $d) (> $d 2) (symptom $patient wound-redness) (fever $patient) <0.80, 0.85>
+(anastomotic-leak $patient) if (post-op-day $patient $d) (> $d 3) (symptom $patient abdominal-pain) (tachycardia $patient) <0.80, 0.85>
+(post-op-hemorrhage $patient) if (drain-output $patient $vol) (> $vol 200) (tachycardia $patient) <0.85, 0.90>
+(ileus $patient) if (post-op-day $patient $d) (> $d 3) (symptom $patient no-bowel-sounds) (symptom $patient distension) <0.80, 0.85>
+(dvt-post-op $patient) if (post-op-day $patient $d) (symptom $patient leg-swelling) (symptom $patient calf-pain) <0.80, 0.85>
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── TRAUMA ASSESSMENT ────────────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+
+;; ATLS primary survey
+(airway-compromise $patient) if (symptom $patient stridor) <0.90, 0.95>
+(airway-compromise $patient) if (symptom $patient gurgling) <0.90, 0.95>
+(breathing-problem $patient) if (symptom $patient absent-breath-sounds) <0.90, 0.95>
+(circulation-problem $patient) if (hypotension $patient) (tachycardia $patient) <0.90, 0.90>
+(hemorrhagic-shock $patient) if (circulation-problem $patient) (symptom $patient external-bleeding) <0.90, 0.90>
+(hemorrhagic-shock $patient) if (circulation-problem $patient) (symptom $patient abdominal-distension) <0.85, 0.85>
+
+;; Needs surgery in trauma
+(operative-trauma $patient) if (hemorrhagic-shock $patient) not (symptom $patient responding-to-fluid) <0.90, 0.90>
+(operative-trauma $patient) if (diagnosis $patient peritonitis) <0.90, 0.90>

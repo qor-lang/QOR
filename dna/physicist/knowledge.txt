@@ -1,0 +1,51 @@
+# PHYSICS KNOWLEDGE CORE
+
+## Classical Mechanics
+- Newton: F=ma. Conservation of momentum, energy, angular momentum.
+- Lagrangian: L = T - V. Euler-Lagrange: d/dt(dL/dq_dot) - dL/dq = 0. Cyclic coordinate = conserved momentum.
+- Hamiltonian: H = T + V (usually total energy). q_dot = dH/dp, p_dot = -dH/dq. Phase space volume conserved (Liouville).
+- Central force: L conserved → planar motion → Kepler's laws. Effective potential V_eff = V(r) + L^2/(2mu*r^2).
+
+## Electromagnetism — Maxwell's Equations
+- div E = rho/epsilon_0 (Gauss — charge creates E field)
+- div B = 0 (no magnetic monopoles)
+- curl E = -dB/dt (Faraday — changing B induces E)
+- curl B = mu_0*J + mu_0*epsilon_0*dE/dt (Ampere-Maxwell — current + changing E induces B)
+- EM wave speed: c = 1/sqrt(mu_0*epsilon_0) = 3e8 m/s
+- Poynting vector: S = (1/mu_0)(E x B) — energy flux (W/m^2)
+- Larmor formula (non-relativistic radiation): P = q^2*a^2/(6*pi*epsilon_0*c^3)
+
+## Quantum Mechanics
+- Schrodinger: ih_bar * dpsi/dt = H_hat * psi. Time-independent: H_hat * psi = E * psi
+- Uncertainty: Delta_x * Delta_p >= h_bar/2. Delta_E * Delta_t >= h_bar/2. Robertson: Delta_A * Delta_B >= |<[A,B]>|/2
+- Infinite square well: E_n = n^2*pi^2*h_bar^2/(2mL^2)
+- Harmonic oscillator: E_n = (n+1/2)*h_bar*omega. Ladder operators a+/a-.
+- Hydrogen: E_n = -13.6 eV/n^2. Wavefunctions psi_nlm = R_nl(r)*Y_l^m(theta,phi)
+- Spin-1/2: Pauli matrices. [Sx,Sy] = ih_bar*Sz (cyclic). Eigenvalues +-h_bar/2.
+- Perturbation theory (1st order): E_n^(1) = <n0|H'|n0>. WKB: quantisation oint p dx = (n+1/2)h
+
+## Statistical Mechanics
+- Boltzmann entropy: S = k_B * ln(Omega)
+- Canonical partition function: Z = sum(exp(-beta*E_i)), beta = 1/(k_B*T). Free energy F = -k_B*T*ln(Z)
+- Fermi-Dirac: f(E) = 1/(exp((E-mu)/k_BT) + 1). Fermi sea at T=0.
+- Bose-Einstein: n(E) = 1/(exp((E-mu)/k_BT) - 1). BEC at low T.
+- Planck distribution: B_nu = 2hnu^3/c^2 * 1/(exp(hnu/k_BT)-1). Wien: lambda_max*T = 2.898e-3 m*K.
+
+## Special Relativity
+- Postulates: (1) Laws of physics same in all inertial frames. (2) c constant in all frames.
+- Lorentz: gamma = 1/sqrt(1-v^2/c^2). Time dilation: Delta_t = gamma*Delta_tau. Length: L = L0/gamma.
+- 4-momentum: p^mu = (E/c, p). Invariant: p^mu*p_mu = -(mc)^2. Energy-momentum: E^2 = (pc)^2 + (mc^2)^2.
+
+## General Relativity
+- Equivalence principle: freely falling frame is locally inertial.
+- Einstein field equations: G_mu_nu = (8*pi*G/c^4)*T_mu_nu
+- Schwarzschild radius: r_s = 2GM/c^2. For Sun ~3km. For Earth ~9mm.
+- Gravitational waves: LIGO first detection GW150914 (2015). Strain h ~ 10^-21.
+
+## Particle Physics — Standard Model
+- Quarks: u,d,c,s,t,b (6 flavours, 3 colours R/G/B)
+- Leptons: e, mu, tau, nu_e, nu_mu, nu_tau
+- Gauge bosons: photon (EM), W+/W-/Z0 (weak), 8 gluons (strong), Higgs
+- QED fine structure constant: alpha = e^2/(4pi*epsilon_0*h_bar*c) ~ 1/137
+- Higgs VEV: v = 246 GeV. W mass = gv/2. Higgs mass = sqrt(2*lambda)*v ~ 125 GeV.
+- Neutrino oscillations confirm mass. PMNS mixing matrix. Normal vs inverted hierarchy unknown.

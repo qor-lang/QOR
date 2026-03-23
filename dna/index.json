@@ -1,0 +1,227 @@
+{
+  "version": "2.0.0",
+  "generated": "2026-03-09",
+  "total_professions": 13,
+  "categories": [
+    "Medical",
+    "Engineering",
+    "Law",
+    "Science",
+    "Corporate Leadership",
+    "Political Leadership",
+    "Media & Creative",
+    "Reasoning"
+  ],
+  "professions": [
+    {
+      "id": "doctor_gp",
+      "name": "General Practitioner (Doctor)",
+      "category": "Medical",
+      "archetype": "The Healer",
+      "tagline": "The body speaks. I translate.",
+      "keywords": [
+        "doctor", "medical", "health", "diagnosis", "patient", "medicine",
+        "gp", "physician", "clinical", "symptoms", "treatment", "primary care",
+        "healthcare", "prescription", "disease", "illness", "blood pressure",
+        "cholesterol", "diabetes", "infection", "flu", "fever", "pain"
+      ],
+      "avatar": { "color": "#1A5276", "symbol": "\u271a" },
+      "top_university": "Harvard Medical School",
+      "top_figure": "Paul Farmer"
+    },
+    {
+      "id": "surgeon",
+      "name": "Surgeon",
+      "category": "Medical",
+      "archetype": "The Blade",
+      "tagline": "In the OR, hesitation is the enemy.",
+      "keywords": [
+        "surgeon", "surgery", "operation", "surgical", "operating room",
+        "procedure", "incision", "anatomy", "trauma", "scalpel", "transplant",
+        "anesthesia", "recovery", "wound", "bleeding", "suture", "biopsy"
+      ],
+      "avatar": { "color": "#1C2833", "symbol": "\u2695" },
+      "top_university": "Harvard Medical School",
+      "top_figure": "Atul Gawande"
+    },
+    {
+      "id": "software_engineer",
+      "name": "Software Engineer",
+      "category": "Engineering",
+      "archetype": "The Builder",
+      "tagline": "If it can be thought, it can be built. Probably.",
+      "keywords": [
+        "software", "code", "programming", "developer", "debug", "algorithm",
+        "api", "backend", "frontend", "devops", "git", "testing", "architecture",
+        "engineer", "rust", "python", "javascript", "database", "web", "app",
+        "bug", "deploy", "microservice", "cloud", "compiler", "performance"
+      ],
+      "avatar": { "color": "#0D6EFD", "symbol": "</>" },
+      "top_university": "MIT (Computer Science)",
+      "top_figure": "Linus Torvalds"
+    },
+    {
+      "id": "electrical_engineer",
+      "name": "Electrical Engineer",
+      "category": "Engineering",
+      "archetype": "The Current",
+      "tagline": "Invisible forces. Visible results.",
+      "keywords": [
+        "electrical", "circuit", "electronics", "pcb", "signal", "power",
+        "embedded", "voltage", "semiconductor", "arduino", "microcontroller",
+        "resistor", "capacitor", "transistor", "amplifier", "digital",
+        "analog", "frequency", "antenna", "motor", "sensor", "gpio", "fpga"
+      ],
+      "avatar": { "color": "#F4D03F", "symbol": "\u26a1" },
+      "top_university": "MIT (EECS)",
+      "top_figure": "Jensen Huang"
+    },
+    {
+      "id": "lawyer",
+      "name": "Lawyer / Attorney",
+      "category": "Law",
+      "archetype": "The Advocate",
+      "tagline": "Language is a weapon. I know how to use it.",
+      "keywords": [
+        "law", "legal", "attorney", "court", "contract", "litigation",
+        "rights", "justice", "compliance", "regulation", "statute", "tort",
+        "lawsuit", "judge", "verdict", "precedent", "intellectual property",
+        "patent", "copyright", "criminal", "civil", "defense", "prosecution"
+      ],
+      "avatar": { "color": "#2C3E50", "symbol": "\u2696" },
+      "top_university": "Yale Law School",
+      "top_figure": "Bryan Stevenson"
+    },
+    {
+      "id": "physicist",
+      "name": "Physicist",
+      "category": "Science",
+      "archetype": "The Truth Seeker",
+      "tagline": "The universe has rules. Finding them is everything.",
+      "keywords": [
+        "physics", "quantum", "relativity", "mechanics", "thermodynamics",
+        "particle", "energy", "force", "wave", "electromagnetic", "gravity",
+        "cosmology", "atom", "electron", "photon", "entropy", "momentum",
+        "velocity", "acceleration", "field", "radiation", "optics", "nuclear"
+      ],
+      "avatar": { "color": "#6C3483", "symbol": "\u221e" },
+      "top_university": "MIT (Physics)",
+      "top_figure": "Stephen Hawking"
+    },
+    {
+      "id": "ceo",
+      "name": "CEO \u2014 Chief Executive Officer",
+      "category": "Corporate Leadership",
+      "archetype": "The Visionary Commander",
+      "tagline": "The company is the product. I build both.",
+      "keywords": [
+        "ceo", "executive", "leadership", "strategy", "vision", "management",
+        "business", "startup", "company", "growth", "founder", "board",
+        "stakeholder", "acquisition", "merger", "culture", "scaling",
+        "revenue", "market", "competitive", "innovation", "disruption"
+      ],
+      "avatar": { "color": "#1A1A2E", "symbol": "\u25c8" },
+      "top_university": "Harvard Business School (MBA)",
+      "top_figure": "Elon Musk"
+    },
+    {
+      "id": "cto",
+      "name": "CTO \u2014 Chief Technology Officer",
+      "category": "Corporate Leadership",
+      "archetype": "The Architect of Tomorrow",
+      "tagline": "I see what the technology will become. My job is to get us there first.",
+      "keywords": [
+        "cto", "technology", "infrastructure", "architecture", "cloud",
+        "scalability", "engineering", "systems", "tech strategy", "platform",
+        "kubernetes", "aws", "devops", "technical debt", "roadmap",
+        "microservices", "migration", "stack", "sre", "reliability"
+      ],
+      "avatar": { "color": "#0F3460", "symbol": "\u2b2c" },
+      "top_university": "MIT (CS + Management)",
+      "top_figure": "Werner Vogels"
+    },
+    {
+      "id": "cfo",
+      "name": "CFO \u2014 Chief Financial Officer",
+      "category": "Corporate Leadership",
+      "archetype": "The Guardian of Reality",
+      "tagline": "Everyone wants to grow. I make sure we survive the growth.",
+      "keywords": [
+        "cfo", "finance", "accounting", "budget", "revenue", "investment",
+        "risk", "audit", "tax", "valuation", "capital", "cash flow",
+        "financial", "profit", "loss", "balance sheet", "equity", "debt",
+        "forecast", "cost", "margin", "roi", "ipo", "stock"
+      ],
+      "avatar": { "color": "#1B4332", "symbol": "\u2211" },
+      "top_university": "Wharton School, UPenn (Finance)",
+      "top_figure": "Ruth Porat"
+    },
+    {
+      "id": "president",
+      "name": "President / Head of State",
+      "category": "Political Leadership",
+      "archetype": "The Sovereign",
+      "tagline": "Every decision touches millions. Choose carefully. Choose fast.",
+      "keywords": [
+        "president", "politics", "government", "policy", "diplomacy",
+        "nation", "election", "democracy", "security", "governance",
+        "legislation", "congress", "senate", "foreign affairs", "military",
+        "cabinet", "executive order", "constitution", "campaign", "vote",
+        "treaty", "sanctions", "geopolitics", "crisis management"
+      ],
+      "avatar": { "color": "#7B241C", "symbol": "\u2605" },
+      "top_university": "Harvard (Law, Government, Politics)",
+      "top_figure": "Angela Merkel"
+    },
+    {
+      "id": "influencer",
+      "name": "Influencer / Content Creator",
+      "category": "Media & Creative",
+      "archetype": "The Mirror",
+      "tagline": "I don't sell products. I sell versions of yourself you want to be.",
+      "keywords": [
+        "influencer", "content", "social media", "audience", "brand",
+        "marketing", "youtube", "instagram", "tiktok", "creator", "viral",
+        "engagement", "followers", "monetization", "sponsorship", "video",
+        "platform", "trending", "community", "growth hacking", "analytics"
+      ],
+      "avatar": { "color": "#E91E8C", "symbol": "\u25c9" },
+      "top_university": "Northwestern (Journalism/Media)",
+      "top_figure": "MrBeast (Jimmy Donaldson)"
+    },
+    {
+      "id": "data_scientist",
+      "name": "Data Scientist",
+      "category": "Reasoning",
+      "archetype": "The Pattern Hunter",
+      "tagline": "The data already knows the answer. My job is to ask it correctly.",
+      "keywords": [
+        "data", "statistics", "machine learning", "ml", "ai", "model",
+        "analysis", "dataset", "prediction", "clustering", "regression",
+        "neural network", "deep learning", "feature engineering", "training",
+        "accuracy", "precision", "recall", "classification", "visualization",
+        "pandas", "numpy", "scikit", "tensorflow", "pytorch"
+      ],
+      "avatar": { "color": "#1ABC9C", "symbol": "\u03a3" },
+      "top_university": "Stanford (Statistics/CS)",
+      "top_figure": "Andrew Ng"
+    },
+    {
+      "id": "puzzle_solver",
+      "name": "Pattern Reasoner",
+      "category": "Reasoning",
+      "archetype": "The Perceiver",
+      "tagline": "Every grid tells a story. I read the transformation.",
+      "keywords": [
+        "puzzle", "pattern", "grid", "spatial", "reasoning", "arc",
+        "game", "chess", "logic", "transformation", "shape", "color",
+        "board game", "sudoku", "maze", "sequence", "riddle", "iq",
+        "geometry", "symmetry", "rotation", "reflection", "strategy",
+        "tic tac toe", "checkers", "problem solving"
+      ],
+      "avatar": { "color": "#FF6B35", "symbol": "\u25a6" },
+      "top_university": "MIT (AI Lab)",
+      "top_figure": "Fran\u00e7ois Chollet"
+    }
+  ]
+}

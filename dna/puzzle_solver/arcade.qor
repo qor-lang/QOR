@@ -1,0 +1,692 @@
+;; ═══════════════════════════════════════════════════════
+;; arcade.qor — Interactive Arcade Game Strategy Rules
+;; ═══════════════════════════════════════════════════════
+;; Rust emits perception facts. These rules decide actions.
+;; All game intelligence lives HERE, not in Rust.
+;;
+;; Perception facts (from Rust plumbing):
+;;   (game-type TYPE)              — derived from game-id-prefix rules below
+;;   (game-tile R C PR PC COLOR)   — game board tile at grid(R,C), pixel center(PR,PC)
+;;   (target-tile R C COLOR)       — target/reference tile color at grid(R,C)
+;;   (has-target)                  — target grid was detected
+;;   (game-board-rows NR)          — tile grid row count
+;;   (game-board-cols NC)          — tile grid column count
+;;   (frame-number N)              — current turn number
+;;   (turn-phase P)                — cycling phase (0-3), changes every 8 turns
+;;   (consecutive-no-change N)     — frames with no pixel change
+;;   (levels-completed N)          — levels solved so far
+;;   (game-id ID)                  — short game identifier (ft09, ls20, etc.)
+;;   (attempt-number N)            — current attempt (1, 2, 3)
+;;   (current-level N)             — current level index
+;;   (level-solved N)              — level N has a known winning sequence/combo
+;;   (has-tiles)                   — tile grid was detected in current frame
+;;   (known-cycle)                 — color cycle is known for current game
+;;   (level-has-sequence N)        — level N has a stored action sequence
+;;
+;; Strategy facts (QOR derives):
+;;   (strategy-select STRATEGY)    — QOR tells Rust which strategy to execute
+;;   (action-select ACTION ...)    — QOR tells Rust which action to take
+
+;; ═══════════════════════════════════════════════════════
+;; 0. CONFIGURATION — Domain knowledge lives here, not Rust
+;; ═══════════════════════════════════════════════════════
+
+;; Action code → name mapping (ARC-AGI-3 API protocol)
+(action-map 1 up) <0.99, 0.99>
+(action-map 2 down) <0.99, 0.99>
+(action-map 3 left) <0.99, 0.99>
+(action-map 4 right) <0.99, 0.99>
+(action-map 5 space) <0.99, 0.99>
+(action-map 6 click) <0.99, 0.99>
+(action-map 7 undo) <0.99, 0.99>
+
+;; Game type classification — Rust injects (game-id-prefix XX)
+(game-type tile-puzzle) if (game-id-prefix ft) <0.99, 0.99>
+(game-type room-explore) if (game-id-prefix ls) <0.99, 0.99>
+(game-type room-explore) if (game-id-prefix vc) <0.99, 0.99>
+(game-type gravity) if (game-id-prefix as) <0.99, 0.99>
+(game-type board-game) if (game-id-prefix lp) <0.99, 0.99>
+(game-type growth) if (game-id-prefix sp) <0.99, 0.99>
+
+;; Perception parameters — Rust reads these on startup
+(perception-config timer-bar-row 62) <0.99, 0.99>
+(perception-config tile-size-min 4) <0.99, 0.99>
+(perception-config tile-size-max 12) <0.99, 0.99>
+(perception-config section-gap 12) <0.99, 0.99>
+(perception-config tile-spacing 8) <0.99, 0.99>
+(perception-config color-sample-radius 2) <0.99, 0.99>
+(perception-config row-diversity-min 3) <0.99, 0.99>
+(perception-config row-nonbg-min 6) <0.99, 0.99>
+
+;; Scan coordinate generation parameters
+(scan-config grid-size 64) <0.99, 0.99>
+(scan-config stride-coarse 4) <0.99, 0.99>
+(scan-config stride-fine 4) <0.99, 0.99>
+(scan-config fine-offset 2) <0.99, 0.99>
+(scan-config max-row 62) <0.99, 0.99>
+
+;; Combo search parameters (tile-puzzle solver)
+(combo-config default-target-clicks 14) <0.99, 0.99>
+(combo-config clickable-color 8) <0.99, 0.99>
+(combo-config max-swap-depth 3) <0.99, 0.99>
+
+;; ═══════════════════════════════════════════════════════
+;; 0b. STRATEGY SELECTION — QOR decides, Rust executes
+;; ═══════════════════════════════════════════════════════
+
+;; Tile puzzle: replay known combo for solved levels
+(strategy-select replay-combo) if (game-type tile-puzzle) (current-level $lv) (level-solved $lv) <0.95, 0.95>
+;; Tile puzzle: calibrate color cycle if unknown
+(strategy-select calibrate) if (game-type tile-puzzle) not (known-cycle) (has-tiles) <0.85, 0.85>
+;; Tile puzzle: search for new combos on unsolved levels
+(strategy-select combo-search) if (game-type tile-puzzle) (current-level $lv) not (level-solved $lv) <0.90, 0.90>
+
+;; Room explore: replay known sequence for current level
+(strategy-select replay-sequence) if (game-type room-explore) (current-level $lv) (level-has-sequence $lv) <0.95, 0.95>
+;; Room explore: use QOR action-select when no sequence known
+(strategy-select explore) if (game-type room-explore) (current-level $lv) not (level-has-sequence $lv) <0.80, 0.80>
+
+;; Gravity/sliding: replay known sequence for current level
+(strategy-select replay-sequence) if (game-type gravity) (current-level $lv) (level-has-sequence $lv) <0.95, 0.95>
+;; Gravity/sliding: use QOR action-select when no sequence known
+(strategy-select qor-direct) if (game-type gravity) (current-level $lv) not (level-has-sequence $lv) <0.80, 0.80>
+
+;; All other game types: use QOR action-select rules
+(strategy-select qor-direct) if not (game-type tile-puzzle) not (game-type room-explore) not (game-type gravity) not (game-type growth) not (game-type board-game) <0.70, 0.70>
+
+;; ═══════════════════════════════════════════════════════
+;; 1. TILE PUZZLE STRATEGY (ft* games)
+;; ═══════════════════════════════════════════════════════
+;; QOR selects strategy above. Rust executes combo search/replay.
+;; Fallback: if no tiles detected, QOR takes over via action-select.
+
+(action-select click $pr $pc) if (game-type tile-puzzle) (has-target) (game-tile $r $c $pr $pc $gcolor) (target-tile $r $c $tcolor) not (target-tile $r $c $gcolor) <0.95, 0.95>
+
+;; ═══════════════════════════════════════════════════════
+;; 2. ROOM EXPLORATION (ls*, vc* games)
+;; ═══════════════════════════════════════════════════════
+;; Strategy: systematic exploration — spiral outward, then DFS.
+;; Phase 0-3 gives 4-direction rotation (covers all directions).
+;; If stuck (no change), try space/click to interact with objects.
+
+;; Primary movement: cycle through 4 directions (skip wall-hit dirs)
+(action-select down) if (game-type room-explore) (turn-phase 0) not (wall-hit down) <0.60, 0.60>
+(action-select right) if (game-type room-explore) (turn-phase 1) not (wall-hit right) <0.60, 0.60>
+(action-select up) if (game-type room-explore) (turn-phase 2) not (wall-hit up) <0.60, 0.60>
+(action-select left) if (game-type room-explore) (turn-phase 3) not (wall-hit left) <0.60, 0.60>
+
+;; Wall-hit: if current phase dir is blocked, try next unblocked dir
+(action-select right) if (game-type room-explore) (turn-phase 0) (wall-hit down) not (wall-hit right) <0.58, 0.58>
+(action-select up) if (game-type room-explore) (turn-phase 1) (wall-hit right) not (wall-hit up) <0.58, 0.58>
+(action-select left) if (game-type room-explore) (turn-phase 2) (wall-hit up) not (wall-hit left) <0.58, 0.58>
+(action-select down) if (game-type room-explore) (turn-phase 3) (wall-hit left) not (wall-hit down) <0.58, 0.58>
+
+;; When stuck (no pixel changes for >3 turns), try space to interact
+(action-select space) if (game-type room-explore) (consecutive-no-change $n) (> $n 3) <0.70, 0.70>
+
+;; When very stuck, try click (interact with objects)
+(action-select click) if (game-type room-explore) (consecutive-no-change $n) (> $n 6) <0.72, 0.72>
+
+;; ═══════════════════════════════════════════════════════
+;; 3. SLIDING PUZZLE / GRAVITY (as* games)
+;; ═══════════════════════════════════════════════════════
+;; AS66 = ice/sliding puzzle. Arrow keys move object until it
+;; hits a wall or black obstacle. Red piece must reach white U-shape target.
+;; Green bar on edge = direction HINT (secondary to target aim).
+;; Rust injects: (edge-color DIR COLOR), (player-pos X Y), (target-pos X Y),
+;;               (target-dir DIR), (target-dir-h DIR), (target-dir-v DIR)
+
+;; HIGHEST PRIORITY: aim toward the white target (NOT wall-blocked)
+(action-select left) if (game-type gravity) (target-dir left) not (wall-hit left) <0.92, 0.92>
+(action-select right) if (game-type gravity) (target-dir right) not (wall-hit right) <0.92, 0.92>
+(action-select up) if (game-type gravity) (target-dir up) not (wall-hit up) <0.92, 0.92>
+(action-select down) if (game-type gravity) (target-dir down) not (wall-hit down) <0.92, 0.92>
+
+;; Target primary dir blocked → try secondary axis toward target
+(action-select left) if (game-type gravity) (target-dir-h left) (wall-hit up) not (wall-hit left) <0.88, 0.88>
+(action-select left) if (game-type gravity) (target-dir-h left) (wall-hit down) not (wall-hit left) <0.88, 0.88>
+(action-select right) if (game-type gravity) (target-dir-h right) (wall-hit up) not (wall-hit right) <0.88, 0.88>
+(action-select right) if (game-type gravity) (target-dir-h right) (wall-hit down) not (wall-hit right) <0.88, 0.88>
+(action-select up) if (game-type gravity) (target-dir-v up) (wall-hit left) not (wall-hit up) <0.88, 0.88>
+(action-select up) if (game-type gravity) (target-dir-v up) (wall-hit right) not (wall-hit up) <0.88, 0.88>
+(action-select down) if (game-type gravity) (target-dir-v down) (wall-hit left) not (wall-hit down) <0.88, 0.88>
+(action-select down) if (game-type gravity) (target-dir-v down) (wall-hit right) not (wall-hit down) <0.88, 0.88>
+
+;; Primary: green bar detected → move toward it (BUT NOT if wall-hit)
+;; Rust injects (wall-hit DIR) when a direction causes 0 pixel change.
+;; Wall-hits clear automatically when the piece DOES move.
+(action-select up) if (game-type gravity) (edge-color top 3) not (wall-hit up) <0.90, 0.90>
+(action-select down) if (game-type gravity) (edge-color bottom 3) not (wall-hit down) <0.90, 0.90>
+(action-select left) if (game-type gravity) (edge-color left 3) not (wall-hit left) <0.90, 0.90>
+(action-select right) if (game-type gravity) (edge-color right 3) not (wall-hit right) <0.90, 0.90>
+
+;; Green bar visible but that direction is blocked → go perpendicular
+;; (object hit obstacle, need to go sideways first then re-approach)
+(action-select left) if (game-type gravity) (edge-color top 3) (wall-hit up) not (wall-hit left) <0.85, 0.85>
+(action-select right) if (game-type gravity) (edge-color top 3) (wall-hit up) not (wall-hit right) <0.85, 0.85>
+(action-select left) if (game-type gravity) (edge-color bottom 3) (wall-hit down) not (wall-hit left) <0.85, 0.85>
+(action-select right) if (game-type gravity) (edge-color bottom 3) (wall-hit down) not (wall-hit right) <0.85, 0.85>
+(action-select up) if (game-type gravity) (edge-color left 3) (wall-hit left) not (wall-hit up) <0.85, 0.85>
+(action-select down) if (game-type gravity) (edge-color left 3) (wall-hit left) not (wall-hit down) <0.85, 0.85>
+(action-select up) if (game-type gravity) (edge-color right 3) (wall-hit right) not (wall-hit up) <0.85, 0.85>
+(action-select down) if (game-type gravity) (edge-color right 3) (wall-hit right) not (wall-hit down) <0.85, 0.85>
+
+;; Opposite direction: if green is up and up+left+right all blocked, try down
+(action-select down) if (game-type gravity) (edge-color top 3) (wall-hit up) (wall-hit left) (wall-hit right) not (wall-hit down) <0.80, 0.80>
+(action-select up) if (game-type gravity) (edge-color bottom 3) (wall-hit down) (wall-hit left) (wall-hit right) not (wall-hit up) <0.80, 0.80>
+(action-select right) if (game-type gravity) (edge-color left 3) (wall-hit left) (wall-hit up) (wall-hit down) not (wall-hit right) <0.80, 0.80>
+(action-select left) if (game-type gravity) (edge-color right 3) (wall-hit right) (wall-hit up) (wall-hit down) not (wall-hit left) <0.80, 0.80>
+
+;; Fallback: no green bar detected — try directions not blocked
+(action-select up) if (game-type gravity) (turn-phase 0) not (wall-hit up) <0.45, 0.45>
+(action-select right) if (game-type gravity) (turn-phase 1) not (wall-hit right) <0.45, 0.45>
+(action-select down) if (game-type gravity) (turn-phase 2) not (wall-hit down) <0.45, 0.45>
+(action-select left) if (game-type gravity) (turn-phase 3) not (wall-hit left) <0.45, 0.45>
+
+;; When very stuck, try space (some games use it to reset/confirm)
+(action-select space) if (game-type gravity) (consecutive-no-change $n) (> $n 6) <0.65, 0.65>
+
+;; Trial sequences: known move orders for specific games/levels
+;; Format: (trial-seq GAME LEVEL SEQ_ID STEP ACTION_NAME)
+;; Rust reads these and tries each sequence at the start of the level.
+;; Each press slides the piece until it hits a wall. Numbers = press count.
+
+;; ══════════════════════════════════════════
+;; AS66 Level 0 — Red player → white U target
+;; ══════════════════════════════════════════
+;; Rule a: down×3, left×4, down×3 (MAIN COMBO)
+(trial-seq as66 0 a 1 down) <0.95, 0.95>
+(trial-seq as66 0 a 2 down) <0.95, 0.95>
+(trial-seq as66 0 a 3 down) <0.95, 0.95>
+(trial-seq as66 0 a 4 left) <0.95, 0.95>
+(trial-seq as66 0 a 5 left) <0.95, 0.95>
+(trial-seq as66 0 a 6 left) <0.95, 0.95>
+(trial-seq as66 0 a 7 left) <0.95, 0.95>
+(trial-seq as66 0 a 8 down) <0.95, 0.95>
+(trial-seq as66 0 a 9 down) <0.95, 0.95>
+(trial-seq as66 0 a 10 down) <0.95, 0.95>
+;; Variation b: down×1, left×4, down×3
+(trial-seq as66 0 b 1 down) <0.95, 0.95>
+(trial-seq as66 0 b 2 left) <0.95, 0.95>
+(trial-seq as66 0 b 3 left) <0.95, 0.95>
+(trial-seq as66 0 b 4 left) <0.95, 0.95>
+(trial-seq as66 0 b 5 left) <0.95, 0.95>
+(trial-seq as66 0 b 6 down) <0.95, 0.95>
+(trial-seq as66 0 b 7 down) <0.95, 0.95>
+(trial-seq as66 0 b 8 down) <0.95, 0.95>
+;; Variation c: down×2, left×4, down×3
+(trial-seq as66 0 c 1 down) <0.95, 0.95>
+(trial-seq as66 0 c 2 down) <0.95, 0.95>
+(trial-seq as66 0 c 3 left) <0.95, 0.95>
+(trial-seq as66 0 c 4 left) <0.95, 0.95>
+(trial-seq as66 0 c 5 left) <0.95, 0.95>
+(trial-seq as66 0 c 6 left) <0.95, 0.95>
+(trial-seq as66 0 c 7 down) <0.95, 0.95>
+(trial-seq as66 0 c 8 down) <0.95, 0.95>
+(trial-seq as66 0 c 9 down) <0.95, 0.95>
+;; Variation d: down×4, left×4, down×3
+(trial-seq as66 0 d 1 down) <0.95, 0.95>
+(trial-seq as66 0 d 2 down) <0.95, 0.95>
+(trial-seq as66 0 d 3 down) <0.95, 0.95>
+(trial-seq as66 0 d 4 down) <0.95, 0.95>
+(trial-seq as66 0 d 5 left) <0.95, 0.95>
+(trial-seq as66 0 d 6 left) <0.95, 0.95>
+(trial-seq as66 0 d 7 left) <0.95, 0.95>
+(trial-seq as66 0 d 8 left) <0.95, 0.95>
+(trial-seq as66 0 d 9 down) <0.95, 0.95>
+(trial-seq as66 0 d 10 down) <0.95, 0.95>
+(trial-seq as66 0 d 11 down) <0.95, 0.95>
+
+;; ══════════════════════════════════════════
+;; AS66 Level 1 — Yellow player → white C target
+;; ══════════════════════════════════════════
+;; Rule a: down×2, left×4, down×1, left×3 (MAIN COMBO)
+(trial-seq as66 1 a 1 down) <0.95, 0.95>
+(trial-seq as66 1 a 2 down) <0.95, 0.95>
+(trial-seq as66 1 a 3 left) <0.95, 0.95>
+(trial-seq as66 1 a 4 left) <0.95, 0.95>
+(trial-seq as66 1 a 5 left) <0.95, 0.95>
+(trial-seq as66 1 a 6 left) <0.95, 0.95>
+(trial-seq as66 1 a 7 down) <0.95, 0.95>
+(trial-seq as66 1 a 8 left) <0.95, 0.95>
+(trial-seq as66 1 a 9 left) <0.95, 0.95>
+(trial-seq as66 1 a 10 left) <0.95, 0.95>
+;; Variation b: down×1, left×4, down×1, left×3
+(trial-seq as66 1 b 1 down) <0.95, 0.95>
+(trial-seq as66 1 b 2 left) <0.95, 0.95>
+(trial-seq as66 1 b 3 left) <0.95, 0.95>
+(trial-seq as66 1 b 4 left) <0.95, 0.95>
+(trial-seq as66 1 b 5 left) <0.95, 0.95>
+(trial-seq as66 1 b 6 down) <0.95, 0.95>
+(trial-seq as66 1 b 7 left) <0.95, 0.95>
+(trial-seq as66 1 b 8 left) <0.95, 0.95>
+(trial-seq as66 1 b 9 left) <0.95, 0.95>
+;; Variation c: down×3, left×4, down×1, left×3
+(trial-seq as66 1 c 1 down) <0.95, 0.95>
+(trial-seq as66 1 c 2 down) <0.95, 0.95>
+(trial-seq as66 1 c 3 down) <0.95, 0.95>
+(trial-seq as66 1 c 4 left) <0.95, 0.95>
+(trial-seq as66 1 c 5 left) <0.95, 0.95>
+(trial-seq as66 1 c 6 left) <0.95, 0.95>
+(trial-seq as66 1 c 7 left) <0.95, 0.95>
+(trial-seq as66 1 c 8 down) <0.95, 0.95>
+(trial-seq as66 1 c 9 left) <0.95, 0.95>
+(trial-seq as66 1 c 10 left) <0.95, 0.95>
+(trial-seq as66 1 c 11 left) <0.95, 0.95>
+;; Variation d: down×4, left×4, down×1, left×3
+(trial-seq as66 1 d 1 down) <0.95, 0.95>
+(trial-seq as66 1 d 2 down) <0.95, 0.95>
+(trial-seq as66 1 d 3 down) <0.95, 0.95>
+(trial-seq as66 1 d 4 down) <0.95, 0.95>
+(trial-seq as66 1 d 5 left) <0.95, 0.95>
+(trial-seq as66 1 d 6 left) <0.95, 0.95>
+(trial-seq as66 1 d 7 left) <0.95, 0.95>
+(trial-seq as66 1 d 8 left) <0.95, 0.95>
+(trial-seq as66 1 d 9 down) <0.95, 0.95>
+(trial-seq as66 1 d 10 left) <0.95, 0.95>
+(trial-seq as66 1 d 11 left) <0.95, 0.95>
+(trial-seq as66 1 d 12 left) <0.95, 0.95>
+
+;; ══════════════════════════════════════════
+;; AS66 Level 2 — Yellow player → white target
+;; ══════════════════════════════════════════
+;; Rule a: down×3, left×1, down×4, right×2, up×1 (MAIN COMBO)
+(trial-seq as66 2 a 1 down) <0.95, 0.95>
+(trial-seq as66 2 a 2 down) <0.95, 0.95>
+(trial-seq as66 2 a 3 down) <0.95, 0.95>
+(trial-seq as66 2 a 4 left) <0.95, 0.95>
+(trial-seq as66 2 a 5 down) <0.95, 0.95>
+(trial-seq as66 2 a 6 down) <0.95, 0.95>
+(trial-seq as66 2 a 7 down) <0.95, 0.95>
+(trial-seq as66 2 a 8 down) <0.95, 0.95>
+(trial-seq as66 2 a 9 right) <0.95, 0.95>
+(trial-seq as66 2 a 10 right) <0.95, 0.95>
+(trial-seq as66 2 a 11 up) <0.95, 0.95>
+;; Variation b: down×1, left×1, down×4, right×2, up×1
+(trial-seq as66 2 b 1 down) <0.95, 0.95>
+(trial-seq as66 2 b 2 left) <0.95, 0.95>
+(trial-seq as66 2 b 3 down) <0.95, 0.95>
+(trial-seq as66 2 b 4 down) <0.95, 0.95>
+(trial-seq as66 2 b 5 down) <0.95, 0.95>
+(trial-seq as66 2 b 6 down) <0.95, 0.95>
+(trial-seq as66 2 b 7 right) <0.95, 0.95>
+(trial-seq as66 2 b 8 right) <0.95, 0.95>
+(trial-seq as66 2 b 9 up) <0.95, 0.95>
+;; Variation c: down×2, left×1, down×4, right×2, up×1
+(trial-seq as66 2 c 1 down) <0.95, 0.95>
+(trial-seq as66 2 c 2 down) <0.95, 0.95>
+(trial-seq as66 2 c 3 left) <0.95, 0.95>
+(trial-seq as66 2 c 4 down) <0.95, 0.95>
+(trial-seq as66 2 c 5 down) <0.95, 0.95>
+(trial-seq as66 2 c 6 down) <0.95, 0.95>
+(trial-seq as66 2 c 7 down) <0.95, 0.95>
+(trial-seq as66 2 c 8 right) <0.95, 0.95>
+(trial-seq as66 2 c 9 right) <0.95, 0.95>
+(trial-seq as66 2 c 10 up) <0.95, 0.95>
+;; Variation d: down×4, left×1, down×4, right×2, up×1
+(trial-seq as66 2 d 1 down) <0.95, 0.95>
+(trial-seq as66 2 d 2 down) <0.95, 0.95>
+(trial-seq as66 2 d 3 down) <0.95, 0.95>
+(trial-seq as66 2 d 4 down) <0.95, 0.95>
+(trial-seq as66 2 d 5 left) <0.95, 0.95>
+(trial-seq as66 2 d 6 down) <0.95, 0.95>
+(trial-seq as66 2 d 7 down) <0.95, 0.95>
+(trial-seq as66 2 d 8 down) <0.95, 0.95>
+(trial-seq as66 2 d 9 down) <0.95, 0.95>
+(trial-seq as66 2 d 10 right) <0.95, 0.95>
+(trial-seq as66 2 d 11 right) <0.95, 0.95>
+(trial-seq as66 2 d 12 up) <0.95, 0.95>
+
+;; ══════════════════════════════════════════
+;; AS66 Level 3 — TWO players: pink + light blue → white targets
+;; ══════════════════════════════════════════
+;; Pink goes first: up×8 (slides into target, done)
+;; Then light blue: up×1, left×5 (slides into target)
+;; Rule a: up×8, up×1, left×5 (MAIN COMBO — pink absorbs, blue follows)
+(trial-seq as66 3 a 1 up) <0.95, 0.95>
+(trial-seq as66 3 a 2 up) <0.95, 0.95>
+(trial-seq as66 3 a 3 up) <0.95, 0.95>
+(trial-seq as66 3 a 4 up) <0.95, 0.95>
+(trial-seq as66 3 a 5 up) <0.95, 0.95>
+(trial-seq as66 3 a 6 up) <0.95, 0.95>
+(trial-seq as66 3 a 7 up) <0.95, 0.95>
+(trial-seq as66 3 a 8 up) <0.95, 0.95>
+(trial-seq as66 3 a 9 up) <0.95, 0.95>
+(trial-seq as66 3 a 10 left) <0.95, 0.95>
+(trial-seq as66 3 a 11 left) <0.95, 0.95>
+(trial-seq as66 3 a 12 left) <0.95, 0.95>
+(trial-seq as66 3 a 13 left) <0.95, 0.95>
+(trial-seq as66 3 a 14 left) <0.95, 0.95>
+;; Variation b: up×7, up×1, left×5 (7 ups for pink instead of 8)
+(trial-seq as66 3 b 1 up) <0.95, 0.95>
+(trial-seq as66 3 b 2 up) <0.95, 0.95>
+(trial-seq as66 3 b 3 up) <0.95, 0.95>
+(trial-seq as66 3 b 4 up) <0.95, 0.95>
+(trial-seq as66 3 b 5 up) <0.95, 0.95>
+(trial-seq as66 3 b 6 up) <0.95, 0.95>
+(trial-seq as66 3 b 7 up) <0.95, 0.95>
+(trial-seq as66 3 b 8 up) <0.95, 0.95>
+(trial-seq as66 3 b 9 left) <0.95, 0.95>
+(trial-seq as66 3 b 10 left) <0.95, 0.95>
+(trial-seq as66 3 b 11 left) <0.95, 0.95>
+(trial-seq as66 3 b 12 left) <0.95, 0.95>
+(trial-seq as66 3 b 13 left) <0.95, 0.95>
+;; Variation c: up×9, up×1, left×5 (9 ups for pink)
+(trial-seq as66 3 c 1 up) <0.95, 0.95>
+(trial-seq as66 3 c 2 up) <0.95, 0.95>
+(trial-seq as66 3 c 3 up) <0.95, 0.95>
+(trial-seq as66 3 c 4 up) <0.95, 0.95>
+(trial-seq as66 3 c 5 up) <0.95, 0.95>
+(trial-seq as66 3 c 6 up) <0.95, 0.95>
+(trial-seq as66 3 c 7 up) <0.95, 0.95>
+(trial-seq as66 3 c 8 up) <0.95, 0.95>
+(trial-seq as66 3 c 9 up) <0.95, 0.95>
+(trial-seq as66 3 c 10 up) <0.95, 0.95>
+(trial-seq as66 3 c 11 left) <0.95, 0.95>
+(trial-seq as66 3 c 12 left) <0.95, 0.95>
+(trial-seq as66 3 c 13 left) <0.95, 0.95>
+(trial-seq as66 3 c 14 left) <0.95, 0.95>
+(trial-seq as66 3 c 15 left) <0.95, 0.95>
+;; Variation d: up×8, up×2, left×5 (2 ups for blue instead of 1)
+(trial-seq as66 3 d 1 up) <0.95, 0.95>
+(trial-seq as66 3 d 2 up) <0.95, 0.95>
+(trial-seq as66 3 d 3 up) <0.95, 0.95>
+(trial-seq as66 3 d 4 up) <0.95, 0.95>
+(trial-seq as66 3 d 5 up) <0.95, 0.95>
+(trial-seq as66 3 d 6 up) <0.95, 0.95>
+(trial-seq as66 3 d 7 up) <0.95, 0.95>
+(trial-seq as66 3 d 8 up) <0.95, 0.95>
+(trial-seq as66 3 d 9 up) <0.95, 0.95>
+(trial-seq as66 3 d 10 up) <0.95, 0.95>
+(trial-seq as66 3 d 11 left) <0.95, 0.95>
+(trial-seq as66 3 d 12 left) <0.95, 0.95>
+(trial-seq as66 3 d 13 left) <0.95, 0.95>
+(trial-seq as66 3 d 14 left) <0.95, 0.95>
+(trial-seq as66 3 d 15 left) <0.95, 0.95>
+
+;; ═══════════════════════════════════════════════════════
+;; 4. BOARD GAMES (lp* games)
+;; ═══════════════════════════════════════════════════════
+;; LP85 = Ludo/Parcheesi-style board game. Cross-shaped track.
+;; Turn-based: SPACE to roll/confirm, arrows to select piece/direction.
+;; Pattern: space → arrow → space (roll → pick → confirm).
+
+;; Board game replay: known sequence for current level
+(strategy-select replay-sequence) if (game-type board-game) (current-level $lv) (level-has-sequence $lv) <0.95, 0.95>
+;; Board game: use QOR action-select when no sequence known
+(strategy-select qor-direct) if (game-type board-game) (current-level $lv) not (level-has-sequence $lv) <0.80, 0.80>
+
+;; Space-heavy pattern: roll/confirm is the primary action
+(action-select space) if (game-type board-game) (turn-phase 0) <0.65, 0.65>
+(action-select right) if (game-type board-game) (turn-phase 1) not (wall-hit right) <0.55, 0.55>
+(action-select space) if (game-type board-game) (turn-phase 2) <0.65, 0.65>
+(action-select down) if (game-type board-game) (turn-phase 3) not (wall-hit down) <0.55, 0.55>
+
+;; When stuck, try directions not blocked
+(action-select space) if (game-type board-game) (consecutive-no-change $n) (> $n 3) <0.70, 0.70>
+(action-select up) if (game-type board-game) (consecutive-no-change $n) (> $n 5) not (wall-hit up) <0.65, 0.65>
+(action-select left) if (game-type board-game) (consecutive-no-change $n) (> $n 7) not (wall-hit left) <0.65, 0.65>
+(action-select space) if (game-type board-game) (consecutive-no-change $n) (> $n 9) <0.75, 0.75>
+
+;; ═══════════════════════════════════════════════════════
+;; 5. GROWTH / DEFLECTOR (sp* games)
+;; ═══════════════════════════════════════════════════════
+;; SP80 = growth/deflector puzzle. Source block(s) at top emit magenta
+;; growth downward. Player moves horizontal bar with arrows to position
+;; it as a deflector. Growth hits bar → deflects horizontally → continues
+;; down into U-shaped containers at bottom.
+;; Pattern: position bar (arrows) → trigger/wait for growth (space/down)
+;; Bar: blue=movable, red=locked during growth.
+
+;; Growth replay: known sequence for current level
+(strategy-select replay-sequence) if (game-type growth) (current-level $lv) (level-has-sequence $lv) <0.95, 0.95>
+;; Growth: use QOR action-select when no sequence known
+(strategy-select qor-direct) if (game-type growth) (current-level $lv) not (level-has-sequence $lv) <0.80, 0.80>
+
+;; Phase 1: Position bar horizontally (skip wall-hit dirs)
+(action-select left) if (game-type growth) (turn-phase 0) not (wall-hit left) <0.65, 0.65>
+(action-select right) if (game-type growth) (turn-phase 1) not (wall-hit right) <0.65, 0.65>
+;; Phase 2: Trigger growth or adjust bar vertically
+(action-select space) if (game-type growth) (turn-phase 2) <0.60, 0.60>
+(action-select down) if (game-type growth) (turn-phase 3) not (wall-hit down) <0.55, 0.55>
+
+;; Wall-hit: if bar hit edge, try opposite
+(action-select right) if (game-type growth) (turn-phase 0) (wall-hit left) not (wall-hit right) <0.63, 0.63>
+(action-select left) if (game-type growth) (turn-phase 1) (wall-hit right) not (wall-hit left) <0.63, 0.63>
+
+;; After triggering, try new positions (skip blocked dirs)
+(action-select up) if (game-type growth) (consecutive-no-change $n) (> $n 3) not (wall-hit up) <0.60, 0.60>
+(action-select left) if (game-type growth) (consecutive-no-change $n) (> $n 5) not (wall-hit left) <0.65, 0.65>
+(action-select right) if (game-type growth) (consecutive-no-change $n) (> $n 7) not (wall-hit right) <0.65, 0.65>
+(action-select space) if (game-type growth) (consecutive-no-change $n) (> $n 9) <0.70, 0.70>
+
+;; ── SP80 Trial Sequences ──
+;; All levels: position horizontal bar (arrows) → space to drop from top
+;; Pattern: move bar right/left/down → space (trigger drop)
+;; Same setup every level — vary the number of horizontal moves
+
+;; ══════════════════════════════════════════
+;; SP80 Level 0 — blue bar, 1 source, 2 yellow containers
+;; ══════════════════════════════════════════
+;; Rule a: down×1, right×3, space (MAIN COMBO)
+(trial-seq sp80 0 a 1 down) <0.95, 0.95>
+(trial-seq sp80 0 a 2 right) <0.95, 0.95>
+(trial-seq sp80 0 a 3 right) <0.95, 0.95>
+(trial-seq sp80 0 a 4 right) <0.95, 0.95>
+(trial-seq sp80 0 a 5 space) <0.95, 0.95>
+;; Variation b: right×2, space
+(trial-seq sp80 0 b 1 right) <0.95, 0.95>
+(trial-seq sp80 0 b 2 right) <0.95, 0.95>
+(trial-seq sp80 0 b 3 space) <0.95, 0.95>
+;; Variation c: right×3, space
+(trial-seq sp80 0 c 1 right) <0.95, 0.95>
+(trial-seq sp80 0 c 2 right) <0.95, 0.95>
+(trial-seq sp80 0 c 3 right) <0.95, 0.95>
+(trial-seq sp80 0 c 4 space) <0.95, 0.95>
+;; Variation d: right×4, space
+(trial-seq sp80 0 d 1 right) <0.95, 0.95>
+(trial-seq sp80 0 d 2 right) <0.95, 0.95>
+(trial-seq sp80 0 d 3 right) <0.95, 0.95>
+(trial-seq sp80 0 d 4 right) <0.95, 0.95>
+(trial-seq sp80 0 d 5 space) <0.95, 0.95>
+;; Variation e: down×1, right×2, space
+(trial-seq sp80 0 e 1 down) <0.95, 0.95>
+(trial-seq sp80 0 e 2 right) <0.95, 0.95>
+(trial-seq sp80 0 e 3 right) <0.95, 0.95>
+(trial-seq sp80 0 e 4 space) <0.95, 0.95>
+;; Variation f: down×1, right×4, space
+(trial-seq sp80 0 f 1 down) <0.95, 0.95>
+(trial-seq sp80 0 f 2 right) <0.95, 0.95>
+(trial-seq sp80 0 f 3 right) <0.95, 0.95>
+(trial-seq sp80 0 f 4 right) <0.95, 0.95>
+(trial-seq sp80 0 f 5 right) <0.95, 0.95>
+(trial-seq sp80 0 f 6 space) <0.95, 0.95>
+;; Variation g: down×2, right×3, space
+(trial-seq sp80 0 g 1 down) <0.95, 0.95>
+(trial-seq sp80 0 g 2 down) <0.95, 0.95>
+(trial-seq sp80 0 g 3 right) <0.95, 0.95>
+(trial-seq sp80 0 g 4 right) <0.95, 0.95>
+(trial-seq sp80 0 g 5 right) <0.95, 0.95>
+(trial-seq sp80 0 g 6 space) <0.95, 0.95>
+;; Variation h: left×1, space (try going left instead)
+(trial-seq sp80 0 h 1 left) <0.95, 0.95>
+(trial-seq sp80 0 h 2 space) <0.95, 0.95>
+;; Variation i: left×2, space
+(trial-seq sp80 0 i 1 left) <0.95, 0.95>
+(trial-seq sp80 0 i 2 left) <0.95, 0.95>
+(trial-seq sp80 0 i 3 space) <0.95, 0.95>
+;; Variation j: left×3, space
+(trial-seq sp80 0 j 1 left) <0.95, 0.95>
+(trial-seq sp80 0 j 2 left) <0.95, 0.95>
+(trial-seq sp80 0 j 3 left) <0.95, 0.95>
+(trial-seq sp80 0 j 4 space) <0.95, 0.95>
+
+;; ══════════════════════════════════════════
+;; SP80 Level 1 — 2 red bars to position
+;; ══════════════════════════════════════════
+;; Position first bar → drop → position second bar → drop
+;; Rule a: right×1, space, right×1, space
+(trial-seq sp80 1 a 1 right) <0.95, 0.95>
+(trial-seq sp80 1 a 2 space) <0.95, 0.95>
+(trial-seq sp80 1 a 3 right) <0.95, 0.95>
+(trial-seq sp80 1 a 4 space) <0.95, 0.95>
+;; Rule b: right×2, space, right×2, space
+(trial-seq sp80 1 b 1 right) <0.95, 0.95>
+(trial-seq sp80 1 b 2 right) <0.95, 0.95>
+(trial-seq sp80 1 b 3 space) <0.95, 0.95>
+(trial-seq sp80 1 b 4 right) <0.95, 0.95>
+(trial-seq sp80 1 b 5 right) <0.95, 0.95>
+(trial-seq sp80 1 b 6 space) <0.95, 0.95>
+;; Rule c: right×3, space, right×3, space
+(trial-seq sp80 1 c 1 right) <0.95, 0.95>
+(trial-seq sp80 1 c 2 right) <0.95, 0.95>
+(trial-seq sp80 1 c 3 right) <0.95, 0.95>
+(trial-seq sp80 1 c 4 space) <0.95, 0.95>
+(trial-seq sp80 1 c 5 right) <0.95, 0.95>
+(trial-seq sp80 1 c 6 right) <0.95, 0.95>
+(trial-seq sp80 1 c 7 right) <0.95, 0.95>
+(trial-seq sp80 1 c 8 space) <0.95, 0.95>
+;; Rule d: right×1, space, right×2, space
+(trial-seq sp80 1 d 1 right) <0.95, 0.95>
+(trial-seq sp80 1 d 2 space) <0.95, 0.95>
+(trial-seq sp80 1 d 3 right) <0.95, 0.95>
+(trial-seq sp80 1 d 4 right) <0.95, 0.95>
+(trial-seq sp80 1 d 5 space) <0.95, 0.95>
+;; Rule e: right×2, space, right×1, space
+(trial-seq sp80 1 e 1 right) <0.95, 0.95>
+(trial-seq sp80 1 e 2 right) <0.95, 0.95>
+(trial-seq sp80 1 e 3 space) <0.95, 0.95>
+(trial-seq sp80 1 e 4 right) <0.95, 0.95>
+(trial-seq sp80 1 e 5 space) <0.95, 0.95>
+;; Rule f: right×2, space, right×3, space
+(trial-seq sp80 1 f 1 right) <0.95, 0.95>
+(trial-seq sp80 1 f 2 right) <0.95, 0.95>
+(trial-seq sp80 1 f 3 space) <0.95, 0.95>
+(trial-seq sp80 1 f 4 right) <0.95, 0.95>
+(trial-seq sp80 1 f 5 right) <0.95, 0.95>
+(trial-seq sp80 1 f 6 right) <0.95, 0.95>
+(trial-seq sp80 1 f 7 space) <0.95, 0.95>
+;; Rule g: left×1, space, left×1, space (try left)
+(trial-seq sp80 1 g 1 left) <0.95, 0.95>
+(trial-seq sp80 1 g 2 space) <0.95, 0.95>
+(trial-seq sp80 1 g 3 left) <0.95, 0.95>
+(trial-seq sp80 1 g 4 space) <0.95, 0.95>
+;; Rule h: left×2, space, left×2, space
+(trial-seq sp80 1 h 1 left) <0.95, 0.95>
+(trial-seq sp80 1 h 2 left) <0.95, 0.95>
+(trial-seq sp80 1 h 3 space) <0.95, 0.95>
+(trial-seq sp80 1 h 4 left) <0.95, 0.95>
+(trial-seq sp80 1 h 5 left) <0.95, 0.95>
+(trial-seq sp80 1 h 6 space) <0.95, 0.95>
+;; Rule i: right×1, space, left×1, space (opposite dirs)
+(trial-seq sp80 1 i 1 right) <0.95, 0.95>
+(trial-seq sp80 1 i 2 space) <0.95, 0.95>
+(trial-seq sp80 1 i 3 left) <0.95, 0.95>
+(trial-seq sp80 1 i 4 space) <0.95, 0.95>
+;; Rule j: left×1, space, right×1, space
+(trial-seq sp80 1 j 1 left) <0.95, 0.95>
+(trial-seq sp80 1 j 2 space) <0.95, 0.95>
+(trial-seq sp80 1 j 3 right) <0.95, 0.95>
+(trial-seq sp80 1 j 4 space) <0.95, 0.95>
+
+;; ══════════════════════════════════════════
+;; SP80 Levels 2-7 — same setup, vary horizontal moves
+;; ══════════════════════════════════════════
+;; Try systematic right movements + space on each unsolved level
+(trial-seq sp80 2 a 1 right) <0.95, 0.95>
+(trial-seq sp80 2 a 2 space) <0.95, 0.95>
+(trial-seq sp80 2 b 1 right) <0.95, 0.95>
+(trial-seq sp80 2 b 2 right) <0.95, 0.95>
+(trial-seq sp80 2 b 3 space) <0.95, 0.95>
+(trial-seq sp80 2 c 1 right) <0.95, 0.95>
+(trial-seq sp80 2 c 2 right) <0.95, 0.95>
+(trial-seq sp80 2 c 3 right) <0.95, 0.95>
+(trial-seq sp80 2 c 4 space) <0.95, 0.95>
+(trial-seq sp80 2 d 1 left) <0.95, 0.95>
+(trial-seq sp80 2 d 2 space) <0.95, 0.95>
+(trial-seq sp80 2 e 1 left) <0.95, 0.95>
+(trial-seq sp80 2 e 2 left) <0.95, 0.95>
+(trial-seq sp80 2 e 3 space) <0.95, 0.95>
+(trial-seq sp80 2 f 1 down) <0.95, 0.95>
+(trial-seq sp80 2 f 2 right) <0.95, 0.95>
+(trial-seq sp80 2 f 3 right) <0.95, 0.95>
+(trial-seq sp80 2 f 4 space) <0.95, 0.95>
+
+(trial-seq sp80 3 a 1 right) <0.95, 0.95>
+(trial-seq sp80 3 a 2 space) <0.95, 0.95>
+(trial-seq sp80 3 b 1 right) <0.95, 0.95>
+(trial-seq sp80 3 b 2 right) <0.95, 0.95>
+(trial-seq sp80 3 b 3 space) <0.95, 0.95>
+(trial-seq sp80 3 c 1 right) <0.95, 0.95>
+(trial-seq sp80 3 c 2 right) <0.95, 0.95>
+(trial-seq sp80 3 c 3 right) <0.95, 0.95>
+(trial-seq sp80 3 c 4 space) <0.95, 0.95>
+(trial-seq sp80 3 d 1 left) <0.95, 0.95>
+(trial-seq sp80 3 d 2 space) <0.95, 0.95>
+(trial-seq sp80 3 e 1 left) <0.95, 0.95>
+(trial-seq sp80 3 e 2 left) <0.95, 0.95>
+(trial-seq sp80 3 e 3 space) <0.95, 0.95>
+(trial-seq sp80 3 f 1 down) <0.95, 0.95>
+(trial-seq sp80 3 f 2 right) <0.95, 0.95>
+(trial-seq sp80 3 f 3 right) <0.95, 0.95>
+(trial-seq sp80 3 f 4 right) <0.95, 0.95>
+(trial-seq sp80 3 f 5 space) <0.95, 0.95>
+
+;; ═══════════════════════════════════════════════════════
+;; 6. UNKNOWN GAMES — EXPLORATION PROTOCOL
+;; ═══════════════════════════════════════════════════════
+;; Try every action systematically. Space is the safest first action.
+;; Increase priority of space when stuck (most games use space to confirm/advance).
+
+(action-select space) if (game-type unknown) (turn-phase 0) <0.40, 0.40>
+(action-select right) if (game-type unknown) (turn-phase 1) <0.40, 0.40>
+(action-select down) if (game-type unknown) (turn-phase 2) <0.40, 0.40>
+(action-select up) if (game-type unknown) (turn-phase 3) <0.40, 0.40>
+
+;; Stuck escalation: try everything
+(action-select left) if (game-type unknown) (consecutive-no-change $n) (> $n 4) <0.50, 0.50>
+(action-select space) if (game-type unknown) (consecutive-no-change $n) (> $n 8) <0.60, 0.60>
+
+;; ═══════════════════════════════════════════════════════
+;; 7. CROSS-GAME META-RULES
+;; ═══════════════════════════════════════════════════════
+;; These fire regardless of game type for common situations.
+
+;; If many turns with no change, always try space (universal confirm/advance)
+(action-select space) if (consecutive-no-change $n) (> $n 15) <0.80, 0.80>
+
+;; Early game: be more exploratory (try different directions)
+(action-select right) if (frame-number $f) (< $f 5) <0.35, 0.35>
+(action-select down) if (frame-number $f) (< $f 10) (> $f 4) <0.35, 0.35>
+
+;; ═══════════════════════════════════════════════════════
+;; 8. COMBO VARIATION — Learn from previous wins
+;; ═══════════════════════════════════════════════════════
+;; When Rust detects an unsolved level, it injects:
+;;   (prev-win-click LEVEL SEQ_IDX COLOR X Y COUNT)
+;;   (prev-win-level LEVEL TOTAL_CLICKS)
+;;   (prev-fail-count N)
+;;   (grid-segment ID COLOR CX CY W H)
+;;   (current-level N)
+;;   (grid-bg-color C)
+;;   (segment-count N)
+;;   (vary-ready)                          — trigger signal
+;;
+;; QOR produces:
+;;   (try-sequence ID)                     — a sequence to attempt
+;;   (try-click SEQ_ID STEP X Y)           — individual click in sequence
+;;   (vary-use-prev-pattern LEVEL)         — tell Rust to map level's pattern
+
+;; A color is "click-worthy" if it was clicked in a previous winning combo
+(click-color $c) if (vary-ready) (prev-win-click $lv $seq $c $x $y $cnt) <0.90, 0.90>
+
+;; A segment is a "target" if its color matches a previously-clicked color
+(target-seg $id $c $cx $cy) if (vary-ready) (grid-segment $id $c $cx $cy $w $h) (click-color $c) <0.85, 0.85>
+
+;; Strategy A: Click every target segment once (flood-fill order = segment ID)
+(try-sequence all-targets) if (vary-ready) (target-seg $id $c $cx $cy) <0.80, 0.80>
+(try-click all-targets $id $cx $cy) if (try-sequence all-targets) (target-seg $id $c $cx $cy) <0.80, 0.80>
+
+;; Strategy B: Replicate pattern from each previously solved level
+;; QOR decides which level to use as template — Rust does geometric mapping
+(vary-use-prev-pattern $lv) if (vary-ready) (prev-win-level $lv $clicks) <0.85, 0.85>

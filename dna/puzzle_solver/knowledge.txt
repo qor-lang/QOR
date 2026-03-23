@@ -1,0 +1,24 @@
+# Pattern Reasoning Knowledge
+
+## Grid Perception
+- Grids are 2D arrays of colored cells where 0 is background
+- Objects are connected components of same-colored non-zero cells
+- BFS flood fill detects objects with 4-connected neighbors
+- Each object has a bounding box (min_row, min_col, max_row, max_col)
+
+## Common Transformations
+- Rotation: 90, 180, 270 degrees clockwise
+- Reflection: horizontal (left-right) or vertical (top-bottom)
+- Translation: shifting all content by a fixed row/col offset
+- Scaling: each cell becomes NxN block of same color
+- Cropping: extracting a sub-grid from the bounding box
+- Color swap: replacing one color with another throughout
+
+## Reasoning Strategy
+- Compare input and output grid sizes first
+- Same size suggests in-place transform (rotation, reflection, color swap)
+- Different size suggests scaling, cropping, or tiling
+- Look for preserved cells to understand what stays fixed
+- Look for added/removed cells to understand the transformation
+- Check if objects maintain their shape but change position
+- Check if colors change but positions stay the same

@@ -1,0 +1,176 @@
+;; ── President DNA — Governance & Political Reasoning Rules ───────────
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── POLICY ANALYSIS ─────────────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+
+;; Policy impact assessment
+(high-impact-policy $policy) if (affected-population $policy $pop) (> $pop 1000000) <0.85, 0.85>
+(low-impact-policy $policy) if (affected-population $policy $pop) (< $pop 10000) <0.80, 0.80>
+(regressive-policy $policy) if (burden-low-income $policy $b) (> $b 5) (benefit-high-income $policy $bh) (> $bh $b) <0.80, 0.80>
+(progressive-policy $policy) if (benefit-low-income $policy $bl) (> $bl 5) (burden-high-income $policy $bh) (> $bh $bl) <0.80, 0.80>
+
+;; Cost-benefit
+(cost-effective $policy) if (benefit-cost-ratio $policy $bcr) (> $bcr 1.5) <0.80, 0.80>
+(fiscally-responsible $policy) if (deficit-impact $policy $di) (< $di 0.5) <0.80, 0.80>
+(budget-buster $policy) if (cost-gdp-pct $policy $pct) (> $pct 2) <0.80, 0.80>
+
+;; Implementation feasibility
+(implementable $policy) if (institutional-capacity $policy) (legal-authority $policy) (budget-available $policy) <0.75, 0.75>
+(needs-legislation $policy) if (legal-authority-lacking $policy) <0.85, 0.85>
+(executive-action-possible $policy) if (executive-authority $policy) not (needs-legislation $policy) <0.80, 0.80>
+(bipartisan-potential $policy) if (support-party-a $policy $sa) (> $sa 30) (support-party-b $policy $sb) (> $sb 30) <0.75, 0.75>
+(partisan-deadlock $policy) if (support-party-a $policy $sa) (> $sa 80) (support-party-b $policy $sb) (< $sb 20) <0.80, 0.80>
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── ECONOMIC GOVERNANCE ─────────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+
+;; Economic health
+(economy-growing $nation) if (gdp-growth $nation $g) (> $g 2) <0.85, 0.85>
+(recession $nation) if (gdp-growth $nation $g) (< $g 0) (consecutive-quarters $nation $q) (> $q 1) <0.85, 0.85>
+(stagnation $nation) if (gdp-growth $nation $g) (< $g 1) (> $g 0) (unemployment $nation $u) (> $u 6) <0.80, 0.80>
+(overheating $nation) if (gdp-growth $nation $g) (> $g 5) (inflation $nation $i) (> $i 4) <0.80, 0.80>
+
+;; Inflation and monetary
+(inflation-controlled $nation) if (inflation $nation $i) (> $i 1) (< $i 3) <0.85, 0.85>
+(inflation-high $nation) if (inflation $nation $i) (> $i 5) <0.85, 0.85>
+(deflation-risk $nation) if (inflation $nation $i) (< $i 0.5) <0.85, 0.85>
+(hyperinflation $nation) if (inflation $nation $i) (> $i 50) <0.95, 0.95>
+(rate-cut-needed $nation) if (recession $nation) (inflation-controlled $nation) <0.80, 0.75>
+(rate-hike-needed $nation) if (inflation-high $nation) (economy-growing $nation) <0.80, 0.75>
+
+;; Employment
+(full-employment $nation) if (unemployment $nation $u) (< $u 5) <0.85, 0.85>
+(unemployment-crisis $nation) if (unemployment $nation $u) (> $u 10) <0.85, 0.85>
+(youth-unemployment-crisis $nation) if (youth-unemployment $nation $u) (> $u 20) <0.85, 0.85>
+(structural-unemployment $nation) if (job-vacancy-rate $nation $jv) (> $jv 3) (unemployment $nation $u) (> $u 5) <0.80, 0.80>
+
+;; Fiscal
+(debt-sustainable $nation) if (debt-gdp $nation $d) (< $d 60) (interest-gdp $nation $i) (< $i 3) <0.80, 0.80>
+(debt-crisis-risk $nation) if (debt-gdp $nation $d) (> $d 100) (interest-gdp $nation $i) (> $i 5) <0.85, 0.85>
+(austerity-needed $nation) if (debt-crisis-risk $nation) (bond-spread $nation $s) (> $s 300) <0.80, 0.80>
+(stimulus-needed $nation) if (recession $nation) (debt-sustainable $nation) <0.80, 0.75>
+
+;; Trade
+(trade-surplus $nation) if (trade-balance $nation $tb) (> $tb 0) <0.85, 0.85>
+(trade-deficit $nation) if (trade-balance $nation $tb) (< $tb 0) <0.85, 0.85>
+(trade-dependent $nation) if (trade-gdp $nation $tg) (> $tg 60) <0.80, 0.80>
+(trade-war-risk $nation $partner) if (tariff-escalation $nation $partner) (retaliation $partner $nation) <0.80, 0.80>
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── NATIONAL SECURITY ───────────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+
+;; Threat assessment
+(existential-threat $threat) if (threat-type $threat $type) (capability $threat $cap) (> $cap 90) (intent $threat $int) (> $int 70) <0.85, 0.85>
+(strategic-threat $threat) if (capability $threat $cap) (> $cap 70) (intent $threat $int) (> $int 50) <0.80, 0.80>
+(emerging-threat $threat) if (capability $threat $cap) (> $cap 30) (capability-growth $threat $cg) (> $cg 10) <0.80, 0.80>
+(terrorism-risk $region) if (extremist-presence $region) (governance-gap $region) (population-grievance $region) <0.80, 0.80>
+
+;; Deterrence
+(deterrence-credible $nation) if (military-capability $nation $mc) (> $mc 70) (alliance-strength $nation $as) (> $as 60) (resolve-demonstrated $nation) <0.80, 0.75>
+(deterrence-failing $nation $adversary) if (provocation $adversary $count) (> $count 3) (no-response $nation) <0.80, 0.80>
+(escalation-risk $conflict) if (military-buildup $conflict) (diplomatic-failure $conflict) (nuclear-capable $conflict) <0.85, 0.85>
+(de-escalation-needed $conflict) if (escalation-risk $conflict) <0.90, 0.85>
+
+;; Cyber
+(cyber-threat $nation) if (cyber-attack-count $nation $n) (> $n 100) <0.80, 0.80>
+(critical-infrastructure-vulnerable $sector) if (cyber-attack-target $sector) not (cyber-defense $sector adequate) <0.85, 0.85>
+
+;; Intelligence
+(intelligence-gap $area) if (threat-area $area) not (intelligence-coverage $area adequate) <0.80, 0.80>
+(intelligence-failure-risk $area) if (intelligence-gap $area) (emerging-threat $area) <0.80, 0.75>
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── DIPLOMACY & INTERNATIONAL ───────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+
+;; Alliance management
+(alliance-strong $alliance) if (burden-sharing $alliance fair) (interoperability $alliance high) (political-cohesion $alliance) <0.80, 0.75>
+(alliance-strained $alliance) if (burden-sharing $alliance unfair) (> (free-rider-count $alliance) 3) <0.80, 0.80>
+(alliance-critical $alliance) if (shared-threat $alliance $threat) (existential-threat $threat) <0.85, 0.85>
+
+;; Diplomatic tools
+(sanctions-appropriate $target) if (violation $target $norm) (diplomatic-failure $target) not (humanitarian-crisis $target) <0.75, 0.75>
+(sanctions-failing $target) if (sanctions-duration $target $years) (> $years 5) not (behavior-change $target) <0.80, 0.80>
+(diplomacy-exhausted $conflict) if (negotiation-rounds $conflict $n) (> $n 5) not (progress $conflict) <0.80, 0.80>
+(mediation-needed $conflict) if (bilateral-talks-failed $conflict) (third-party-acceptable $conflict) <0.75, 0.75>
+
+;; Treaty
+(treaty-compliance $party) if (obligations-met $party $pct) (> $pct 90) <0.85, 0.85>
+(treaty-violation $party) if (obligations-met $party $pct) (< $pct 50) <0.85, 0.85>
+(ratification-likely $treaty) if (senate-support $treaty $pct) (> $pct 66) <0.80, 0.80>
+(ratification-unlikely $treaty) if (senate-support $treaty $pct) (< $pct 50) <0.80, 0.80>
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── CRISIS MANAGEMENT ───────────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+
+;; Crisis classification
+(national-crisis $event) if (casualties $event $c) (> $c 100) <0.85, 0.85>
+(national-crisis $event) if (economic-impact $event $ei) (> $ei 1) <0.85, 0.85>
+(national-crisis $event) if (infrastructure-disruption $event critical) <0.85, 0.85>
+(pandemic $event) if (infection-rate $event $r) (> $r 10) (fatality-rate $event $f) (> $f 0.5) (spread $event international) <0.85, 0.85>
+(natural-disaster $event) if (disaster-type $event $type) (affected-area $event $a) (> $a 1000) <0.85, 0.85>
+
+;; Response framework
+(emergency-declaration-needed $event) if (national-crisis $event) (federal-resources-needed $event) <0.85, 0.80>
+(martial-law-consideration $event) if (civil-order-collapsed $event) (law-enforcement-overwhelmed $event) <0.80, 0.80>
+(international-aid-needed $event) if (national-crisis $event) (capacity-exceeded $event) <0.80, 0.80>
+
+;; Multi-step: crisis → response chain
+(crisis-response-inadequate $event) if (national-crisis $event) (response-time $event $rt) (> $rt 48) <0.80, 0.80>
+(public-trust-damaged $event) if (crisis-response-inadequate $event) (media-coverage $event intense) <0.80, 0.75>
+(political-fallout $event) if (public-trust-damaged $event) (approval-drop $event $d) (> $d 10) <0.80, 0.75>
+(leadership-test $event) if (national-crisis $event) (presidential-response $event) <0.85, 0.85>
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── ELECTORAL & POLITICAL ───────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+
+;; Approval and mandate
+(strong-mandate $president) if (approval-rating $president $ar) (> $ar 55) <0.80, 0.80>
+(weak-mandate $president) if (approval-rating $president $ar) (< $ar 40) <0.80, 0.80>
+(lame-duck $president) if (term-remaining $president $months) (< $months 12) <0.80, 0.80>
+(honeymoon-period $president) if (days-in-office $president $d) (< $d 100) <0.80, 0.80>
+
+;; Coalition
+(coalition-stable $government) if (majority-margin $government $m) (> $m 10) (party-discipline $government high) <0.80, 0.80>
+(coalition-fragile $government) if (majority-margin $government $m) (< $m 5) <0.80, 0.80>
+(minority-government $government) if (seat-pct $government $pct) (< $pct 50) <0.85, 0.85>
+(confidence-vote-risk $government) if (coalition-fragile $government) (policy-disagreement $government major) <0.80, 0.80>
+
+;; Legislative strategy
+(legislative-priority $bill) if (campaign-promise $bill) (public-support $bill $ps) (> $ps 60) <0.80, 0.75>
+(veto-threat $bill) if (presidential-opposition $bill) (override-unlikely $bill) <0.80, 0.80>
+(compromise-needed $bill) if (partisan-deadlock $bill) (legislative-priority $bill) <0.80, 0.75>
+(executive-order-alternative $policy) if (partisan-deadlock $policy) (executive-action-possible $policy) <0.75, 0.75>
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── GOVERNANCE QUALITY ──────────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+
+;; Institutional health
+(democratic-backsliding $nation) if (press-freedom-declining $nation) (judicial-independence-weakening $nation) <0.85, 0.85>
+(institutional-strength $nation) if (rule-of-law-index $nation $r) (> $r 70) (corruption-index $nation $c) (< $c 30) <0.80, 0.80>
+(corruption-risk $institution) if (transparency $institution $t) (< $t 40) (oversight $institution weak) <0.80, 0.80>
+
+;; Public trust
+(trust-high $government) if (trust-index $government $t) (> $t 60) <0.80, 0.80>
+(trust-crisis $government) if (trust-index $government $t) (< $t 30) <0.85, 0.85>
+(legitimacy-crisis $government) if (trust-crisis $government) (protest-frequency $nation high) (democratic-backsliding $nation) <0.80, 0.75>
+
+;; Social cohesion
+(social-unrest-risk $nation) if (inequality-index $nation $gi) (> $gi 45) (youth-unemployment-crisis $nation) <0.80, 0.80>
+(polarization-high $nation) if (partisan-gap $nation $pg) (> $pg 40) <0.80, 0.80>
+(unity-needed $nation) if (polarization-high $nation) (national-crisis $event) <0.85, 0.80>
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── LEGACY & HISTORY ────────────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+
+(legacy-defining-moment $event) if (national-crisis $event) (leadership-test $event) (historical-significance $event) <0.80, 0.75>
+(transformative-presidency $president) if (major-legislation $president $count) (> $count 3) (strong-mandate $president) <0.75, 0.75>
+(caretaker-presidency $president) if (weak-mandate $president) (lame-duck $president) not (national-crisis $event) <0.75, 0.75>
+(wartime-president $president) if (armed-conflict $nation) (commander-in-chief $president) <0.85, 0.85>

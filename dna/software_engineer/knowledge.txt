@@ -1,0 +1,40 @@
+# SOFTWARE ENGINEERING KNOWLEDGE CORE
+
+## Algorithms & Complexity
+- Big O: O(1) hash | O(log n) binary search | O(n) linear | O(n log n) mergesort/heapsort | O(n^2) nested loops | O(2^n) exponential
+- When n=1M: O(n log n) = ~20M ops (fine). O(n^2) = 10^12 ops (not fine).
+- Graph: BFS (shortest unweighted path, O(V+E)) | DFS (cycle detect, topo sort) | Dijkstra (weighted, O((V+E)log V)) | Bellman-Ford (negative edges, O(VE))
+- DP: Overlapping subproblems + optimal substructure. Memoisation (top-down) vs tabulation (bottom-up).
+- Trees: BST O(h). AVL/Red-Black balanced. B-tree for disk. Segment tree for range queries.
+
+## System Design
+- Horizontal scaling: stateless services + load balancer. Session state in Redis, not in-process.
+- Caching: Cache-aside (app checks cache, miss = fetch DB + populate). Write-through (write to cache + DB). CDN for static.
+- DB selection: Postgres (ACID, JSON, complex queries) | MongoDB (flexible schema, horizontal) | Cassandra (high write, time-series) | Redis (cache/sessions/leaderboards) | Elasticsearch (full-text search)
+- Indexing: B-tree (range queries) | Hash (equality only) | GIN (JSONB/full-text) | Partial index (WHERE clause). Always EXPLAIN ANALYZE.
+- Kafka: High-throughput durable log. Partitions for parallelism. Consumer groups for competing consumers. At-least-once delivery. Idempotent consumers required.
+- Microservices: Only when team size justifies (Conway's Law). Circuit breaker. Service mesh (Istio). Saga pattern for distributed transactions.
+
+## Architecture
+- SOLID: Single Responsibility | Open/Closed | Liskov Substitution | Interface Segregation | Dependency Inversion
+- Clean Architecture: Entities → Use Cases → Interface Adapters → Frameworks. Dependencies point inward.
+- Design patterns: Factory (creation) | Observer (events) | Strategy (interchangeable algorithms) | Decorator (extend behaviour) | Repository (data access)
+- Event sourcing: Immutable append-only log. State = replaying events. CQRS natural companion.
+- CQRS: Separate read model from write model. Scale independently.
+
+## Languages
+- Python: GIL prevents true thread parallelism for CPU-bound. Use multiprocessing. asyncio for I/O. Generators = lazy. Decorators = @functools.wraps.
+- TypeScript: Structural typing. Mapped types. Conditional types T extends U ? X : Y. Discriminated unions for type narrowing.
+- Rust: One owner. Borrowing: &T immutable (multiple ok), &mut T mutable (only one). Lifetimes prevent dangling refs. Result<T,E> for errors.
+- Go: Goroutines (~2KB stack). Channels (buffered vs unbuffered). Context for cancellation. Duck typing interfaces.
+
+## DevOps
+- Docker: Multi-stage builds. Never run as root. Distroless/Alpine base.
+- Kubernetes: Pod → ReplicaSet → Deployment. Service (ClusterIP/NodePort/LoadBalancer). Ingress (HTTP routing). HPA (autoscaling). Requests (scheduling) vs Limits (enforcement).
+- DORA metrics: Deployment frequency | Lead time for changes | Change failure rate | MTTR. High performers are faster AND more stable (not a trade-off).
+- Observability: Logs (structured JSON, correlation ID) | Metrics (RED: Rate/Error/Duration) | Traces (distributed across services). OpenTelemetry standard.
+
+## Security
+- OWASP Top 10: Injection (parameterised queries) | Broken auth (MFA) | XSS (output encoding, CSP) | Broken access control | Security misconfiguration
+- OAuth 2.0: Auth Code + PKCE (SPAs/mobile). Client Credentials (M2M). JWT: verify signature + expiry. Short TTL (15min access token).
+- Secrets: Never hardcode. Secrets manager (Vault, AWS SM). Rotate. Envelope encryption.

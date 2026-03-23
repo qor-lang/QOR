@@ -1,0 +1,28 @@
+;; Web Agent — Extraction Rules
+;; ==============================
+;; Rules that extract findings from page content.
+;; These are templates — DNA users override/extend for their domain.
+
+;; Extract page title as a finding
+(finding $title) if
+    (page-title $title)
+    (extract-titles true) <0.80, 0.80>
+
+;; Extract headings as content
+(extracted heading $text) if
+    (page-content heading $text) <0.75, 0.75>
+
+;; Count interactive elements as page summary
+(result page-links $n) if
+    (page-link-count $n) <0.70, 0.70>
+
+(result page-buttons $n) if
+    (page-button-count $n) <0.70, 0.70>
+
+(result page-forms $n) if
+    (page-form-count $n) <0.70, 0.70>
+
+;; Extract JS evaluation results
+(finding $result) if
+    (js-result $script $result)
+    (extract-js true) <0.80, 0.80>

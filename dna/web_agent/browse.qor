@@ -1,0 +1,61 @@
+;; Web Agent — Browse Strategy
+;; ============================
+;; Rules that decide WHAT to do based on current page state.
+;; Pure QOR reasoning — no domain logic.
+
+;; Step 1: Navigate to start URL if we haven't loaded any page yet
+(browser-action navigate $url) if
+    (start-url $url)
+    not (page-url $any) <0.90, 0.90>
+
+;; Step 2: Take a snapshot after navigating to see what's on the page
+(browser-action snapshot) if
+    (page-url $url)
+    not (page-element $any $role $name $href)
+    not (snapshot-taken true) <0.85, 0.85>
+
+;; Mark that we took a snapshot
+(snapshot-taken true) if
+    (page-element $any $role $name $href) <0.99, 0.99>
+
+;; Step 3: Extract page text if we have a snapshot but no text yet
+(browser-action page-text) if
+    (snapshot-taken true)
+    not (page-text $any)
+    not (text-extracted true) <0.80, 0.80>
+
+;; Mark text extracted
+(text-extracted true) if
+    (page-text $any) <0.99, 0.99>
+
+;; Click a link that matches our search topic
+(browser-action click $uid) if
+    (search-topic $topic)
+    (page-element $uid link $name $href)
+    not (clicked $uid) <0.75, 0.75>
+
+;; Fill a search box with our search topic
+(browser-action fill $uid $query) if
+    (search-topic $query)
+    (page-element $uid textbox $label $x)
+    not (filled $uid) <0.80, 0.80>
+
+;; Mark clicked/filled to avoid repeating
+(clicked $uid) if
+    (action-result clicked $uid) <0.99, 0.99>
+
+(filled $uid) if
+    (action-result filled $uid) <0.99, 0.99>
+
+;; Monitor API calls if configured
+(browser-action network-list "api") if
+    (monitor-api true)
+    (page-url $url) <0.70, 0.70>
+
+;; Done when we have findings
+(browser-action done) if
+    (finding $text) <0.95, 0.95>
+
+;; Done when all topics are searched and results extracted
+(browser-action done) if
+    (search-complete true) <0.90, 0.90>

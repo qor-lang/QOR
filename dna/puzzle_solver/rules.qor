@@ -1,0 +1,1662 @@
+;; ── Puzzle Solver DNA — Complete Grid Reasoning Engine ─────────────────
+;;
+;; Every rule QOR needs to reason about 2D grids, spatial patterns,
+;; transformations, and puzzle solving. Load via: qor chat --dna puzzle_solver
+;;
+;; Note: QOR guards support (> $x num), (< $x $y), (== $x num) etc.
+;; No inline arithmetic — use pre-computed ratio/percentage facts.
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── SIZE & STRUCTURE ──────────────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+
+;; Grids with identical dimensions
+(same-size $a $b) if (grid-size $a $r $c) (grid-size $b $r $c) <0.99, 0.95>
+
+;; REMOVED: square-grid, row-grid, col-grid, tiny-grid, small-grid, large-grid,
+;; empty-grid, scaled-output — all dead (never consumed by any rule)
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── OBJECT ANALYSIS ──────────────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+
+;; Object size classification
+(tiny-object $g $obj) if (grid-object $g $obj $color $size) (== $size 1) <0.95, 0.95>
+(small-object $g $obj) if (grid-object $g $obj $color $size) (< $size 4) <0.90, 0.90>
+(medium-object $g $obj) if (grid-object $g $obj $color $size) (> $size 3) (< $size 10) <0.90, 0.90>
+(large-object $g $obj) if (grid-object $g $obj $color $size) (> $size 9) <0.90, 0.90>
+
+;; Object is a single pixel (point)
+(point-object $g $obj $r $c $color) if (grid-object $g $obj $color 1) (grid-obj-cell $g $obj $r $c) <0.99, 0.95>
+
+;; Two objects share the same color
+(same-color $g $obj1 $obj2 $color) if (grid-object $g $obj1 $color $s1) (grid-object $g $obj2 $color $s2) <0.90, 0.85>
+
+;; REMOVED: same-shape-size — never consumed
+
+;; Object touches the top border
+(touches-top $g $obj) if (grid-obj-bbox $g $obj 0 $c1 $r2 $c2) <0.95, 0.90>
+
+;; Object touches the left border
+(touches-left $g $obj) if (grid-obj-bbox $g $obj $r1 0 $r2 $c2) <0.95, 0.90>
+
+;; Object touches a border (detected by bbox at row/col 0)
+(touches-border $g $obj) if (touches-top $g $obj) <0.90, 0.85>
+(touches-border $g $obj) if (touches-left $g $obj) <0.90, 0.85>
+
+;; Object bbox starts away from borders (floating)
+(interior-object $g $obj) if (grid-obj-bbox $g $obj $r1 $c1 $r2 $c2) (> $r1 0) (> $c1 0) <0.85, 0.80>
+
+;; REMOVED: h-line, v-line, square-bbox — never consumed (square-bbox also had broken deps)
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── CELL-LEVEL COMPARISON ────────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+;; PRE-COMPUTED by Rust perception layer (Grid::compare_pair in grid.rs).
+;; Facts: cell-kept, cell-removed, cell-added, recolored — emitted directly.
+;; QOR rules removed to avoid wasteful re-derivation.
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── ADJACENCY & NEIGHBORS ────────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+
+;; Adjacent cells detected by grid-neighbor facts (pre-computed by perception)
+;; NOTE: adjacency facts (grid-neighbor) should be emitted by the perception layer.
+;; If not available, these rules won't fire — future enhancement to perception.
+
+;; REMOVED: color-boundary-cell, isolated-cell — broken deps (grid-neighbor, same-color-neighbor undefined)
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── SPATIAL RELATIONSHIPS BETWEEN OBJECTS ────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+;; PRE-COMPUTED by Rust perception layer (Grid::to_statements in grid.rs).
+;; Facts: above, left-of, h-aligned, v-aligned, contains, same-color — emitted directly.
+;; QOR rules removed to avoid wasteful O(objects²) re-derivation.
+
+;; REMOVED: bbox-overlap — never consumed
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── INPUT→OUTPUT MAPPING ─────────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+
+;; REMOVED: object-preserved, object-moved, output-subset-cell — never consumed
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── COLOR ANALYSIS ───────────────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+
+;; (has-color g color) — pre-computed by Rust perception layer
+
+;; Color in input but not in output (eliminated)
+(color-eliminated $in $out $color) if (has-color $in $color) not (has-color $out $color) <0.90, 0.85>
+
+;; Color in output but not in input (introduced)
+(color-introduced $in $out $color) if (has-color $out $color) not (has-color $in $color) <0.90, 0.85>
+
+;; REMOVED: monochrome — never consumed
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── CORNER & EDGE CELLS ──────────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+
+;; Corner cells of the grid
+(top-left-cell $g $color) if (grid-cell $g 0 0 $color) <0.99, 0.95>
+
+;; REMOVED: top-edge-cell, left-edge-cell — never consumed (flood O(cells))
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── PATTERN REPETITION ──────────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+;; REMOVED: (repeated-color ...) was O(cells²) — 10,000+ combinations per grid.
+;; Replaced by (color-cell-count g color count) pre-computed in Rust perception.
+;; Downstream rules should use color-cell-count or same-color instead.
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── MARKER & SIGNAL PATTERNS ─────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+
+;; Single-pixel objects are often markers/signals in puzzles
+(marker $g $obj $r $c $color) if (point-object $g $obj $r $c $color) (interior-object $g $obj) <0.85, 0.80>
+
+;; REMOVED: marker-effect — never consumed
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── FILLING & HOLES ─────────────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+;; REMOVED: (filled-cell ...) — equivalent to cell-added (pre-computed).
+;; Cell-added already covers: output has color where input doesn't.
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── META-REASONING (multi-step chains) ──────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+
+;; REMOVED: consistent-color-elim — never consumed
+;; REMOVED: size-preserving — trivial wrapper for same-size, not consumed
+
+;; Output is smaller than input (cropping/extraction pattern)
+(output-smaller $in $out) if (grid-size $in $ri $ci) (grid-size $out $ro $co) (> $ri $ro) <0.85, 0.80>
+(output-smaller $in $out) if (grid-size $in $ri $ci) (grid-size $out $ro $co) (> $ci $co) <0.85, 0.80>
+
+;; REMOVED: output-larger — duplicate of Rust compute_observations()
+
+;; Object count changed between input and output
+(objects-added $in $out) if (object-count $in $ni) (object-count $out $no) (> $no $ni) <0.80, 0.75>
+(objects-removed $in $out) if (object-count $in $ni) (object-count $out $no) (< $no $ni) <0.80, 0.75>
+(objects-preserved $in $out) if (object-count $in $n) (object-count $out $n) <0.85, 0.80>
+
+;; REMOVED: marker-driven, color-swap-transform — never consumed
+(selective-removal $in $out) if (cell-removed $in $out $r $c $color) (cell-kept $in $out $r2 $c2 $color2) <0.80, 0.75>
+
+;; REMOVED: Entire GAME & BOARD REASONING section (50 rules)
+;; — tic-tac-toe logic has zero puzzle-solving value
+;; — 30+ predicates (occupied, piece-at, threat, winner, draw, etc.) all dead
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── GENERATIVE PREDICTION ─────────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+;; These rules derive (predict-cell row col color) facts that compose
+;; the predicted test output. The ARC test harness feeds grid facts
+;; with IDs like "t0i" (train0 input), "t0o" (train0 output), "ti" (test input).
+;; Perception layer emits pair-level transform facts:
+;;   pair-identity, pair-reflect-h, pair-reflect-v, pair-rotate-90/180/270,
+;;   pair-transpose, pair-shift, pair-crop, pair-scale-up
+
+;; ── ALL-PAIRS CONSISTENCY ───────────────────────────────────────────
+;; A transform is only "detected" if ALL training pairs agree.
+;; pair-* facts are BASE facts from Rust perception — safe to negate.
+
+(non-identity-pair) if (train-pair $in $out) not (pair-identity $in $out) <0.95, 0.95>
+(non-reflect-h-pair) if (train-pair $in $out) not (pair-reflect-h $in $out) <0.95, 0.95>
+(non-reflect-v-pair) if (train-pair $in $out) not (pair-reflect-v $in $out) <0.95, 0.95>
+(non-rotate-90-pair) if (train-pair $in $out) not (pair-rotate-90 $in $out) <0.95, 0.95>
+(non-rotate-180-pair) if (train-pair $in $out) not (pair-rotate-180 $in $out) <0.95, 0.95>
+(non-rotate-270-pair) if (train-pair $in $out) not (pair-rotate-270 $in $out) <0.95, 0.95>
+(non-transpose-pair) if (train-pair $in $out) not (pair-transpose $in $out) <0.95, 0.95>
+(non-shift-pair) if (train-pair $in $out) not (pair-shift $in $out $dr $dc) <0.95, 0.95>
+(non-crop-pair) if (train-pair $in $out) not (pair-crop $in $out $r0 $c0) <0.95, 0.95>
+(non-scale-up-pair) if (train-pair $in $out) not (pair-scale-up $in $out $factor) <0.95, 0.95>
+(non-crop-to-bbox-pair) if (train-pair $in $out) not (pair-crop-to-bbox $in $out) <0.95, 0.95>
+
+;; ── Lift per-pair perception to general "detected" facts ───────────
+;; Only fire if ALL training pairs agree (no non-* pair exists)
+
+(detected-identity) if (train-pair $in $out) (pair-identity $in $out) not (non-identity-pair) <0.95, 0.95>
+(detected-reflect-h) if (train-pair $in $out) (pair-reflect-h $in $out) not (non-reflect-h-pair) <0.95, 0.95>
+(detected-reflect-v) if (train-pair $in $out) (pair-reflect-v $in $out) not (non-reflect-v-pair) <0.95, 0.95>
+(detected-rotate-90) if (train-pair $in $out) (pair-rotate-90 $in $out) not (non-rotate-90-pair) <0.95, 0.95>
+(detected-rotate-180) if (train-pair $in $out) (pair-rotate-180 $in $out) not (non-rotate-180-pair) <0.95, 0.95>
+(detected-rotate-270) if (train-pair $in $out) (pair-rotate-270 $in $out) not (non-rotate-270-pair) <0.95, 0.95>
+(detected-transpose) if (train-pair $in $out) (pair-transpose $in $out) not (non-transpose-pair) <0.95, 0.95>
+(detected-shift $dr $dc) if (train-pair $in $out) (pair-shift $in $out $dr $dc) not (non-shift-pair) <0.95, 0.95>
+(detected-crop $r0 $c0) if (train-pair $in $out) (pair-crop $in $out $r0 $c0) not (non-crop-pair) <0.95, 0.95>
+;; Scale-up detection: disabled when conditional tiling detected (obs-inputs-have-zeros)
+;; because conditional tiling ≠ scale-up — tiling rules handle it instead.
+(detected-scale-up $factor) if (train-pair $in $out) (pair-scale-up $in $out $factor) not (non-scale-up-pair) not (obs-inputs-have-zeros) <0.95, 0.95>
+(detected-crop-to-bbox) if (train-pair $in $out) (pair-crop-to-bbox $in $out) not (non-crop-to-bbox-pair) <0.95, 0.95>
+
+;; ── Size detection ──
+;; Use base-fact guards to detect different-size — avoids negating derived same-size
+
+(different-size-pair) if (train-pair $in $out) (grid-size $in $ri $ci) (grid-size $out $ro $co) (< $ri $ro) <0.90, 0.90>
+(different-size-pair) if (train-pair $in $out) (grid-size $in $ri $ci) (grid-size $out $ro $co) (> $ri $ro) <0.90, 0.90>
+(different-size-pair) if (train-pair $in $out) (grid-size $in $ri $ci) (grid-size $out $ro $co) (< $ci $co) <0.90, 0.90>
+(different-size-pair) if (train-pair $in $out) (grid-size $in $ri $ci) (grid-size $out $ro $co) (> $ci $co) <0.90, 0.90>
+(size-preserving-pattern) if (train-pair $in $out) (same-size $in $out) not (different-size-pair) <0.90, 0.90>
+
+;; ── Color remap detection ──
+;; A color is remapped if it's recolored AND no cell preserves the original color
+;; (i.e., no position has the same $from color in both input and output)
+;; Uses base facts (grid-cell) only — avoids negating derived cell-kept
+
+(color-remap $from $to) if (train-pair $in $out) (recolored $in $out $r $c $from $to) not (grid-cell $out $r2 $c2 $from) <0.80, 0.80>
+;; REMOVED: color-swap — never consumed
+
+;; Consistency check: reject remap if same source maps to multiple targets
+(conflicting-remap $from) if (color-remap $from $to1) (color-remap $from $to2) (< $to1 $to2) <0.90, 0.90>
+
+;; Cross-pair consistency: a pair has color $from but doesn't remap $from→$to
+;; Uses only BASE facts (grid-cell, recolored) — stratification-safe
+(pair-has-unremaped $from $to) if (train-pair $in $out) (grid-cell $in $r $c $from) not (recolored $in $out $r2 $c2 $from $to) <0.80, 0.80>
+(inconsistent-cross-remap $from $to) if (pair-has-unremaped $from $to) <0.90, 0.90>
+
+(consistent-remap $from $to) if (color-remap $from $to) not (conflicting-remap $from) not (inconsistent-cross-remap $from $to) <0.90, 0.90>
+
+;; ── Pure color change detection ──
+;; A cell is occupied in input but background in output (structural change)
+;; grid-cell only emits non-zero cells — so absence = background
+(cell-vacated $in $out $r $c) if (train-pair $in $out) (grid-cell $in $r $c $color) not (grid-cell $out $r $c $any) <0.90, 0.90>
+(cell-appeared $in $out $r $c) if (train-pair $in $out) (grid-cell $out $r $c $color) not (grid-cell $in $r $c $any) <0.90, 0.90>
+
+;; Pure color change: same occupancy pattern, only colors differ
+;; Uses base facts for negation: no cell in input is absent from output (vacated)
+;; and no cell in output is absent from input (appeared)
+(pure-color-change) if (size-preserving-pattern) not (cell-vacated-exists) not (cell-appeared-exists) <0.85, 0.85>
+(cell-vacated-exists) if (cell-vacated $in $out $r $c) <0.90, 0.90>
+(cell-appeared-exists) if (cell-appeared $in $out $r $c) <0.90, 0.90>
+
+;; Legacy: rule-based identity detection (backup if perception misses it)
+(transform-identity) if (train-pair $in $out) (same-size $in $out) not (cell-removed $in $out $r $c $clr) not (cell-added $in $out $r2 $c2 $clr2) <0.90, 0.90>
+
+;; ── Mutual exclusivity ──
+;; Geometric transforms suppress remap predictions
+
+(has-geometric-transform) if (detected-identity) <0.95, 0.95>
+(has-geometric-transform) if (detected-reflect-h) <0.95, 0.95>
+(has-geometric-transform) if (detected-reflect-v) <0.95, 0.95>
+(has-geometric-transform) if (detected-rotate-90) <0.95, 0.95>
+(has-geometric-transform) if (detected-rotate-180) <0.95, 0.95>
+(has-geometric-transform) if (detected-rotate-270) <0.95, 0.95>
+(has-geometric-transform) if (detected-transpose) <0.95, 0.95>
+(has-geometric-transform) if (detected-shift $dr $dc) <0.95, 0.95>
+(has-geometric-transform) if (detected-crop $r0 $c0) <0.95, 0.95>
+(has-geometric-transform) if (detected-crop-to-bbox) <0.95, 0.95>
+(has-geometric-transform) if (detected-scale-up $factor) <0.95, 0.95>
+
+;; ── INPUT GRID MARKERS ────────────────────────────────────────────
+;; Mark which grid IDs are inputs (training + test) so rules fire
+;; for ALL inputs, enabling both training scoring and test prediction.
+(input-grid $id) if (train-pair $id $out) <0.99, 0.99>
+(input-grid $id) if (test-input $id) <0.99, 0.99>
+
+;; ── PREDICTION RULES ───────────────────────────────────────────────
+;; Each transform type generates predict-cell facts for ALL input grids.
+;; Arity 5: (predict-cell grid-id row col color)
+
+;; ── 1. Identity: copy input grid as-is ──
+(predict-cell $id $r $c $color) if (detected-identity) (input-grid $id) (grid-cell $id $r $c $color) <0.95, 0.95>
+(predict-cell $id $r $c $color) if (transform-identity) (input-grid $id) (grid-cell $id $r $c $color) <0.90, 0.90>
+
+;; ── 2. Color remap: change mapped colors, keep unmapped ──
+;; Guards: pure color change (same occupancy) AND no geometric transform
+(predict-cell $id $r $c $to) if (pure-color-change) (consistent-remap $from $to) (input-grid $id) (grid-cell $id $r $c $from) not (has-geometric-transform) <0.80, 0.80>
+(predict-keep $id $r $c $clr) if (pure-color-change) (consistent-remap $any1 $any2) (input-grid $id) (grid-cell $id $r $c $clr) not (color-remap $clr $any3) not (has-geometric-transform) <0.80, 0.80>
+(predict-cell $id $r $c $clr) if (predict-keep $id $r $c $clr) <0.80, 0.80>
+
+;; ── 3. Reflect horizontally ──
+(predict-cell $id $r $nc $color) if (detected-reflect-h) (input-grid $id) (grid-size $id $rows $cols) (grid-cell $id $r $c $color) (- $cols 1 $maxc) (- $maxc $c $nc) <0.95, 0.95>
+
+;; ── 4. Reflect vertically ──
+(predict-cell $id $nr $c $color) if (detected-reflect-v) (input-grid $id) (grid-size $id $rows $cols) (grid-cell $id $r $c $color) (- $rows 1 $maxr) (- $maxr $r $nr) <0.95, 0.95>
+
+;; ── 5. Rotate 90 clockwise: (r,c) → (c, rows-1-r) ──
+;; Rotate 90° CW: new_row = old_col, new_col = (rows-1) - old_row
+(predict-cell $id $c $nc $color) if (detected-rotate-90) (input-grid $id) (grid-size $id $rows $cols) (grid-cell $id $r $c $color) (- $rows 1 $maxr) (- $maxr $r $nc) <0.95, 0.95>
+
+;; ── 6. Rotate 180: (r,c) → (rows-1-r, cols-1-c) ──
+(predict-cell $id $nr $nc $color) if (detected-rotate-180) (input-grid $id) (grid-size $id $rows $cols) (grid-cell $id $r $c $color) (- $rows 1 $maxr) (- $maxr $r $nr) (- $cols 1 $maxc) (- $maxc $c $nc) <0.95, 0.95>
+
+;; ── 7. Rotate 270 clockwise: (r,c) → (cols-1-c, r) ──
+(predict-cell $id $nr $r $color) if (detected-rotate-270) (input-grid $id) (grid-size $id $rows $cols) (grid-cell $id $r $c $color) (- $cols 1 $maxc) (- $maxc $c $nr) <0.95, 0.95>
+
+;; ── 8. Transpose: (r,c) → (c,r) ──
+(predict-cell $id $c $r $color) if (detected-transpose) (input-grid $id) (grid-cell $id $r $c $color) <0.95, 0.95>
+
+;; ── 9. Shift: move all cells by (dr, dc) ──
+(predict-cell $id $nr $nc $color) if (detected-shift $dr $dc) (input-grid $id) (grid-cell $id $r $c $color) (+ $r $dr $nr) (+ $c $dc $nc) (>= $nr 0) (>= $nc 0) <0.95, 0.95>
+
+;; ── 10. Crop: extract sub-grid starting at (r0, c0) ──
+(predict-cell $id $nr $nc $color) if (detected-crop $r0 $c0) (input-grid $id) (grid-cell $id $r $c $color) (- $r $r0 $nr) (- $c $c0 $nc) (>= $nr 0) (>= $nc 0) <0.95, 0.95>
+
+;; ── 11. Scale up by 2: each input cell becomes 2×2 block ──
+(predict-cell $id $nr $nc $color) if (detected-scale-up 2) (input-grid $id) (grid-cell $id $r $c $color) (* $r 2 $nr) (* $c 2 $nc) <0.90, 0.90>
+(predict-cell $id $nr $nc $color) if (detected-scale-up 2) (input-grid $id) (grid-cell $id $r $c $color) (* $r 2 $nr) (* $c 2 $bc) (+ $bc 1 $nc) <0.90, 0.90>
+(predict-cell $id $nr $nc $color) if (detected-scale-up 2) (input-grid $id) (grid-cell $id $r $c $color) (* $r 2 $br) (+ $br 1 $nr) (* $c 2 $nc) <0.90, 0.90>
+(predict-cell $id $nr $nc $color) if (detected-scale-up 2) (input-grid $id) (grid-cell $id $r $c $color) (* $r 2 $br) (+ $br 1 $nr) (* $c 2 $bc) (+ $bc 1 $nc) <0.90, 0.90>
+
+;; ── 12. Scale up by 3: each input cell becomes 3×3 block ──
+(predict-cell $id $nr $nc $color) if (detected-scale-up 3) (input-grid $id) (grid-cell $id $r $c $color) (* $r 3 $nr) (* $c 3 $nc) <0.90, 0.90>
+(predict-cell $id $nr $nc $color) if (detected-scale-up 3) (input-grid $id) (grid-cell $id $r $c $color) (* $r 3 $nr) (* $c 3 $bc) (+ $bc 1 $nc) <0.90, 0.90>
+(predict-cell $id $nr $nc $color) if (detected-scale-up 3) (input-grid $id) (grid-cell $id $r $c $color) (* $r 3 $nr) (* $c 3 $bc) (+ $bc 2 $nc) <0.90, 0.90>
+(predict-cell $id $nr $nc $color) if (detected-scale-up 3) (input-grid $id) (grid-cell $id $r $c $color) (* $r 3 $br) (+ $br 1 $nr) (* $c 3 $nc) <0.90, 0.90>
+(predict-cell $id $nr $nc $color) if (detected-scale-up 3) (input-grid $id) (grid-cell $id $r $c $color) (* $r 3 $br) (+ $br 1 $nr) (* $c 3 $bc) (+ $bc 1 $nc) <0.90, 0.90>
+(predict-cell $id $nr $nc $color) if (detected-scale-up 3) (input-grid $id) (grid-cell $id $r $c $color) (* $r 3 $br) (+ $br 1 $nr) (* $c 3 $bc) (+ $bc 2 $nc) <0.90, 0.90>
+(predict-cell $id $nr $nc $color) if (detected-scale-up 3) (input-grid $id) (grid-cell $id $r $c $color) (* $r 3 $br) (+ $br 2 $nr) (* $c 3 $nc) <0.90, 0.90>
+(predict-cell $id $nr $nc $color) if (detected-scale-up 3) (input-grid $id) (grid-cell $id $r $c $color) (* $r 3 $br) (+ $br 2 $nr) (* $c 3 $bc) (+ $bc 1 $nc) <0.90, 0.90>
+(predict-cell $id $nr $nc $color) if (detected-scale-up 3) (input-grid $id) (grid-cell $id $r $c $color) (* $r 3 $br) (+ $br 2 $nr) (* $c 3 $bc) (+ $bc 2 $nc) <0.90, 0.90>
+
+;; ── 13. Crop to content bbox: output = input cropped to non-zero region ──
+(predict-cell $id $nr $nc $color) if (detected-crop-to-bbox) (input-grid $id) (content-bbox $id $r1 $c1 $r2 $c2) (grid-cell $id $r $c $color) (- $r $r1 $nr) (- $c $c1 $nc) (>= $nr 0) (>= $nc 0) <0.90, 0.90>
+
+;; ── 14. Uniform Tiling: repeat input grid at every block position ──
+;; output[br*rows + sr][bc*cols + sc] = input[sr][sc]
+;; Gate: obs-uniform-scale AND obs-all-inputs-nonzero (all cells filled).
+;; If inputs have zeros, use rule 15 (conditional tiling) instead.
+;; tile-block facts provide block indices (0..factor-1) for enumeration.
+;; (> $color 0) skips zero-value predictions (expected only contains non-zero).
+(predict-cell $id $nr $nc $color) if (obs-uniform-scale $f) (> $f 1) (obs-all-inputs-nonzero) (input-grid $id) (grid-size $id $rows $cols) (grid-cell $id $sr $sc $color) (> $color 0) (tile-block $br) (tile-block $bc) (* $br $rows $off_r) (* $bc $cols $off_c) (+ $sr $off_r $nr) (+ $sc $off_c $nc) <0.88, 0.88>
+
+;; ── 15. Self-multiplication tiling: non-zero cells as tile placement mask ──
+;; Each non-zero cell (tr,tc) in input stamps the entire input at block (tr,tc).
+;; Block (tr,tc) gets the input pattern only if input[tr][tc] is non-zero.
+;; (> $tv 0) ensures only non-zero template cells trigger stamping.
+;; (> $color 0) skips zero-value predictions (expected only contains non-zero).
+;; Gate: obs-inputs-have-zeros — some cells are zero, acting as placement mask.
+(predict-cell $id $nr $nc $color) if (obs-uniform-scale $f) (> $f 1) (obs-inputs-have-zeros) (input-grid $id) (grid-size $id $rows $cols) (grid-cell $id $tr $tc $tv) (> $tv 0) (grid-cell $id $sr $sc $color) (> $color 0) (* $tr $rows $off_r) (* $tc $cols $off_c) (+ $sr $off_r $nr) (+ $sc $off_c $nc) <0.85, 0.85>
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── SYMMETRY COMPLETION ──────────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+;; Rust perception detects (pair-symmetry-complete in out h/v)
+
+(detected-symmetry-complete-h) if (train-pair $in $out) (pair-symmetry-complete $in $out h) not (non-symmetry-h-pair) <0.90, 0.90>
+(non-symmetry-h-pair) if (train-pair $in $out) not (pair-symmetry-complete $in $out h) <0.90, 0.90>
+
+(detected-symmetry-complete-v) if (train-pair $in $out) (pair-symmetry-complete $in $out v) not (non-symmetry-v-pair) <0.90, 0.90>
+(non-symmetry-v-pair) if (train-pair $in $out) not (pair-symmetry-complete $in $out v) <0.90, 0.90>
+
+;; Predict: mirror existing cells across the horizontal axis (left↔right)
+(predict-cell $id $r $c $color) if (detected-symmetry-complete-h) (input-grid $id) (grid-cell $id $r $c $color) <0.90, 0.90>
+(predict-cell $id $r $nc $color) if (detected-symmetry-complete-h) (input-grid $id) (grid-size $id $rows $cols) (grid-cell $id $r $c $color) (- $cols 1 $maxc) (- $maxc $c $nc) <0.90, 0.90>
+
+;; Predict: mirror existing cells across the vertical axis (top↔bottom)
+(predict-cell $id $r $c $color) if (detected-symmetry-complete-v) (input-grid $id) (grid-cell $id $r $c $color) <0.90, 0.90>
+(predict-cell $id $nr $c $color) if (detected-symmetry-complete-v) (input-grid $id) (grid-size $id $rows $cols) (grid-cell $id $r $c $color) (- $rows 1 $maxr) (- $maxr $r $nr) <0.90, 0.90>
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── FLOOD FILL ──────────────────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+;; Rust perception detects (pair-flood-fill in out color)
+
+(detected-flood-fill $color) if (train-pair $in $out) (pair-flood-fill $in $out $color) not (non-flood-fill-pair) <0.88, 0.88>
+(non-flood-fill-pair) if (train-pair $in $out) not (pair-flood-fill $in $out $any) <0.88, 0.88>
+
+;; Predict: keep all existing non-zero cells
+(predict-cell $id $r $c $color) if (detected-flood-fill $fc) (input-grid $id) (grid-cell $id $r $c $color) <0.90, 0.90>
+
+;; Fill empty cells adjacent to non-zero cells with detected color.
+(predict-cell $id $r $c $fc) if (detected-flood-fill $fc) (input-grid $id) (grid-neighbor $id $r2 $c2 $r $c) (grid-cell $id $r2 $c2 $adj) not (grid-cell $id $r $c $any) <0.82, 0.82>
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── GRAVITY (objects fall down) ────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+;; Rust perception detects (pair-gravity-down in out)
+
+(detected-gravity-down) if (train-pair $in $out) (pair-gravity-down $in $out) not (non-gravity-down-pair) <0.90, 0.90>
+(non-gravity-down-pair) if (train-pair $in $out) not (pair-gravity-down $in $out) <0.90, 0.90>
+
+;; Predict: Rust pre-computes gravity, QOR just copies the result
+;; (gravity prediction is done via the Rust perception layer since it
+;; requires per-column stacking — too expensive for QOR rules)
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── ROW/COL/CROSS FILL ──────────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+;; Rust perception detects (pair-row-fill in out), (pair-col-fill in out),
+;; (pair-cross-fill in out) when marker cells extend to full rows/cols.
+
+(detected-row-fill) if (train-pair $in $out) (pair-row-fill $in $out) not (non-row-fill-pair) <0.90, 0.90>
+(non-row-fill-pair) if (train-pair $in $out) not (pair-row-fill $in $out) <0.90, 0.90>
+
+(detected-col-fill) if (train-pair $in $out) (pair-col-fill $in $out) not (non-col-fill-pair) <0.90, 0.90>
+(non-col-fill-pair) if (train-pair $in $out) not (pair-col-fill $in $out) <0.90, 0.90>
+
+(detected-cross-fill) if (train-pair $in $out) (pair-cross-fill $in $out) not (non-cross-fill-pair) <0.90, 0.90>
+(non-cross-fill-pair) if (train-pair $in $out) not (pair-cross-fill $in $out) <0.90, 0.90>
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── NOISE REMOVAL ───────────────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+;; Rust perception detects noise patterns:
+;;   (pair-noise-remove-isolated in out) — remove pixels with no same-color neighbor
+;;   (pair-noise-remove-minority in out keep_color) — keep only majority color
+;;   (pair-keep-largest in out) — keep only the largest connected object
+;;   (pair-noise-remove-small in out threshold) — remove objects <= threshold size
+
+(detected-noise-remove-isolated) if (train-pair $in $out) (pair-noise-remove-isolated $in $out) not (non-noise-isolated-pair) <0.90, 0.90>
+(non-noise-isolated-pair) if (train-pair $in $out) not (pair-noise-remove-isolated $in $out) <0.90, 0.90>
+
+(detected-noise-remove-minority $color) if (train-pair $in $out) (pair-noise-remove-minority $in $out $color) not (non-noise-minority-pair) <0.90, 0.90>
+(non-noise-minority-pair) if (train-pair $in $out) not (pair-noise-remove-minority $in $out $c) <0.90, 0.90>
+
+(detected-keep-largest) if (train-pair $in $out) (pair-keep-largest $in $out) not (non-keep-largest-pair) <0.90, 0.90>
+(non-keep-largest-pair) if (train-pair $in $out) not (pair-keep-largest $in $out) <0.90, 0.90>
+
+(detected-noise-remove-small $threshold) if (train-pair $in $out) (pair-noise-remove-small $in $out $threshold) not (non-noise-small-pair) <0.90, 0.90>
+(non-noise-small-pair) if (train-pair $in $out) not (pair-noise-remove-small $in $out $t) <0.90, 0.90>
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── REGION FILL FROM SEED ───────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+;; Rust perception detects (pair-region-fill-seed in out wall_color)
+
+(detected-region-fill-seed $wall) if (train-pair $in $out) (pair-region-fill-seed $in $out $wall) not (non-region-fill-seed-pair) <0.90, 0.90>
+(non-region-fill-seed-pair) if (train-pair $in $out) not (pair-region-fill-seed $in $out $w) <0.90, 0.90>
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── COLOR HISTOGRAM ─────────────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+;; Rust perception detects (pair-color-histogram in out)
+
+(detected-color-histogram) if (train-pair $in $out) (pair-color-histogram $in $out) not (non-color-histogram-pair) <0.90, 0.90>
+(non-color-histogram-pair) if (train-pair $in $out) not (pair-color-histogram $in $out) <0.90, 0.90>
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── NEIGHBOR-CONDITIONAL RECOLOR ───────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+;; "Empty cells adjacent to color X become color Y"
+
+(neighbor-recolor $trigger $result) if (train-pair $in $out) (grid-cell $in $r $c 0) (grid-neighbor $in $r $c $r2 $c2) (grid-cell $in $r2 $c2 $trigger) (grid-cell $out $r $c $result) <0.80, 0.80>
+
+;; Consistent neighbor recolor: same trigger→result across all pairs
+(consistent-neighbor-recolor $trigger $result) if (neighbor-recolor $trigger $result) not (conflicting-neighbor-recolor $trigger) <0.85, 0.85>
+(conflicting-neighbor-recolor $trigger) if (neighbor-recolor $trigger $r1) (neighbor-recolor $trigger $r2) (< $r1 $r2) <0.80, 0.80>
+
+;; Predict: apply consistent neighbor recolor to test input
+(predict-cell $id $r $c $color) if (consistent-neighbor-recolor $trigger $result) (input-grid $id) (grid-cell $id $r $c 0) (grid-neighbor $id $r $c $r2 $c2) (grid-cell $id $r2 $c2 $trigger) not (grid-cell $id $r $c $keep) <0.80, 0.80>
+(predict-cell $id $r $c $result) if (consistent-neighbor-recolor $trigger $result) (input-grid $id) (grid-cell $id $r $c 0) (grid-neighbor $id $r $c $r2 $c2) (grid-cell $id $r2 $c2 $trigger) <0.80, 0.80>
+
+;; Keep cells that already have color
+(predict-cell $id $r $c $color) if (consistent-neighbor-recolor $trigger $result) (input-grid $id) (grid-cell $id $r $c $color) <0.90, 0.90>
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── OBJECT COUNT → OUTPUT SIZE ─────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+;; "Number of objects determines output dimensions"
+
+(count-determines-rows) if (train-pair $in $out) (object-count $in $n) (grid-size $out $n $c) not (non-count-rows-pair) <0.80, 0.80>
+(non-count-rows-pair) if (train-pair $in $out) (object-count $in $n) (grid-size $out $rows $c) (< $n $rows) <0.80, 0.80>
+(non-count-rows-pair) if (train-pair $in $out) (object-count $in $n) (grid-size $out $rows $c) (> $n $rows) <0.80, 0.80>
+
+(count-determines-cols) if (train-pair $in $out) (object-count $in $n) (grid-size $out $r $n) not (non-count-cols-pair) <0.80, 0.80>
+(non-count-cols-pair) if (train-pair $in $out) (object-count $in $n) (grid-size $out $r $cols) (< $n $cols) <0.80, 0.80>
+(non-count-cols-pair) if (train-pair $in $out) (object-count $in $n) (grid-size $out $r $cols) (> $n $cols) <0.80, 0.80>
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── CROSS-MODAL: TEXT HINTS BOOST DETECTION (Phase 5B) ──────────────
+;; ══════════════════════════════════════════════════════════════════════
+
+;; Text hints boost detection confidence
+(text-boosted-reflect) if (text-hint reflect $c) (> $c 0.5) (pair-reflect-h $in $out) <0.98, 0.98>
+(text-boosted-reflect) if (text-hint reflect $c) (> $c 0.5) (pair-reflect-v $in $out) <0.98, 0.98>
+(text-boosted-gravity) if (text-hint gravity $c) (> $c 0.5) (pair-gravity-down $in $out) <0.98, 0.98>
+(text-boosted-rotate) if (text-hint rotate $c) (> $c 0.5) (pair-rotate-90 $in $out 90) <0.98, 0.98>
+(text-boosted-rotate) if (text-hint rotate $c) (> $c 0.5) (pair-rotate-180 $in $out 180) <0.98, 0.98>
+(text-boosted-crop) if (text-hint crop $c) (> $c 0.5) (detected-crop $in $out) <0.98, 0.98>
+(text-boosted-scale) if (text-hint scale $c) (> $c 0.5) (detected-scale $in $out) <0.98, 0.98>
+(text-boosted-fill) if (text-hint flood-fill $c) (> $c 0.5) (obs-consistent has-enclosed-regions) <0.98, 0.98>
+(text-boosted-recolor) if (text-hint recolor $c) (> $c 0.5) (pair-color-remap $in $out) <0.98, 0.98>
+(text-boosted-shift) if (text-hint shift $c) (> $c 0.5) (obs-parameter shift-dr $v) <0.98, 0.98>
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── META-REASONING: UNCERTAINTY DETECTION (Phase 6B) ────────────────
+;; ══════════════════════════════════════════════════════════════════════
+
+;; Know what we know
+(knows-puzzle-type) if (has-geometric-transform) <0.95, 0.95>
+(knows-puzzle-type) if (consistent-remap $from $to) <0.95, 0.95>
+(knows-puzzle-type) if (obs-consistent same-size) (pair-color-remap $in $out) <0.95, 0.95>
+
+;; Recognize uncertainty
+(unknown-puzzle-type) if not (knows-puzzle-type) <0.80, 0.80>
+
+;; REMOVED: duplicate has-geometric-transform rules — already defined in PREDICTION section above
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── MISSING SINGLE-TRANSFORM PREDICTIONS ─────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+;; Transforms detected by perception but lacking predict-cell rules.
+
+;; ── Row Fill: each non-zero cell extends across its entire row ──
+;; $mc binds the marker column, $c binds from any occupied column
+(predict-cell $id $r $c $color) if (detected-row-fill) (input-grid $id) (grid-cell $id $r $mc $color) (grid-cell $id $ar $c $av) <0.88, 0.88>
+(predict-cell $id $r $c $color) if (detected-row-fill) (input-grid $id) (grid-cell $id $r $c $color) <0.92, 0.92>
+
+;; ── Col Fill: each non-zero cell extends down its entire column ──
+(predict-cell $id $r $c $color) if (detected-col-fill) (input-grid $id) (grid-cell $id $mr $c $color) (grid-cell $id $r $ac $av) <0.88, 0.88>
+(predict-cell $id $r $c $color) if (detected-col-fill) (input-grid $id) (grid-cell $id $r $c $color) <0.92, 0.92>
+
+;; ── Cross Fill: extend both row and column from each marker ──
+(predict-cell $id $r $c $color) if (detected-cross-fill) (input-grid $id) (grid-cell $id $r $mc $color) (grid-cell $id $ar $c $ac) <0.88, 0.88>
+(predict-cell $id $r $c $color) if (detected-cross-fill) (input-grid $id) (grid-cell $id $mr $c $color) (grid-cell $id $r $ac $av) <0.88, 0.88>
+(predict-cell $id $r $c $color) if (detected-cross-fill) (input-grid $id) (grid-cell $id $r $c $color) <0.92, 0.92>
+
+;; ── Noise Remove Isolated: keep only cells with same-color neighbor ──
+(predict-cell $id $r $c $color) if (detected-noise-remove-isolated) (input-grid $id) (grid-cell $id $r $c $color) (grid-neighbor $id $r $c $r2 $c2) (grid-cell $id $r2 $c2 $color) <0.90, 0.90>
+
+;; ── Noise Remove Minority: keep only the specified color ──
+(predict-cell $id $r $c $color) if (detected-noise-remove-minority $color) (input-grid $id) (grid-cell $id $r $c $color) <0.90, 0.90>
+
+;; ── Keep Largest Object: keep only cells of the biggest object ──
+(bigger-than-this $id $obj1) if (input-grid $id) (grid-object $id $obj1 $c1 $s1) (grid-object $id $obj2 $c2 $s2) (> $s2 $s1) <0.90, 0.90>
+(biggest-object $id $obj) if (input-grid $id) (grid-object $id $obj $clr $sz) not (bigger-than-this $id $obj) <0.90, 0.90>
+(predict-cell $id $r $c $color) if (detected-keep-largest) (biggest-object $id $obj) (grid-obj-cell $id $obj $r $c $color) <0.90, 0.90>
+
+;; ── Noise Remove Small: keep objects above threshold size ──
+(predict-cell $id $r $c $color) if (detected-noise-remove-small $thresh) (input-grid $id) (grid-obj-cell $id $obj $r $c $color) (grid-object $id $obj $clr $sz) (> $sz $thresh) <0.90, 0.90>
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── COMPOSITE PREDICTIONS: GEOMETRIC + COLOR REMAP ──────────────────
+;; ══════════════════════════════════════════════════════════════════════
+;; When BOTH a geometric transform AND color remap are detected,
+;; apply them together. Higher confidence than either alone.
+
+;; ── Rotate 180 + Color Remap ──
+(predict-cell $id $nr $nc $to) if (detected-rotate-180) (consistent-remap $from $to) (input-grid $id) (grid-size $id $rows $cols) (grid-cell $id $r $c $from) (- $rows 1 $maxr) (- $maxr $r $nr) (- $cols 1 $maxc) (- $maxc $c $nc) <0.97, 0.97>
+;; Unmapped colors still rotate
+(predict-cell $id $nr $nc $color) if (detected-rotate-180) (consistent-remap $a $b) (input-grid $id) (grid-size $id $rows $cols) (grid-cell $id $r $c $color) (- $rows 1 $maxr) (- $maxr $r $nr) (- $cols 1 $maxc) (- $maxc $c $nc) not (color-remap $color $any) <0.96, 0.96>
+
+;; ── Rotate 90 + Color Remap ──
+(predict-cell $id $c $nc $to) if (detected-rotate-90) (consistent-remap $from $to) (input-grid $id) (grid-size $id $rows $cols) (grid-cell $id $r $c $from) (- $rows 1 $maxr) (- $maxr $r $nc) <0.97, 0.97>
+(predict-cell $id $c $nc $color) if (detected-rotate-90) (consistent-remap $a $b) (input-grid $id) (grid-size $id $rows $cols) (grid-cell $id $r $c $color) (- $rows 1 $maxr) (- $maxr $r $nc) not (color-remap $color $any) <0.96, 0.96>
+
+;; ── Rotate 270 + Color Remap ──
+(predict-cell $id $nr $r $to) if (detected-rotate-270) (consistent-remap $from $to) (input-grid $id) (grid-size $id $rows $cols) (grid-cell $id $r $c $from) (- $cols 1 $maxc) (- $maxc $c $nr) <0.97, 0.97>
+(predict-cell $id $nr $r $color) if (detected-rotate-270) (consistent-remap $a $b) (input-grid $id) (grid-size $id $rows $cols) (grid-cell $id $r $c $color) (- $cols 1 $maxc) (- $maxc $c $nr) not (color-remap $color $any) <0.96, 0.96>
+
+;; ── Reflect H + Color Remap ──
+(predict-cell $id $r $nc $to) if (detected-reflect-h) (consistent-remap $from $to) (input-grid $id) (grid-size $id $rows $cols) (grid-cell $id $r $c $from) (- $cols 1 $maxc) (- $maxc $c $nc) <0.97, 0.97>
+(predict-cell $id $r $nc $color) if (detected-reflect-h) (consistent-remap $a $b) (input-grid $id) (grid-size $id $rows $cols) (grid-cell $id $r $c $color) (- $cols 1 $maxc) (- $maxc $c $nc) not (color-remap $color $any) <0.96, 0.96>
+
+;; ── Reflect V + Color Remap ──
+(predict-cell $id $nr $c $to) if (detected-reflect-v) (consistent-remap $from $to) (input-grid $id) (grid-size $id $rows $cols) (grid-cell $id $r $c $from) (- $rows 1 $maxr) (- $maxr $r $nr) <0.97, 0.97>
+(predict-cell $id $nr $c $color) if (detected-reflect-v) (consistent-remap $a $b) (input-grid $id) (grid-size $id $rows $cols) (grid-cell $id $r $c $color) (- $rows 1 $maxr) (- $maxr $r $nr) not (color-remap $color $any) <0.96, 0.96>
+
+;; ── Transpose + Color Remap ──
+(predict-cell $id $c $r $to) if (detected-transpose) (consistent-remap $from $to) (input-grid $id) (grid-cell $id $r $c $from) <0.97, 0.97>
+(predict-cell $id $c $r $color) if (detected-transpose) (consistent-remap $a $b) (input-grid $id) (grid-cell $id $r $c $color) not (color-remap $color $any) <0.96, 0.96>
+
+;; ── Shift + Color Remap ──
+(predict-cell $id $nr $nc $to) if (detected-shift $dr $dc) (consistent-remap $from $to) (input-grid $id) (grid-cell $id $r $c $from) (+ $r $dr $nr) (+ $c $dc $nc) (>= $nr 0) (>= $nc 0) <0.97, 0.97>
+(predict-cell $id $nr $nc $color) if (detected-shift $dr $dc) (consistent-remap $a $b) (input-grid $id) (grid-cell $id $r $c $color) (+ $r $dr $nr) (+ $c $dc $nc) (>= $nr 0) (>= $nc 0) not (color-remap $color $any) <0.96, 0.96>
+
+;; ── Crop + Color Remap ──
+(predict-cell $id $nr $nc $to) if (detected-crop $r0 $c0) (consistent-remap $from $to) (input-grid $id) (grid-cell $id $r $c $from) (- $r $r0 $nr) (- $c $c0 $nc) (>= $nr 0) (>= $nc 0) <0.97, 0.97>
+(predict-cell $id $nr $nc $color) if (detected-crop $r0 $c0) (consistent-remap $a $b) (input-grid $id) (grid-cell $id $r $c $color) (- $r $r0 $nr) (- $c $c0 $nc) (>= $nr 0) (>= $nc 0) not (color-remap $color $any) <0.96, 0.96>
+
+;; ── Crop-to-bbox + Color Remap ──
+(predict-cell $id $nr $nc $to) if (detected-crop-to-bbox) (consistent-remap $from $to) (input-grid $id) (content-bbox $id $r1 $c1 $r2 $c2) (grid-cell $id $r $c $from) (- $r $r1 $nr) (- $c $c1 $nc) (>= $nr 0) (>= $nc 0) <0.97, 0.97>
+(predict-cell $id $nr $nc $color) if (detected-crop-to-bbox) (consistent-remap $a $b) (input-grid $id) (content-bbox $id $r1 $c1 $r2 $c2) (grid-cell $id $r $c $color) (- $r $r1 $nr) (- $c $c1 $nc) (>= $nr 0) (>= $nc 0) not (color-remap $color $any) <0.96, 0.96>
+
+;; ── Scale-up 2 + Color Remap (all 4 sub-cells) ──
+(predict-cell $id $nr $nc $to) if (detected-scale-up 2) (consistent-remap $from $to) (input-grid $id) (grid-cell $id $r $c $from) (* $r 2 $nr) (* $c 2 $nc) <0.92, 0.92>
+(predict-cell $id $nr $nc $to) if (detected-scale-up 2) (consistent-remap $from $to) (input-grid $id) (grid-cell $id $r $c $from) (* $r 2 $nr) (* $c 2 $bc) (+ $bc 1 $nc) <0.92, 0.92>
+(predict-cell $id $nr $nc $to) if (detected-scale-up 2) (consistent-remap $from $to) (input-grid $id) (grid-cell $id $r $c $from) (* $r 2 $br) (+ $br 1 $nr) (* $c 2 $nc) <0.92, 0.92>
+(predict-cell $id $nr $nc $to) if (detected-scale-up 2) (consistent-remap $from $to) (input-grid $id) (grid-cell $id $r $c $from) (* $r 2 $br) (+ $br 1 $nr) (* $c 2 $bc) (+ $bc 1 $nc) <0.92, 0.92>
+
+;; ── Symmetry Complete H + Color Remap ──
+(predict-cell $id $r $c $to) if (detected-symmetry-complete-h) (consistent-remap $from $to) (input-grid $id) (grid-cell $id $r $c $from) <0.92, 0.92>
+(predict-cell $id $r $nc $to) if (detected-symmetry-complete-h) (consistent-remap $from $to) (input-grid $id) (grid-size $id $rows $cols) (grid-cell $id $r $c $from) (- $cols 1 $maxc) (- $maxc $c $nc) <0.92, 0.92>
+
+;; ── Symmetry Complete V + Color Remap ──
+(predict-cell $id $r $c $to) if (detected-symmetry-complete-v) (consistent-remap $from $to) (input-grid $id) (grid-cell $id $r $c $from) <0.92, 0.92>
+(predict-cell $id $nr $c $to) if (detected-symmetry-complete-v) (consistent-remap $from $to) (input-grid $id) (grid-size $id $rows $cols) (grid-cell $id $r $c $from) (- $rows 1 $maxr) (- $maxr $r $nr) <0.92, 0.92>
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── COMPOSITE: NOISE REMOVAL + GEOMETRIC ─────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+;; First remove noise, then apply geometric transform.
+;; "cleaned" = survived noise removal. Then transform the cleaned grid.
+
+;; ── Cleaned cell: survived noise removal ──
+(cleaned-cell $id $r $c $color) if (detected-noise-remove-isolated) (input-grid $id) (grid-cell $id $r $c $color) (grid-neighbor $id $r $c $r2 $c2) (grid-cell $id $r2 $c2 $color) <0.88, 0.88>
+(cleaned-cell $id $r $c $color) if (detected-noise-remove-minority $keep) (input-grid $id) (grid-cell $id $r $c $keep) <0.88, 0.88>
+(cleaned-cell $id $r $c $color) if (detected-keep-largest) (biggest-object $id $obj) (grid-obj-cell $id $obj $r $c $color) <0.88, 0.88>
+(cleaned-cell $id $r $c $color) if (detected-noise-remove-small $thresh) (input-grid $id) (grid-obj-cell $id $obj $r $c $color) (grid-object $id $obj $clr $sz) (> $sz $thresh) <0.88, 0.88>
+
+;; ── Cleaned + Rotate 180 ──
+(predict-cell $id $nr $nc $color) if (cleaned-cell $id $r $c $color) (detected-rotate-180) (grid-size $id $rows $cols) (- $rows 1 $maxr) (- $maxr $r $nr) (- $cols 1 $maxc) (- $maxc $c $nc) <0.85, 0.85>
+
+;; ── Cleaned + Reflect H ──
+(predict-cell $id $r $nc $color) if (cleaned-cell $id $r $c $color) (detected-reflect-h) (grid-size $id $rows $cols) (- $cols 1 $maxc) (- $maxc $c $nc) <0.85, 0.85>
+
+;; ── Cleaned + Reflect V ──
+(predict-cell $id $nr $c $color) if (cleaned-cell $id $r $c $color) (detected-reflect-v) (grid-size $id $rows $cols) (- $rows 1 $maxr) (- $maxr $r $nr) <0.85, 0.85>
+
+;; ── Cleaned + Transpose ──
+(predict-cell $id $c $r $color) if (cleaned-cell $id $r $c $color) (detected-transpose) <0.85, 0.85>
+
+;; ── Cleaned + Color Remap ──
+(predict-cell $id $r $c $to) if (cleaned-cell $id $r $c $from) (consistent-remap $from $to) <0.87, 0.87>
+(predict-cell $id $r $c $color) if (cleaned-cell $id $r $c $color) (consistent-remap $a $b) not (color-remap $color $any) <0.86, 0.86>
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── COMPOSITE: FLOOD FILL + COLOR REMAP ──────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+
+;; Keep existing cells with remapped color
+(predict-cell $id $r $c $to) if (detected-flood-fill $fc) (consistent-remap $from $to) (input-grid $id) (grid-cell $id $r $c $from) <0.85, 0.85>
+;; Fill empty cells and remap the fill color
+(predict-cell $id $r $c $to) if (detected-flood-fill $fc) (consistent-remap $fc $to) (input-grid $id) (grid-neighbor $id $r2 $c2 $r $c) (grid-cell $id $r2 $c2 $adj) not (grid-cell $id $r $c $any) <0.80, 0.80>
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── MULTI-TEST SUPPORT ───────────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+;; Some puzzles have multiple test cases (ti, ti1, ti2...).
+;; Prediction rules hardcode "ti" but extra test inputs use "ti1" etc.
+;; This alias rule copies cells from additional tests into "ti" namespace
+;; so all existing prediction rules fire for every test input.
+;; Note: if multiple tests have cells at the same position, both exist
+;; in the store — scoring picks whichever matches expected output.
+
+(grid-cell ti $r $c $color) if (test-input ti1) (grid-cell ti1 $r $c $color) <0.99, 0.99>
+(grid-cell ti $r $c $color) if (test-input ti2) (grid-cell ti2 $r $c $color) <0.99, 0.99>
+(grid-size ti $rows $cols) if (test-input ti1) (grid-size ti1 $rows $cols) <0.99, 0.99>
+(grid-size ti $rows $cols) if (test-input ti2) (grid-size ti2 $rows $cols) <0.99, 0.99>
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── CROP WITH NON-ZERO BACKGROUND ───────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+;; Some grids have non-zero background (e.g., all 1s).
+;; "Crop to objects" means: find bbox of non-dominant cells, extract, bg→0.
+;; Uses arithmetic to detect background (>50% of cells) — NO negation needed
+;; (avoids stratification issues with unstratified forward chaining).
+
+;; Background detection: color occupying > 50% of total cells
+(half-total-cells $id $half) if (grid-size $id $rows $cols) (* $rows $cols $total) (/ $total 2 $half) <0.90, 0.90>
+(detected-bg-color $id $bg) if (color-cell-count $id $bg $n) (half-total-cells $id $half) (> $n $half) <0.90, 0.90>
+
+;; Non-zero background detected when the majority color > 0
+(has-nonzero-bg $id) if (detected-bg-color $id $bg) (> $bg 0) <0.90, 0.90>
+
+;; Non-background cells (cells that are NOT the background color)
+(non-bg-cell $id $r $c $color) if (detected-bg-color $id $bg) (grid-cell $id $r $c $color) (> $color $bg) <0.90, 0.90>
+(non-bg-cell $id $r $c $color) if (detected-bg-color $id $bg) (grid-cell $id $r $c $color) (< $color $bg) <0.90, 0.90>
+
+;; Find content bbox of non-bg cells via aggregation
+(min-content-row $id $mr) if (has-nonzero-bg $id) (min (non-bg-cell $id $r $c $color) $r -> $mr) <0.90, 0.90>
+(min-content-col $id $mc) if (has-nonzero-bg $id) (min (non-bg-cell $id $r $c $color) $c -> $mc) <0.90, 0.90>
+(max-content-row $id $mr) if (has-nonzero-bg $id) (max (non-bg-cell $id $r $c $color) $r -> $mr) <0.90, 0.90>
+(max-content-col $id $mc) if (has-nonzero-bg $id) (max (non-bg-cell $id $r $c $color) $c -> $mc) <0.90, 0.90>
+
+;; Crop: emit non-bg cells, shifted to (0,0) origin
+(predict-cell $id $nr $nc $color) if (has-nonzero-bg $id) (obs-consistent output-smaller) (min-content-row $id $r0) (min-content-col $id $c0) (non-bg-cell $id $r $c $color) (- $r $r0 $nr) (- $c $c0 $nc) (>= $nr 0) (>= $nc 0) <0.88, 0.88>
+
+;; Crop: background cells within the content bbox become 0 in output
+(predict-cell $id $nr $nc 0) if (has-nonzero-bg $id) (obs-consistent output-smaller) (min-content-row $id $r0) (min-content-col $id $c0) (max-content-row $id $r1) (max-content-col $id $c1) (detected-bg-color $id $bg) (grid-cell $id $r $c $bg) (>= $r $r0) (<= $r $r1) (>= $c $c0) (<= $c $c1) (- $r $r0 $nr) (- $c $c0 $nc) <0.88, 0.88>
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── MARKER EXPANSION (3x3 BOX DILATION) ──────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+;; Pattern: each non-zero cell in input keeps its color,
+;; and ALL 8 surrounding cells gain a specific fill color (3x3 box).
+;; grid-neighbor is 4-connected, so we use arithmetic for 8-connected.
+
+;; Detect the marker→fill relationship from training pairs
+;; A candidate: input cell kept, its orthogonal neighbor in output has a new color
+(marker-fill-candidate $src $fill) if
+    (train-pair $in $out)
+    (grid-cell $in $r $c $src)
+    (grid-cell $out $r $c $src)
+    (grid-neighbor $in $r $c $nr $nc)
+    (grid-cell $out $nr $nc $fill)
+    not (grid-cell $in $nr $nc $fill) <0.75, 0.75>
+
+;; Prediction: keep the marker cells
+(predict-cell $id $r $c $src) if (marker-fill-candidate $src $fill) (size-preserving-pattern) (input-grid $id) (grid-cell $id $r $c $src) <0.85, 0.85>
+
+;; Prediction: expand fill color to ALL 8 neighbors via arithmetic
+;; Orthogonal: up, down, left, right
+(predict-cell $id $nr $c $fill) if (marker-fill-candidate $src $fill) (size-preserving-pattern) (input-grid $id) (grid-cell $id $r $c $src) (- $r 1 $nr) (>= $nr 0) <0.82, 0.82>
+(predict-cell $id $nr $c $fill) if (marker-fill-candidate $src $fill) (size-preserving-pattern) (input-grid $id) (grid-cell $id $r $c $src) (+ $r 1 $nr) (grid-size $id $rows $cols) (< $nr $rows) <0.82, 0.82>
+(predict-cell $id $r $nc $fill) if (marker-fill-candidate $src $fill) (size-preserving-pattern) (input-grid $id) (grid-cell $id $r $c $src) (- $c 1 $nc) (>= $nc 0) <0.82, 0.82>
+(predict-cell $id $r $nc $fill) if (marker-fill-candidate $src $fill) (size-preserving-pattern) (input-grid $id) (grid-cell $id $r $c $src) (+ $c 1 $nc) (grid-size $id $rows $cols) (< $nc $cols) <0.82, 0.82>
+;; Diagonal: up-left, up-right, down-left, down-right
+(predict-cell $id $nr $nc $fill) if (marker-fill-candidate $src $fill) (size-preserving-pattern) (input-grid $id) (grid-cell $id $r $c $src) (- $r 1 $nr) (- $c 1 $nc) (>= $nr 0) (>= $nc 0) <0.82, 0.82>
+(predict-cell $id $nr $nc $fill) if (marker-fill-candidate $src $fill) (size-preserving-pattern) (input-grid $id) (grid-cell $id $r $c $src) (- $r 1 $nr) (+ $c 1 $nc) (>= $nr 0) (grid-size $id $rows $cols) (< $nc $cols) <0.82, 0.82>
+(predict-cell $id $nr $nc $fill) if (marker-fill-candidate $src $fill) (size-preserving-pattern) (input-grid $id) (grid-cell $id $r $c $src) (+ $r 1 $nr) (- $c 1 $nc) (grid-size $id $rows $cols) (< $nr $rows) (>= $nc 0) <0.82, 0.82>
+(predict-cell $id $nr $nc $fill) if (marker-fill-candidate $src $fill) (size-preserving-pattern) (input-grid $id) (grid-cell $id $r $c $src) (+ $r 1 $nr) (+ $c 1 $nc) (grid-size $id $rows $cols) (< $nr $rows) (< $nc $cols) <0.82, 0.82>
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── OBJECT SHIFT-UP-BY-HEIGHT ────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+;; Pattern: each rectangular object moves UP by exactly its own height.
+;; Objects start near the bottom, columns preserved, old positions → 0.
+
+;; Object height from bounding box
+(obj-height $id $obj $h) if (grid-obj-bbox $id $obj $r1 $c1 $r2 $c2) (- $r2 $r1 $diff) (+ $diff 1 $h) <0.90, 0.90>
+
+;; Verify pattern on training data:
+;; An input object cell, shifted up by its height, matches the output cell
+(shift-up-match) if
+    (train-pair $in $out)
+    (obs-consistent same-size)
+    (grid-obj-cell $in $obj $r $c)
+    (grid-object $in $obj $color $sz)
+    (obj-height $in $obj $h)
+    (- $r $h $nr)
+    (>= $nr 0)
+    (grid-cell $out $nr $c $color) <0.85, 0.85>
+
+;; Predict: shift each test object cell up by its height
+(predict-cell $id $nr $c $color) if
+    (shift-up-match)
+    (input-grid $id)
+    (grid-obj-cell $id $obj $r $c)
+    (grid-object $id $obj $color $sz)
+    (obj-height $id $obj $h)
+    (- $r $h $nr)
+    (>= $nr 0) <0.85, 0.85>
+
+;; Default: all cells become 0 (clears old object positions)
+;; Scorer picks the best match, so both 0 and non-zero predictions coexist
+(predict-cell $id $r $c 0) if (shift-up-match) (input-grid $id) (grid-cell $id $r $c $anycolor) <0.50, 0.50>
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── FRAME REFLECTION ────────────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+;; Pattern: hollow frame (color 2), external shapes (color 5) get
+;; reflected through the nearest frame edge into the interior.
+;; Formula: reflected_pos = 2 * frame_edge - external_pos
+;; External shapes removed, frame preserved, rest becomes 0.
+
+;; Frame bounds from color-2 cells in input grid
+(frame-top $id $mr) if (input-grid $id) (min (grid-cell $id $r $c 2) $r -> $mr) <0.90, 0.90>
+(frame-bot $id $mr) if (input-grid $id) (max (grid-cell $id $r $c 2) $r -> $mr) <0.90, 0.90>
+(frame-left $id $mc) if (input-grid $id) (min (grid-cell $id $r $c 2) $c -> $mc) <0.90, 0.90>
+(frame-right $id $mc) if (input-grid $id) (max (grid-cell $id $r $c 2) $c -> $mc) <0.90, 0.90>
+
+;; Verify on training: some 5-cell is removed (→background) and frame 2-cells are preserved
+;; NOTE: grid-cell only emits non-zero colors, so "color 0" = no grid-cell fact.
+;; Use negation on base fact (grid-cell) — safe for unstratified chaining.
+(frame-reflect-verified) if
+    (train-pair $in $out)
+    (obs-consistent same-size)
+    (grid-cell $in $r $c 5)
+    not (grid-cell $out $r $c $any)
+    (grid-cell $in $r2 $c2 2)
+    (grid-cell $out $r2 $c2 2) <0.80, 0.80>
+
+;; Reflect above-frame 5s through top edge
+(predict-cell $id $nr $c 5) if (frame-reflect-verified) (input-grid $id) (grid-cell $id $r $c 5) (frame-top $id $top) (< $r $top) (* $top 2 $dbl) (- $dbl $r $nr) <0.85, 0.85>
+
+;; Reflect below-frame 5s through bottom edge
+(predict-cell $id $nr $c 5) if (frame-reflect-verified) (input-grid $id) (grid-cell $id $r $c 5) (frame-bot $id $bot) (> $r $bot) (* $bot 2 $dbl) (- $dbl $r $nr) <0.85, 0.85>
+
+;; Reflect left-of-frame 5s through left edge
+(predict-cell $id $r $nc 5) if (frame-reflect-verified) (input-grid $id) (grid-cell $id $r $c 5) (frame-left $id $left) (< $c $left) (* $left 2 $dbl) (- $dbl $c $nc) <0.85, 0.85>
+
+;; Reflect right-of-frame 5s through right edge
+(predict-cell $id $r $nc 5) if (frame-reflect-verified) (input-grid $id) (grid-cell $id $r $c 5) (frame-right $id $right) (> $c $right) (* $right 2 $dbl) (- $dbl $c $nc) <0.85, 0.85>
+
+;; Keep frame cells
+(predict-cell $id $r $c 2) if (frame-reflect-verified) (input-grid $id) (grid-cell $id $r $c 2) <0.85, 0.85>
+
+;; Default all cells to 0 (clears external 5s and empty interior)
+(predict-cell $id $r $c 0) if (frame-reflect-verified) (input-grid $id) (grid-cell $id $r $c $v) <0.50, 0.50>
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── SEPARATOR COMBINE ────────────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+;; Rust emits (separator-row id row color) and (separator-col id col color).
+;; QOR does ALL detection + prediction.
+;;
+;; Stratification fix: negation of DERIVED facts in the same iteration
+;; causes race conditions. Solution: only negate BASE facts (separator-col,
+;; separator-row, has-color). Use positive derived dependencies to push
+;; negation-checked rules to later iterations.
+;;
+;; Iteration 0: positive derivations from base facts
+;; Iteration 1: negation-checked rules (delayed by positive dependency)
+;; Iteration 2+: prediction rules
+
+;; ── Color analysis (iteration 0 → 1) ──
+;; Step 1 (iter 0): which colors appear in inputs vs outputs
+(any-input-has-color $color) if (train-pair $in $out) (has-color $in $color) <0.90, 0.90>
+(any-output-has-color $color) if (train-pair $in $out) (has-color $out $color) <0.90, 0.90>
+;; Step 2 (iter 1): needs any-output-has-color in store → correctly delayed
+(output-only-color $marker) if (any-output-has-color $marker) not (any-input-has-color $marker) <0.85, 0.85>
+
+;; ── Vertical separator detection (iteration 0 → 1) ──
+;; Step 1 (iter 0): positive — at least one training pair has separator structure
+(train-has-separator-v) if
+    (train-pair $in $out)
+    (separator-col $in $sep $sc)
+    (grid-size $in $rows $cols)
+    (grid-size $out $rows $sep)
+    (* $sep 2 $dbl)
+    (+ $dbl 1 $expected)
+    (== $expected $cols) <0.90, 0.90>
+
+;; Step 1b (iter 0): negates BASE fact separator-col (safe — always in store)
+(non-separator-v-pair) if (train-pair $in $out) not (separator-col $in $any $any2) <0.90, 0.90>
+
+;; Step 2 (iter 1): needs train-has-separator-v → delayed past non-separator-v-pair
+(detected-separator-v $id) if
+    (train-has-separator-v)
+    (input-grid $id)
+    (separator-col $id $sep $sc)
+    (grid-size $id $rows $cols)
+    (* $sep 2 $dbl)
+    (+ $dbl 1 $expected)
+    (== $expected $cols)
+    not (non-separator-v-pair) <0.90, 0.90>
+
+;; ── Horizontal separator detection (iteration 0 → 1) ──
+(train-has-separator-h) if
+    (train-pair $in $out)
+    (separator-row $in $sep $sc)
+    (grid-size $in $rows $cols)
+    (grid-size $out $sep $cols)
+    (* $sep 2 $dbl)
+    (+ $dbl 1 $expected)
+    (== $expected $rows) <0.90, 0.90>
+
+(non-separator-h-pair) if (train-pair $in $out) not (separator-row $in $any $any2) <0.90, 0.90>
+
+(detected-separator-h $id) if
+    (train-has-separator-h)
+    (input-grid $id)
+    (separator-row $id $sep $sc)
+    (grid-size $id $rows $cols)
+    (* $sep 2 $dbl)
+    (+ $dbl 1 $expected)
+    (== $expected $rows)
+    not (non-separator-h-pair) <0.90, 0.90>
+
+;; ── Bridge: derive detection from obs-* (obs-* survive clone_obs_only) ──
+;; The training detection chain (train-has-separator-v → detected-separator-v)
+;; breaks in test sessions because intermediate facts are stripped.
+;; These bridge rules re-derive detection from obs-* cross-pair observations.
+(detected-separator-v $id) if (obs-separator-and $v) (input-grid $id) (separator-col $id $sep $sc) <0.95, 0.95>
+(detected-separator-v $id) if (obs-separator-xor $v) (input-grid $id) (separator-col $id $sep $sc) <0.95, 0.95>
+(detected-separator-h $id) if (obs-separator-and-h $v) (input-grid $id) (separator-row $id $sep $sc) <0.95, 0.95>
+
+;; ── Vertical separator predictions (iteration 2+) ──
+;; BUG FIX: all rules MUST check (!= $color 0) because grid-cell exists
+;; for ALL cells including value 0. Without this guard, rules fire for
+;; every cell, causing massive over-prediction.
+
+;; AND-with-marker: both halves non-zero → predict introduced marker color
+(predict-cell $id $r $c $marker) if
+    (detected-separator-v $id)
+    (separator-col $id $sep $sc)
+    (output-only-color $marker)
+    (grid-cell $id $r $c $color1)
+    (!= $color1 0)
+    (< $c $sep)
+    (+ $sep 1 $base)
+    (+ $base $c $bc)
+    (grid-cell $id $r $bc $color2)
+    (!= $color2 0) <0.86, 0.86>
+
+;; XOR: left half non-zero, right half zero (no marker puzzle)
+(predict-cell $id $r $c $color) if
+    (detected-separator-v $id)
+    (separator-col $id $sep $sc)
+    not (output-only-color $any)
+    (grid-cell $id $r $c $color)
+    (!= $color 0)
+    (< $c $sep)
+    (+ $sep 1 $base)
+    (+ $base $c $bc)
+    (grid-cell $id $r $bc 0) <0.88, 0.88>
+
+;; XOR: right half non-zero, left half zero (no marker puzzle)
+(predict-cell $id $r $c $color) if
+    (detected-separator-v $id)
+    (separator-col $id $sep $sc)
+    not (output-only-color $any)
+    (grid-cell $id $r $bc $color)
+    (!= $color 0)
+    (> $bc $sep)
+    (+ $sep 1 $base)
+    (- $bc $base $c)
+    (grid-cell $id $r $c 0) <0.88, 0.88>
+
+;; OR (no marker): both halves non-zero → predict left color
+(predict-cell $id $r $c $color) if
+    (detected-separator-v $id)
+    (separator-col $id $sep $sc)
+    not (output-only-color $any)
+    (grid-cell $id $r $c $color)
+    (!= $color 0)
+    (< $c $sep)
+    (+ $sep 1 $base)
+    (+ $base $c $bc)
+    (grid-cell $id $r $bc $color2)
+    (!= $color2 0) <0.85, 0.85>
+
+;; ── Horizontal separator predictions (iteration 2+) ──
+
+;; AND-with-marker: both halves non-zero → predict introduced marker color
+(predict-cell $id $r $c $marker) if
+    (detected-separator-h $id)
+    (separator-row $id $sep $sc)
+    (output-only-color $marker)
+    (grid-cell $id $r $c $color1)
+    (!= $color1 0)
+    (< $r $sep)
+    (+ $sep 1 $base)
+    (+ $base $r $br)
+    (grid-cell $id $br $c $color2)
+    (!= $color2 0) <0.86, 0.86>
+
+;; XOR: top half non-zero, bottom half zero (no marker puzzle)
+(predict-cell $id $r $c $color) if
+    (detected-separator-h $id)
+    (separator-row $id $sep $sc)
+    not (output-only-color $any)
+    (grid-cell $id $r $c $color)
+    (!= $color 0)
+    (< $r $sep)
+    (+ $sep 1 $base)
+    (+ $base $r $br)
+    (grid-cell $id $br $c 0) <0.88, 0.88>
+
+;; XOR: bottom half non-zero, top half zero (no marker puzzle)
+(predict-cell $id $r $c $color) if
+    (detected-separator-h $id)
+    (separator-row $id $sep $sc)
+    not (output-only-color $any)
+    (grid-cell $id $br $c $color)
+    (!= $color 0)
+    (> $br $sep)
+    (+ $sep 1 $base)
+    (- $br $base $r)
+    (grid-cell $id $r $c 0) <0.88, 0.88>
+
+;; OR (no marker): both halves non-zero → predict top color
+(predict-cell $id $r $c $color) if
+    (detected-separator-h $id)
+    (separator-row $id $sep $sc)
+    not (output-only-color $any)
+    (grid-cell $id $r $c $color)
+    (!= $color 0)
+    (< $r $sep)
+    (+ $sep 1 $base)
+    (+ $base $r $br)
+    (grid-cell $id $br $c $color2)
+    (!= $color2 0) <0.85, 0.85>
+
+;; ═══════════════════════════════════════════════════════════════════
+;; 22. Border/Padding: input embedded in center of output with border
+;; ═══════════════════════════════════════════════════════════════════
+;; When obs-border-added fires, the output = input + uniform border.
+;; The observation provides pad_top, pad_left, and border_color.
+;; Predict: border cells + input cells shifted by padding offset.
+
+;; Predict input cells at their padded positions
+(predict-cell $id $nr $nc $color) if
+    (obs-border-added $pt $pl $bc)
+    (input-grid $id)
+    (grid-cell $id $r $c $color)
+    (+ $r $pt $nr)
+    (+ $c $pl $nc) <0.92, 0.92>
+
+;; Predict border cells (top rows)
+(predict-cell $id $r $c $bc) if
+    (obs-border-added $pt $pl $bc)
+    (> $pt 0)
+    (input-grid $id)
+    (grid-size $id $rows $cols)
+    (+ $rows $pt $orows_half)
+    (+ $orows_half $pt $orows)
+    (+ $cols $pl $ocols_half)
+    (+ $ocols_half $pl $ocols)
+    (tile-block $r)
+    (< $r $pt)
+    (tile-block $c)
+    (< $c $ocols) <0.90, 0.90>
+
+;; ═══════════════════════════════════════════════════════════════════
+;; 23. Pure-recolor + marker-removal: remove small marker, recolor large object
+;; ═══════════════════════════════════════════════════════════════════
+;; When both pure-recolor and fewer-objects are detected, and there's a
+;; cell-diff pattern where one color consistently maps to 0 (marker removed),
+;; keep the large object positions, predict 0 for marker positions.
+
+;; Keep zero cells as zero (background preserved in recolor puzzles)
+(predict-cell $id $r $c 0) if
+    (obs-consistent pure-recolor)
+    (input-grid $id)
+    (grid-cell $id $r $c 0) <0.85, 0.85>
+
+;; ═══════════════════════════════════════════════════════════════════
+;; 24. Pure-addition: cells only added (0→nonzero), never removed
+;; ═══════════════════════════════════════════════════════════════════
+;; Preserve all existing non-zero cells. The added cells are for genesis.
+(predict-cell $id $r $c $color) if
+    (obs-consistent pure-addition)
+    (input-grid $id)
+    (grid-cell $id $r $c $color)
+    (> $color 0) <0.90, 0.90>
+
+;; If single fill color, also fill cells adjacent to non-zero (expansion)
+(predict-cell $id $r2 $c2 $fc) if
+    (obs-consistent pure-addition)
+    (obs-fill-color $fc)
+    (input-grid $id)
+    (grid-cell $id $r $c $color)
+    (> $color 0)
+    (grid-neighbor $id $r $c $r2 $c2)
+    (grid-cell $id $r2 $c2 0) <0.60, 0.60>
+
+;; ═══════════════════════════════════════════════════════════════════
+;; 25. Pure-removal: cells only removed (nonzero→0)
+;; ═══════════════════════════════════════════════════════════════════
+;; Output is input with some cells zeroed out. Zero cells stay zero.
+(predict-cell $id $r $c 0) if
+    (obs-consistent pure-removal)
+    (input-grid $id)
+    (grid-cell $id $r $c 0) <0.90, 0.90>
+
+;; ═══════════════════════════════════════════════════════════════════
+;; 26. Subgrid extraction: output is a verbatim subgrid of input
+;; ═══════════════════════════════════════════════════════════════════
+;; When obs-output-is-subgrid fires, the output exists somewhere in
+;; the input. The specific extraction location must come from:
+;; - Non-zero bounding box
+;; - Object selection
+;; - Separator region
+;; Baseline: predict cells from the content bounding box (crop)
+
+;; If output is subgrid AND output-smaller, try content bbox crop
+(predict-cell $id $r $c $color) if
+    (obs-consistent output-is-subgrid)
+    (obs-consistent output-smaller)
+    (input-grid $id)
+    (grid-cell $id $r $c $color)
+    (> $color 0) <0.70, 0.70>
+
+;; ═══════════════════════════════════════════════════════════════════
+;; 27. Output-binary: output has only 2 values (typically 0 and 1 color)
+;; ═══════════════════════════════════════════════════════════════════
+;; These are classification/masking puzzles. The output marks which
+;; cells satisfy some condition. Baseline: keep the overall structure.
+;; The specific marking logic is for genesis to discover.
+
+;; Preserve zero cells in binary output (most common pattern)
+(predict-cell $id $r $c 0) if
+    (obs-consistent output-binary)
+    (obs-consistent output-smaller)
+    (input-grid $id)
+    (grid-cell $id $r $c 0) <0.65, 0.65>
+
+;; ═══════════════════════════════════════════════════════════════════
+;; 28. Position-dependent recolor: colors change based on position
+;; ═══════════════════════════════════════════════════════════════════
+;; Same-size puzzles where the SAME input color maps to DIFFERENT
+;; output colors at different positions. Can't use consistent-remap.
+;; Baseline: predict zero cells stay zero, non-zero cells change.
+
+;; Zeros stay zero in position-dependent recolor
+(predict-cell $id $r $c 0) if
+    (obs-consistent position-dependent-recolor)
+    (input-grid $id)
+    (grid-cell $id $r $c 0) <0.88, 0.88>
+
+;; Non-zero cells get SOME color (preserve position, genesis finds color)
+(predict-cell $id $r $c $color) if
+    (obs-consistent position-dependent-recolor)
+    (obs-consistent same-cell-count)
+    (input-grid $id)
+    (grid-cell $id $r $c $color)
+    (> $color 0) <0.55, 0.55>
+
+;; ═══════════════════════════════════════════════════════════════════
+;; 29. Content rearrangement: same values, different positions
+;; ═══════════════════════════════════════════════════════════════════
+;; Output has exactly the same multiset of non-zero values as input,
+;; but rearranged (gravity, sorting, rotation within grid, etc.)
+;; Baseline: predict zero for all cells, let genesis figure out placement.
+;; (Gravity is handled by rule 10, shift by rule 8 — this catches the rest)
+
+;; ═══════════════════════════════════════════════════════════════════
+;; 30. Expansion with input-embedded: output contains input + extra
+;; ═══════════════════════════════════════════════════════════════════
+;; When input is embedded at top-left in a larger output,
+;; predict the embedded input cells. Genesis fills the rest.
+
+(predict-cell $id $r $c $color) if
+    (obs-consistent input-embedded-in-output)
+    (obs-consistent output-larger)
+    (input-grid $id)
+    (grid-cell $id $r $c $color) <0.85, 0.85>
+
+;; ═══════════════════════════════════════════════════════════════════
+;; 31. Mixed-size puzzles: different pairs have different size changes
+;; ═══════════════════════════════════════════════════════════════════
+;; These are the hardest — output size depends on input content.
+;; QOR predicts input cells as baseline; the size/shape determination
+;; is for genesis to discover from the training pair structure.
+
+;; For mixed-size, preserve non-zero input cells as minimum baseline
+(predict-cell $id $r $c $color) if
+    (obs-consistent mixed-size)
+    (input-grid $id)
+    (grid-cell $id $r $c $color)
+    (> $color 0) <0.50, 0.50>
+
+;; ═══════════════════════════════════════════════════════════════════
+;; 32. Output-tiny (≤3x3): counting/summarization puzzles
+;; ═══════════════════════════════════════════════════════════════════
+;; Very small outputs often represent counts, modes, or extracted
+;; patterns. The specific extraction logic is for genesis.
+;; No baseline prediction possible — genesis must discover the rule.
+
+;; ═══════════════════════════════════════════════════════════════════
+;; 33. Output-1-row: single-row output (counting/feature extraction)
+;; ═══════════════════════════════════════════════════════════════════
+;; Similar to output-tiny but specifically 1-row outputs.
+;; Often represents column-wise counts or features.
+;; No baseline prediction — genesis must discover.
+
+;; ═══════════════════════════════════════════════════════════════════
+;; 34. Same-palette rearrangement (moderate change, no new colors)
+;; ═══════════════════════════════════════════════════════════════════
+;; Same-size, same color palette, 30-50% cells changed.
+;; Often: object manipulation, pattern completion, shape transformation.
+;; Baseline: cells that match between input and training output
+;; are likely correct for test too.
+
+;; Zero cells that are zero in ALL training inputs stay zero
+(predict-cell $id $r $c 0) if
+    (obs-consistent same-size)
+    (obs-consistent value-set-preserved)
+    (input-grid $id)
+    (grid-cell $id $r $c 0) <0.60, 0.60>
+
+;; ═══════════════════════════════════════════════════════════════════
+;; 35. Content-dependent expansion: each input cell → a block in output
+;; ═══════════════════════════════════════════════════════════════════
+;; Clean expansion ratio but NOT simple scale-up.
+;; Each input cell value determines the block pattern in the output.
+;; Example: 3x3 input → 9x9 output with ratio 3x3.
+;; Baseline: genesis must learn the value→block mapping.
+;; We can at least predict that zero input cells map to zero blocks.
+
+;; Zero input cells produce zero blocks in content-dependent expansion
+(predict-cell $id $nr $nc 0) if
+    (obs-content-dependent-expansion $fr $fc)
+    (input-grid $id)
+    (grid-cell $id $ir $ic 0)
+    (tile-block $br)
+    (< $br $fr)
+    (tile-block $bc)
+    (< $bc $fc)
+    (* $ir $fr $base_r)
+    (* $ic $fc $base_c)
+    (+ $base_r $br $nr)
+    (+ $base_c $bc $nc) <0.70, 0.70>
+
+;; ═══════════════════════════════════════════════════════════════════
+;; 36. Content-dependent reduction: each input block → one output cell
+;; ═══════════════════════════════════════════════════════════════════
+;; Clean reduction ratio. Input is divided into blocks, each block
+;; maps to one output cell. The mapping rule is for genesis.
+;; Baseline: predict the most common value in each block.
+
+;; ═══════════════════════════════════════════════════════════════════
+;; 37. Fixed-output-size: output always has same dimensions
+;; ═══════════════════════════════════════════════════════════════════
+;; When all training outputs have the same height/width regardless
+;; of input size, the output dimensions are known for test.
+;; This helps genesis know the target grid shape.
+
+;; ═══════════════════════════════════════════════════════════════════
+;; 38. Enclosed Region Fill: fill zero cells enclosed by non-zero boundary
+;; ═══════════════════════════════════════════════════════════════════
+;; Rust perception emits (enclosed-cell id r c) for zero cells not reachable
+;; from the grid border. obs-enclosed-fill-color provides the fill color.
+
+;; Fill enclosed cells with detected fill color
+(predict-cell $id $r $c $fill) if (obs-enclosed-fill-color $fill) (input-grid $id) (enclosed-cell $id $r $c) <0.96, 0.96>
+
+;; Keep all existing non-zero cells when filling enclosed regions
+(predict-cell $id $r $c $color) if (obs-enclosed-fill-color $fill) (input-grid $id) (grid-cell $id $r $c $color) (> $color 0) <0.97, 0.97>
+
+;; ═══════════════════════════════════════════════════════════════════
+;; 39. Tile with Alternating Horizontal Reflection
+;; ═══════════════════════════════════════════════════════════════════
+;; Tile the input N×N, but even block-rows use normal input,
+;; odd block-rows use columns reversed (horizontal reflection).
+;; obs-tile-alt-reflect-h detected by Rust perception.
+
+;; Even block-row: normal tiling
+(predict-cell $id $nr $nc $color) if (obs-tile-alt-reflect-h) (obs-uniform-scale $f) (> $f 1) (input-grid $id) (grid-size $id $rows $cols) (grid-cell $id $sr $sc $color) (> $color 0) (tile-block $br) (tile-block $bc) (% $br 2 $rem) (== $rem 0) (* $br $rows $off_r) (* $bc $cols $off_c) (+ $sr $off_r $nr) (+ $sc $off_c $nc) <0.93, 0.93>
+
+;; Odd block-row: horizontal reflection (columns reversed within each tile)
+(predict-cell $id $nr $nc $color) if (obs-tile-alt-reflect-h) (obs-uniform-scale $f) (> $f 1) (input-grid $id) (grid-size $id $rows $cols) (grid-cell $id $sr $sc $color) (> $color 0) (tile-block $br) (tile-block $bc) (% $br 2 $rem) (== $rem 1) (* $br $rows $off_r) (* $bc $cols $off_c) (- $cols 1 $maxc) (- $maxc $sc $rsc) (+ $rsc $off_c $nc) (+ $sr $off_r $nr) <0.93, 0.93>
+
+;; ═══════════════════════════════════════════════════════════════════
+;; 38b. Non-enclosed zero cells stay zero when filling enclosed regions
+;; ═══════════════════════════════════════════════════════════════════
+;; Prevents other DNA rules from producing false positive predictions
+;; for zero cells that are NOT enclosed (they should remain 0).
+
+(predict-cell $id $r $c 0) if (obs-enclosed-fill-color $fill) (input-grid $id) (grid-cell $id $r $c 0) not (enclosed-cell $id $r $c) <0.95, 0.95>
+
+;; ═══════════════════════════════════════════════════════════════════
+;; 40. Size-dependent enclosed region fill
+;; ═══════════════════════════════════════════════════════════════════
+;; When enclosed regions have DIFFERENT fill colors depending on area,
+;; obs-enclosed-size-fill maps area→color. Each enclosed region is
+;; identified by (enclosed-region-cell id region r c) with its area.
+
+;; Fill enclosed cells based on their region's area → color mapping
+(predict-cell $id $r $c $fill) if (enclosed-region-cell $id $region $r $c) (enclosed-region $id $region $area) (obs-enclosed-size-fill $area $fill) <0.96, 0.96>
+
+;; Keep all non-zero cells when doing size-based fill
+(predict-cell $id $r $c $color) if (obs-enclosed-size-fill $a $f) (input-grid $id) (grid-cell $id $r $c $color) (> $color 0) <0.97, 0.97>
+
+;; Non-enclosed zero cells stay zero in size-based fill
+(predict-cell $id $r $c 0) if (obs-enclosed-size-fill $a $f) (input-grid $id) (grid-cell $id $r $c 0) not (enclosed-cell $id $r $c) <0.95, 0.95>
+
+;; ═══════════════════════════════════════════════════════════════════
+;; 41. Shape-key color remap
+;; ═══════════════════════════════════════════════════════════════════
+;; Input has 2 non-zero colors: a "key" shape and a "target" pattern.
+;; The key's shape (bitmap signature) determines what color to remap
+;; the target to. Key cells are removed (become 0).
+;; obs-shape-remap, obs-shape-key-color, obs-shape-map detected by Rust.
+
+;; Remap target color based on key shape signature lookup
+(predict-cell $id $r $c $out) if (obs-shape-remap $target) (shape-sig $id $key_color $sig) (obs-shape-key-color $key_color) (obs-shape-map $sig $out) (grid-cell $id $r $c $target) <0.96, 0.96>
+
+;; Remove key shape cells (become 0)
+(predict-cell $id $r $c 0) if (obs-shape-key-color $key) (input-grid $id) (grid-cell $id $r $c $key) <0.95, 0.95>
+
+;; Background cells stay 0 in shape-key remap
+(predict-cell $id $r $c 0) if (obs-shape-remap $target) (input-grid $id) (grid-cell $id $r $c 0) <0.94, 0.94>
+
+;; ═══════════════════════════════════════════════════════════════════
+;; 42. Periodic tiling with color remap
+;; ═══════════════════════════════════════════════════════════════════
+;; Output is larger than input vertically, same width.
+;; Output rows cycle through input rows (period = minimum row-repeat period).
+;; Non-zero cells get a consistent color remap (from → to).
+;; Zero cells stay zero.
+;; obs-periodic-tile $out_height $from $to detected by Rust.
+;; obs-row-idx $r enumerates output rows.
+;; input-period $id $period emitted per grid by to_statements().
+;; QOR computes row mapping via modulo: (% $r $period $sr).
+
+;; Remap non-zero cells using periodic tiling + color remap
+(predict-cell $id $r $c $to) if
+    (obs-periodic-tile $out_h $from $to)
+    (obs-row-idx $r)
+    (input-grid $id)
+    (input-period $id $period)
+    (% $r $period $sr)
+    (grid-cell $id $sr $c $from)
+    (!= $from 0) <0.95, 0.95>
+
+;; Keep zero cells as zero in periodic tiling
+(predict-cell $id $r $c 0) if
+    (obs-periodic-tile $out_h $from $to)
+    (obs-row-idx $r)
+    (input-grid $id)
+    (input-period $id $period)
+    (% $r $period $sr)
+    (grid-cell $id $sr $c 0) <0.94, 0.94>
+
+;; Keep cells that are not the remapped color (other non-zero colors stay)
+(predict-cell $id $r $c $color) if
+    (obs-periodic-tile $out_h $from $to)
+    (obs-row-idx $r)
+    (input-grid $id)
+    (input-period $id $period)
+    (% $r $period $sr)
+    (grid-cell $id $sr $c $color)
+    (!= $color 0)
+    (!= $color $from) <0.95, 0.95>
+
+;; ═══════════════════════════════════════════════════════════════════
+;; 43. Separator AND/XOR with observation-detected operation
+;; ═══════════════════════════════════════════════════════════════════
+;; When grid.rs detects the exact binary operation (obs-separator-and $val),
+;; we can predict directly without needing output-only-color heuristic.
+
+;; Vertical separator AND: both sides nonzero → $val
+(predict-cell $id $r $c $val) if
+    (obs-separator-and $val)
+    (detected-separator-v $id)
+    (separator-col $id $sep $sc)
+    (grid-cell $id $r $c $color1)
+    (!= $color1 0)
+    (< $c $sep)
+    (+ $sep 1 $base)
+    (+ $base $c $bc)
+    (grid-cell $id $r $bc $color2)
+    (!= $color2 0) <0.97, 0.97>
+
+;; Vertical separator AND: at least one side zero → 0
+(predict-cell $id $r $c 0) if
+    (obs-separator-and $val)
+    (detected-separator-v $id)
+    (separator-col $id $sep $sc)
+    (< $c $sep)
+    (+ $sep 1 $base)
+    (+ $base $c $bc)
+    (grid-cell $id $r $c 0) <0.96, 0.96>
+
+(predict-cell $id $r $c 0) if
+    (obs-separator-and $val)
+    (detected-separator-v $id)
+    (separator-col $id $sep $sc)
+    (< $c $sep)
+    (+ $sep 1 $base)
+    (+ $base $c $bc)
+    (grid-cell $id $r $bc 0) <0.96, 0.96>
+
+;; Vertical separator XOR: exactly one side nonzero → $val
+(predict-cell $id $r $c $val) if
+    (obs-separator-xor $val)
+    (detected-separator-v $id)
+    (separator-col $id $sep $sc)
+    (grid-cell $id $r $c $color1)
+    (!= $color1 0)
+    (< $c $sep)
+    (+ $sep 1 $base)
+    (+ $base $c $bc)
+    (grid-cell $id $r $bc 0) <0.97, 0.97>
+
+(predict-cell $id $r $c $val) if
+    (obs-separator-xor $val)
+    (detected-separator-v $id)
+    (separator-col $id $sep $sc)
+    (< $c $sep)
+    (+ $sep 1 $base)
+    (+ $base $c $bc)
+    (grid-cell $id $r $c 0)
+    (grid-cell $id $r $bc $color2)
+    (!= $color2 0) <0.97, 0.97>
+
+;; Separator XOR: both sides nonzero or both zero → 0
+(predict-cell $id $r $c 0) if
+    (obs-separator-xor $val)
+    (detected-separator-v $id)
+    (separator-col $id $sep $sc)
+    (grid-cell $id $r $c $color1)
+    (!= $color1 0)
+    (< $c $sep)
+    (+ $sep 1 $base)
+    (+ $base $c $bc)
+    (grid-cell $id $r $bc $color2)
+    (!= $color2 0) <0.96, 0.96>
+
+(predict-cell $id $r $c 0) if
+    (obs-separator-xor $val)
+    (detected-separator-v $id)
+    (separator-col $id $sep $sc)
+    (< $c $sep)
+    (+ $sep 1 $base)
+    (+ $base $c $bc)
+    (grid-cell $id $r $c 0)
+    (grid-cell $id $r $bc 0) <0.96, 0.96>
+
+;; ═══════════════════════════════════════════════════════════════════
+;; 44. RESERVED
+
+;; ═══════════════════════════════════════════════════════════════════
+;; 45. ARCADE: INTERACTIVE GAME ACTION SELECTION
+;; ═══════════════════════════════════════════════════════════════════
+;; For interactive arcade games (ARC-AGI-3). Agent observes 64x64
+;; frames and takes actions (up/down/left/right/space/click/undo).
+;; Grid perception facts come from Grid::to_statements() via feed_grid().
+;; Python agent injects per frame:
+;;   (frame-number N)
+;;   (levels-completed L)
+;;   (game-state STATE)
+;;   (last-action NAME)
+;;   (consecutive-no-change N)
+;;   (frame-changed true/false)
+;;   (effective-type click/direction)  -- what works for this game
+;;   (game-attempt N)                  -- which attempt (main.rs retry pattern)
+;; Rules derive (action-select ...) facts for the agent to read.
+;;
+;; PERSISTENT predicates (NOT cleared between frames):
+;;   visited-cell, cell-effect, good-position, bad-position,
+;;   action-effective, clicked-cell
+;; These survive frame clears for cross-frame learning (LS20 etc.)
+
+;; ── Stuck detection ──
+(stuck) if (consecutive-no-change $n) (> $n 3) <0.95, 0.95>
+(very-stuck) if (consecutive-no-change $n) (> $n 8) <0.95, 0.95>
+(extremely-stuck) if (consecutive-no-change $n) (> $n 15) <0.95, 0.95>
+
+;; When very stuck, undo
+(action-select undo) if (very-stuck) <0.80, 0.80>
+
+;; ── Phase-based cycling: lowest-priority exploration fallback ──
+;; turn-phase 0/1/2/3 cycles through up/right/down/left (clockwise spiral)
+;; Low confidence (0.50) — only used when no game-specific rule fires higher
+(action-select up) if (turn-phase 0) <0.50, 0.50>
+(action-select right) if (turn-phase 1) <0.50, 0.50>
+(action-select down) if (turn-phase 2) <0.50, 0.50>
+(action-select left) if (turn-phase 3) <0.50, 0.50>
+
+;; ── Adaptive: if we know clicks work, suggest clicks ──
+(action-select click $r $c) if (effective-type click) (obj-center f $obj $r $c)
+    not (clicked-cell $r $c) <0.80, 0.80>
+
+;; ── Adaptive: if we know directions work, prefer directions ──
+(action-select up) if (effective-type direction) <0.70, 0.70>
+(action-select down) if (effective-type direction) <0.70, 0.70>
+(action-select left) if (effective-type direction) <0.70, 0.70>
+(action-select right) if (effective-type direction) <0.70, 0.70>
+
+;; ── Object center for click targeting ──
+(obj-center f $obj $cr $cc) if
+    (grid-obj-bbox f $obj $r1 $c1 $r2 $c2)
+    (+ $r1 $r2 $rsum) (/ $rsum 2 $cr)
+    (+ $c1 $c2 $csum) (/ $csum 2 $cc) <0.90, 0.90>
+
+;; ═══════════════════════════════════════════════════════════════════
+;; 46. AS66: GRAVITY PUZZLE
+;; ═══════════════════════════════════════════════════════════════════
+;; Player controls gravity direction (up/down/left/right).
+;; A small ball is pulled toward the chosen edge.
+;; Goal: guide ball to colored target objects by switching gravity.
+;; Ball bounces off obstacles and wraps at the gravity edge.
+
+;; ── Ball: very small interior object (2x2 to 3x3) ──
+(game-ball $obj $r $c) if
+    (grid-object f $obj $color $size)
+    (< $size 12)
+    (> $size 1)
+    (grid-obj-bbox f $obj $r1 $c1 $r2 $c2)
+    (> $r1 3) (> $c1 3) (< $r2 60) (< $c2 60)
+    (+ $r1 $r2 $rsum) (/ $rsum 2 $r)
+    (+ $c1 $c2 $csum) (/ $csum 2 $c) <0.85, 0.85>
+
+;; ── Target: moderate-sized interior colored object ──
+(game-target $obj $r $c) if
+    (grid-object f $obj $color $size)
+    (> $size 8)
+    (< $size 200)
+    (grid-obj-bbox f $obj $r1 $c1 $r2 $c2)
+    (> $r1 3) (> $c1 3) (< $r2 60) (< $c2 60)
+    (+ $r1 $r2 $rsum) (/ $rsum 2 $r)
+    (+ $c1 $c2 $csum) (/ $csum 2 $c) <0.80, 0.80>
+
+;; ── Composite gravity detector: needs exactly 1 ball-like + targets ──
+(gravity-game) if
+    (game-ball $b $br $bc)
+    (game-target $t $tr $tc)
+    (num-objects $n)
+    (< $n 30) <0.85, 0.85>
+
+;; ── Direction toward target ──
+(target-above) if (game-ball $b $br $bc) (game-target $t $tr $tc) (< $tr $br) <0.80, 0.80>
+(target-below) if (game-ball $b $br $bc) (game-target $t $tr $tc) (> $tr $br) <0.80, 0.80>
+(target-left) if (game-ball $b $br $bc) (game-target $t $tr $tc) (< $tc $bc) <0.80, 0.80>
+(target-right) if (game-ball $b $br $bc) (game-target $t $tr $tc) (> $tc $bc) <0.80, 0.80>
+
+(action-select up) if (target-above) <0.70, 0.70>
+(action-select down) if (target-below) <0.70, 0.70>
+(action-select left) if (target-left) <0.70, 0.70>
+(action-select right) if (target-right) <0.70, 0.70>
+
+;; ── When stuck, try perpendicular direction ──
+(action-select left) if (stuck) (target-above) <0.60, 0.60>
+(action-select right) if (stuck) (target-above) <0.60, 0.60>
+(action-select left) if (stuck) (target-below) <0.60, 0.60>
+(action-select right) if (stuck) (target-below) <0.60, 0.60>
+(action-select up) if (stuck) (target-left) <0.60, 0.60>
+(action-select down) if (stuck) (target-left) <0.60, 0.60>
+(action-select up) if (stuck) (target-right) <0.60, 0.60>
+(action-select down) if (stuck) (target-right) <0.60, 0.60>
+
+;; ═══════════════════════════════════════════════════════════════════
+;; 47. TILE-GRID GAMES (FT09 etc.) — DIRECTION-BASED TOGGLE
+;; ═══════════════════════════════════════════════════════════════════
+;; Games with grids of colored tiles where ACTION1-5 toggle tile patterns
+;; (Lights Out style). Clicks (ACTION6) do NOT work on these games.
+;; Strategy: cycle through all 5 actions to discover toggle patterns.
+
+;; ── Tile detection: rectangular colored blocks (variable size) ──
+(game-tile f $obj $color $r $c) if
+    (grid-object f $obj $color $size)
+    (> $size 15) (< $size 500)
+    (grid-obj-bbox f $obj $r1 $c1 $r2 $c2)
+    (> $r1 0) (< $r2 63)
+    (+ $r1 $r2 $rsum) (/ $rsum 2 $r)
+    (+ $c1 $c2 $csum) (/ $csum 2 $c) <0.85, 0.85>
+
+;; ── Detect tile-grid layout: MANY tiles + high object count ──
+;; Requires 3+ tiles AND lots of objects (tile grids have 30-60 objects)
+(tile-grid-game) if
+    (game-tile f $o1 $c1 $r1 $cc1)
+    (game-tile f $o2 $c2 $r2 $cc2)
+    (game-tile f $o3 $c3 $r3 $cc3)
+    (num-objects $n) (> $n 25) <0.90, 0.90>
+
+;; ── Explore all 5 actions on tile-grid games ──
+;; Cycle through up/down/left/right/space to discover toggle patterns
+(action-select up) if (tile-grid-game) <0.65, 0.65>
+(action-select down) if (tile-grid-game) <0.65, 0.65>
+(action-select left) if (tile-grid-game) <0.65, 0.65>
+(action-select right) if (tile-grid-game) <0.65, 0.65>
+(action-select space) if (tile-grid-game) <0.65, 0.65>
+
+;; ═══════════════════════════════════════════════════════════════════
+;; 48. LS20: ROOM EXPLORATION — HIDDEN STATE DISCOVERY
+;; ═══════════════════════════════════════════════════════════════════
+;; 7x6 room grid with walls. Player block moves with directions.
+;; Hidden state changes based on position. Must explore systematically.
+;; Key: visit every walkable cell to discover latent rules.
+;;
+;; PERSISTENT PREDICATES (NOT cleared between frames):
+;;   visited-cell    — (row, col) cells agent has been to
+;;   cell-effect     — (row, col, delta) effect of visiting cell
+;;   good-position   — positions that increased score
+;;   bad-position    — positions that decreased score
+;; These are NOT in ALL_CLEAR_PREDICATES in Python.
+
+;; ── Detect room-like layout: large bg + enclosed regions ──
+(room-game) if
+    (grid-object f $obj $color $size)
+    (> $size 500)
+    (enclosed-region f $reg $rsize)
+    (> $rsize 3) <0.80, 0.80>
+
+;; ── Alternate room detection (large grids without enclosed-region) ──
+;; Large bg object + small movable objects → room-like game
+(room-game) if
+    (grid-object f $bg $bgc $bgs)
+    (> $bgs 2000)
+    (grid-object f $small $sc $ss)
+    (> $ss 2) (< $ss 50)
+    (num-objects $n) (> $n 5) <0.70, 0.70>
+
+;; ── Systematic exploration: cycle through all 4 directions ──
+;; Room games need all 4 directions to reach all cells
+(action-select up) if (room-game) <0.60, 0.60>
+(action-select down) if (room-game) <0.60, 0.60>
+(action-select left) if (room-game) <0.60, 0.60>
+(action-select right) if (room-game) <0.60, 0.60>
+
+;; ── Prefer directions toward good positions (cross-frame learning) ──
+(action-select up) if (room-game) (good-position $r $c) (game-ball $b $br $bc)
+    (< $r $br) <0.75, 0.75>
+(action-select down) if (room-game) (good-position $r $c) (game-ball $b $br $bc)
+    (> $r $br) <0.75, 0.75>
+(action-select left) if (room-game) (good-position $r $c) (game-ball $b $br $bc)
+    (< $c $bc) <0.75, 0.75>
+(action-select right) if (room-game) (good-position $r $c) (game-ball $b $br $bc)
+    (> $c $bc) <0.75, 0.75>
+
+;; ── Avoid bad positions ──
+(action-select down) if (room-game) (bad-position $r $c) (game-ball $b $br $bc)
+    (< $r $br) <0.65, 0.65>
+(action-select up) if (room-game) (bad-position $r $c) (game-ball $b $br $bc)
+    (> $r $br) <0.65, 0.65>
+
+;; ═══════════════════════════════════════════════════════════════════
+;; 49. LP85: BOARD GAME — CIRCULAR TRACK
+;; ═══════════════════════════════════════════════════════════════════
+;; Cross-shaped Ludo-like board with pieces moving on circular track.
+;; Pieces advance leftward, wrap at edges.
+;; Strategy: click to select pieces, directions to advance.
+;; ACTION6 clicks likely select which piece to move.
+
+;; ── Detect board-like layout: cross shape with colored zones ──
+;; Cross-shaped boards have many medium-sized distinct-color objects
+;; Board game needs distinct colored medium regions plus small pieces
+(board-game) if
+    (grid-object f $o1 $c1 $s1)
+    (grid-object f $o2 $c2 $s2)
+    (grid-object f $piece $pc $ps)
+    (> $s1 100) (< $s1 800)
+    (> $s2 100) (< $s2 800)
+    (> $ps 3) (< $ps 30) <0.70, 0.70>
+
+;; ── Board game piece: small colored object on the board ──
+(board-piece $obj $r $c $color) if
+    (board-game)
+    (grid-object f $obj $color $size)
+    (> $size 3) (< $size 30)
+    (obj-center f $obj $r $c) <0.75, 0.75>
+
+;; ── Try clicking pieces to select them ──
+(action-select click $r $c) if (board-piece $obj $r $c $color) <0.65, 0.65>
+
+;; ── Try directions to advance selected piece ──
+(action-select up) if (board-game) <0.55, 0.55>
+(action-select down) if (board-game) <0.55, 0.55>
+(action-select left) if (board-game) <0.55, 0.55>
+(action-select right) if (board-game) <0.55, 0.55>
+(action-select space) if (board-game) <0.55, 0.55>
+
+;; ═══════════════════════════════════════════════════════════════════
+;; 50. SP80: GROWTH/SPREADING PUZZLE
+;; ═══════════════════════════════════════════════════════════════════
+;; Grid with directional growth from source point.
+;; Magenta shape expands in controlled directions.
+;; Red bar acts as constraint. Yellow targets at bottom.
+;; Strategy: grow toward uncovered targets.
+
+;; ── Detect growth game: large expanding region NOT covering entire grid ──
+;; Must not span the full grid width/height (that's just background)
+(growth-game) if
+    (grid-object f $obj $color $size)
+    (> $size 1000)
+    (grid-obj-bbox f $obj $r1 $c1 $r2 $c2)
+    (> $r1 2) (> $c1 2)
+    (> $r2 30) <0.75, 0.75>
+
+;; ── Growth source: the large expanding shape ──
+(growth-source $obj $r $c) if
+    (growth-game)
+    (grid-object f $obj $color $size)
+    (> $size 1000)
+    (grid-obj-bbox f $obj $r1 $c1 $r2 $c2)
+    (+ $r1 $r2 $rs) (/ $rs 2 $r)
+    (+ $c1 $c2 $cs) (/ $cs 2 $c) <0.75, 0.75>
+
+;; ── Growth target: small different-colored objects (yellow goals) ──
+(growth-target $obj $r $c) if
+    (growth-game)
+    (grid-object f $obj $color $size)
+    (> $size 2) (< $size 100)
+    (grid-obj-bbox f $obj $r1 $c1 $r2 $c2)
+    (+ $r1 $r2 $rs) (/ $rs 2 $r)
+    (+ $c1 $c2 $cs) (/ $cs 2 $c) <0.70, 0.70>
+
+;; ── Grow toward targets ──
+(action-select down) if (growth-source $s $sr $sc) (growth-target $t $tr $tc)
+    (> $tr $sr) <0.75, 0.75>
+(action-select up) if (growth-source $s $sr $sc) (growth-target $t $tr $tc)
+    (< $tr $sr) <0.75, 0.75>
+(action-select right) if (growth-source $s $sr $sc) (growth-target $t $tr $tc)
+    (> $tc $sc) <0.75, 0.75>
+(action-select left) if (growth-source $s $sr $sc) (growth-target $t $tr $tc)
+    (< $tc $sc) <0.75, 0.75>
+
+;; ── Fallback: try all directions when no clear target ──
+(action-select down) if (growth-game) <0.60, 0.60>
+(action-select right) if (growth-game) <0.60, 0.60>
+(action-select up) if (growth-game) <0.55, 0.55>
+(action-select left) if (growth-game) <0.55, 0.55>
+(action-select space) if (growth-game) <0.50, 0.50>

@@ -1,0 +1,465 @@
+;; ══════════════════════════════════════════════════════════════════════════
+;; QUANTITATIVE TRADER — COMPREHENSIVE INDICATOR RULES
+;; ══════════════════════════════════════════════════════════════════════════
+;;
+;; All domain logic lives HERE. Rust computes raw indicator values and feeds
+;; them as facts. These rules reason about what those values MEAN.
+;;
+;; Input facts (computed in Rust, fed as QOR facts):
+;;   (current-price $sym $price)
+;;   (rsi $sym $val)
+;;   (ema-21 $sym $val)  (ema-50 $sym $val)  (ema-200 $sym $val)
+;;   (macd-line $sym $val)  (macd-signal $sym $val)  (macd-histogram $sym $val)
+;;   (bb-upper $sym $val)  (bb-mid $sym $val)  (bb-lower $sym $val)
+;;   (vwap $sym $val)  (vwap-upper $sym $val)  (vwap-lower $sym $val)
+;;   (atr $sym $val)  (adx $sym $val)
+;;   (stoch-k $sym $val)  (stoch-d $sym $val)
+;;   (kc-upper $sym $val)  (kc-mid $sym $val)  (kc-lower $sym $val)
+;;   (pivot-pp $sym $val)  (pivot-s1 $sym $val)  (pivot-s2 $sym $val)
+;;   (pivot-r1 $sym $val)  (pivot-r2 $sym $val)
+;;   (fib-support $sym $val)  (fib-resistance $sym $val)  (fib-bias $sym $val)
+;;   (rsi-div $sym $type)  (rsi-pivot $sym $type)
+;;   (lower-band-touched $sym)  (upper-band-touched $sym)
+;;   (bands-shrinking $sym)
+;;   (fvg-bullish $sym)  (fvg-bearish $sym)
+;;   (liq-sweep-bullish $sym)  (liq-sweep-bearish $sym)
+;;   (fear-greed $val)  (funding-rate $sym $val)
+;;   (swing-high $sym $val)  (swing-low $sym $val)
+;;   (risk-reward $sym $val)
+
+
+;; ── 1. RSI INTERPRETATION ─────────────────────────────────────────────────
+
+(overbought $sym) if (rsi $sym $v) (> $v 70) <0.90, 0.90>
+(oversold $sym) if (rsi $sym $v) (< $v 30) <0.90, 0.90>
+(rsi-neutral $sym) if (rsi $sym $v) (> $v 30) (< $v 70) <0.85, 0.85>
+(rsi-extreme-high $sym) if (rsi $sym $v) (> $v 80) <0.92, 0.92>
+(rsi-extreme-low $sym) if (rsi $sym $v) (< $v 20) <0.92, 0.92>
+(rsi-bullish-zone $sym) if (rsi $sym $v) (> $v 50) (< $v 70) <0.80, 0.80>
+(rsi-bearish-zone $sym) if (rsi $sym $v) (< $v 50) (> $v 30) <0.80, 0.80>
+
+;; RSI divergence confirmation
+(rsi-confirmed-long $sym) if (rsi-div $sym bullish) <0.88, 0.88>
+(rsi-confirmed-long $sym) if (rsi-pivot $sym low) <0.85, 0.85>
+(rsi-confirmed-short $sym) if (rsi-div $sym bearish) <0.88, 0.88>
+(rsi-confirmed-short $sym) if (rsi-pivot $sym high) <0.85, 0.85>
+
+
+;; ── 2. EMA / TREND ANALYSIS ──────────────────────────────────────────────
+
+;; Price vs EMAs — trend position
+(above-ema-21 $sym) if (current-price $sym $p) (ema-21 $sym $e) (> $p $e) <0.85, 0.85>
+(below-ema-21 $sym) if (current-price $sym $p) (ema-21 $sym $e) (< $p $e) <0.85, 0.85>
+(above-ema-50 $sym) if (current-price $sym $p) (ema-50 $sym $e) (> $p $e) <0.85, 0.85>
+(below-ema-50 $sym) if (current-price $sym $p) (ema-50 $sym $e) (< $p $e) <0.85, 0.85>
+(above-ema-200 $sym) if (current-price $sym $p) (ema-200 $sym $e) (> $p $e) <0.85, 0.85>
+(below-ema-200 $sym) if (current-price $sym $p) (ema-200 $sym $e) (< $p $e) <0.85, 0.85>
+
+;; EMA alignment — trend strength
+(ema-bullish-stack $sym) if (above-ema-21 $sym) (above-ema-50 $sym) (above-ema-200 $sym) <0.90, 0.90>
+(ema-bearish-stack $sym) if (below-ema-21 $sym) (below-ema-50 $sym) (below-ema-200 $sym) <0.90, 0.90>
+
+;; EMA relative position (21 vs 50)
+;; Note: these detect current state, not crossover events (would need previous bar)
+(ema-21-above-50 $sym) if (ema-21 $sym $e21) (ema-50 $sym $e50) (> $e21 $e50) <0.85, 0.85>
+(ema-21-below-50 $sym) if (ema-21 $sym $e21) (ema-50 $sym $e50) (< $e21 $e50) <0.85, 0.85>
+
+;; Long-term trend (200 EMA)
+(long-term-bullish $sym) if (above-ema-200 $sym) <0.80, 0.80>
+(long-term-bearish $sym) if (below-ema-200 $sym) <0.80, 0.80>
+
+
+;; ── 3. MACD ANALYSIS ────────────────────────────────────────────────────
+
+(macd-bullish-cross $sym) if (macd-histogram $sym $h) (> $h 0) <0.85, 0.85>
+(macd-bearish-cross $sym) if (macd-histogram $sym $h) (< $h 0) <0.85, 0.85>
+
+;; MACD momentum strength
+(macd-strong-bullish $sym) if (macd-line $sym $l) (macd-signal $sym $s) (> $l $s) (> $l 0) <0.88, 0.88>
+(macd-strong-bearish $sym) if (macd-line $sym $l) (macd-signal $sym $s) (< $l $s) (< $l 0) <0.88, 0.88>
+
+;; MACD line above/below zero
+(macd-above-zero $sym) if (macd-line $sym $l) (> $l 0) <0.80, 0.80>
+(macd-below-zero $sym) if (macd-line $sym $l) (< $l 0) <0.80, 0.80>
+
+
+;; ── 4. BOLLINGER BANDS ANALYSIS ──────────────────────────────────────────
+
+;; Band position
+(at-bb-upper $sym) if (current-price $sym $p) (bb-upper $sym $u) (> $p $u) <0.88, 0.88>
+(at-bb-lower $sym) if (current-price $sym $p) (bb-lower $sym $l) (< $p $l) <0.88, 0.88>
+(inside-bb $sym) if (current-price $sym $p) (bb-upper $sym $u) (bb-lower $sym $l) (< $p $u) (> $p $l) <0.80, 0.80>
+
+;; Bollinger squeeze (Keltner inside Bollinger = low volatility, breakout imminent)
+(bb-squeeze $sym) if (bb-lower $sym $bbl) (bb-upper $sym $bbu) (kc-lower $sym $kcl) (kc-upper $sym $kcu) (> $bbl $kcl) (< $bbu $kcu) <0.85, 0.85>
+
+;; Mean reversion from bands — requires RSI oversold/overbought for stronger signal
+(bb-mean-revert-long $sym) if (at-bb-lower $sym) (oversold $sym) <0.85, 0.85>
+(bb-mean-revert-short $sym) if (at-bb-upper $sym) (overbought $sym) <0.85, 0.85>
+
+
+;; ── 5. VWAP ANALYSIS ────────────────────────────────────────────────────
+
+;; Price relative to VWAP
+(price-below-vwap $sym) if (current-price $sym $p) (vwap $sym $v) (< $p $v) <0.85, 0.85>
+(price-above-vwap $sym) if (current-price $sym $p) (vwap $sym $v) (> $p $v) <0.85, 0.85>
+
+;; VWAP band touches → direction
+(signal-long $sym) if (lower-band-touched $sym) not (upper-band-touched $sym) <0.90, 0.90>
+(signal-short $sym) if (upper-band-touched $sym) not (lower-band-touched $sym) <0.90, 0.90>
+;; Both touched — RSI tiebreak
+(signal-long $sym) if (lower-band-touched $sym) (upper-band-touched $sym) (rsi $sym $v) (< $v 50) <0.85, 0.85>
+(signal-short $sym) if (lower-band-touched $sym) (upper-band-touched $sym) (rsi $sym $v) (> $v 50) <0.85, 0.85>
+
+;; Mean reversion zone check
+(in-buy-zone $sym) if (price-below-vwap $sym) <0.90, 0.90>
+(in-sell-zone $sym) if (price-above-vwap $sym) <0.90, 0.90>
+
+;; Band shrinking = consolidation trap
+(consolidation-trap $sym) if (bands-shrinking $sym) <0.85, 0.85>
+
+
+;; ── 6. PIVOT POINT ANALYSIS ─────────────────────────────────────────────
+
+;; Position relative to pivot
+(above-pivot $sym) if (current-price $sym $p) (pivot-pp $sym $pp) (> $p $pp) <0.85, 0.85>
+(below-pivot $sym) if (current-price $sym $p) (pivot-pp $sym $pp) (< $p $pp) <0.85, 0.85>
+
+;; Near support/resistance levels (price below support or above resistance)
+(near-support-s1 $sym) if (current-price $sym $p) (pivot-s1 $sym $s1) (< $p $s1) <0.82, 0.82>
+(near-support-s2 $sym) if (current-price $sym $p) (pivot-s2 $sym $s2) (< $p $s2) <0.82, 0.82>
+(near-resistance-r1 $sym) if (current-price $sym $p) (pivot-r1 $sym $r1) (> $p $r1) <0.82, 0.82>
+(near-resistance-r2 $sym) if (current-price $sym $p) (pivot-r2 $sym $r2) (> $p $r2) <0.82, 0.82>
+
+;; Pivot bias
+(pivot-bias-bullish $sym) if (above-pivot $sym) <0.80, 0.80>
+(pivot-bias-bearish $sym) if (below-pivot $sym) <0.80, 0.80>
+
+
+;; ── 7. FIBONACCI ANALYSIS ───────────────────────────────────────────────
+
+;; Fibonacci golden zone (0.382-0.618 retracement)
+(in-fib-golden-zone $sym) if (fib-bias $sym $b) (> $b 0) <0.85, 0.85>
+(fib-rejection-zone $sym) if (fib-bias $sym $b) (< $b 0) <0.85, 0.85>
+
+;; Fibonacci direction alignment
+(fib-uptrend $sym) if (fib-direction $sym up) <0.82, 0.82>
+(fib-downtrend $sym) if (fib-direction $sym down) <0.82, 0.82>
+
+;; Price near Fibonacci support/resistance
+(at-fib-support $sym) if (current-price $sym $p) (fib-support $sym $s) (< $p $s) <0.80, 0.80>
+(at-fib-resistance $sym) if (current-price $sym $p) (fib-resistance $sym $r) (> $p $r) <0.80, 0.80>
+
+
+;; ── 8. KELTNER CHANNEL ANALYSIS ─────────────────────────────────────────
+
+;; Keltner breakout
+(kc-breakout-bullish $sym) if (current-price $sym $p) (kc-upper $sym $u) (> $p $u) <0.85, 0.85>
+(kc-breakout-bearish $sym) if (current-price $sym $p) (kc-lower $sym $l) (< $p $l) <0.85, 0.85>
+(inside-keltner $sym) if (current-price $sym $p) (kc-upper $sym $u) (kc-lower $sym $l) (< $p $u) (> $p $l) <0.80, 0.80>
+
+
+;; ── 9. STOCHASTIC OSCILLATOR ─────────────────────────────────────────────
+
+(stoch-overbought $sym) if (stoch-k $sym $k) (> $k 80) <0.85, 0.85>
+(stoch-oversold $sym) if (stoch-k $sym $k) (< $k 20) <0.85, 0.85>
+(stoch-bullish-cross $sym) if (stoch-k $sym $k) (stoch-d $sym $d) (> $k $d) <0.82, 0.82>
+(stoch-bearish-cross $sym) if (stoch-k $sym $k) (stoch-d $sym $d) (< $k $d) <0.82, 0.82>
+
+;; Stochastic extreme + crossover = strong signal
+(stoch-buy-signal $sym) if (stoch-oversold $sym) (stoch-bullish-cross $sym) <0.88, 0.88>
+(stoch-sell-signal $sym) if (stoch-overbought $sym) (stoch-bearish-cross $sym) <0.88, 0.88>
+
+
+;; ── 10. ADX / TREND STRENGTH ─────────────────────────────────────────────
+
+(no-trend $sym) if (adx $sym $v) (< $v 20) <0.85, 0.85>
+(trending $sym) if (adx $sym $v) (> $v 20) (< $v 40) <0.85, 0.85>
+(strong-trend $sym) if (adx $sym $v) (> $v 40) (< $v 60) <0.88, 0.88>
+(extreme-trend $sym) if (adx $sym $v) (> $v 60) <0.90, 0.90>
+
+;; Trending markets favour trend-following, ranging markets favour mean-reversion
+(favour-trend-follow $sym) if (strong-trend $sym) <0.85, 0.85>
+(favour-trend-follow $sym) if (extreme-trend $sym) <0.88, 0.88>
+(favour-mean-reversion $sym) if (no-trend $sym) <0.85, 0.85>
+
+
+;; ── 11. ATR / VOLATILITY ─────────────────────────────────────────────────
+
+;; Volatility regime — QOR computes ATR/price inline (no pre-computed atr-pct needed)
+(high-volatility $sym) if (atr $sym $a) (current-price $sym $p) (/ $a $p $ratio) (> $ratio 0.03) <0.82, 0.82>
+(low-volatility $sym) if (atr $sym $a) (current-price $sym $p) (/ $a $p $ratio) (< $ratio 0.01) <0.82, 0.82>
+(normal-volatility $sym) if (atr $sym $a) (current-price $sym $p) (/ $a $p $ratio) (> $ratio 0.01) (< $ratio 0.03) <0.80, 0.80>
+
+
+;; ── 12. SMART MONEY CONCEPTS ──────────────────────────────────────────────
+
+;; Fair Value Gaps — institutional buying/selling zones
+(fvg-long-setup $sym) if (fvg-bullish $sym) (price-below-vwap $sym) <0.82, 0.82>
+(fvg-short-setup $sym) if (fvg-bearish $sym) (price-above-vwap $sym) <0.82, 0.82>
+
+;; Liquidity sweeps — stop hunt reversal patterns
+(sweep-reversal-long $sym) if (liq-sweep-bullish $sym) (oversold $sym) <0.85, 0.85>
+(sweep-reversal-short $sym) if (liq-sweep-bearish $sym) (overbought $sym) <0.85, 0.85>
+
+;; Sweep + FVG = high probability setup
+(smart-money-long $sym) if (liq-sweep-bullish $sym) (fvg-bullish $sym) <0.88, 0.88>
+(smart-money-short $sym) if (liq-sweep-bearish $sym) (fvg-bearish $sym) <0.88, 0.88>
+
+
+;; ── 13. SENTIMENT ANALYSIS ──────────────────────────────────────────────
+
+;; Fear & Greed Index (contrarian signals)
+(extreme-fear) if (fear-greed $v) (< $v 20) <0.85, 0.85>
+(extreme-greed) if (fear-greed $v) (> $v 80) <0.85, 0.85>
+(fear-zone) if (fear-greed $v) (< $v 40) (> $v 20) <0.80, 0.80>
+(greed-zone) if (fear-greed $v) (> $v 60) (< $v 80) <0.80, 0.80>
+
+;; Contrarian: buy when others panic, sell when others euphoric
+(sentiment-buy) if (extreme-fear) <0.80, 0.80>
+(sentiment-sell) if (extreme-greed) <0.80, 0.80>
+
+;; Funding rate (crypto perps)
+(funding-positive $sym) if (funding-rate $sym $f) (> $f 0.001) <0.82, 0.82>
+(funding-negative $sym) if (funding-rate $sym $f) (< $f -0.001) <0.82, 0.82>
+(funding-extreme-positive $sym) if (funding-rate $sym $f) (> $f 0.01) <0.88, 0.88>
+(funding-extreme-negative $sym) if (funding-rate $sym $f) (< $f -0.01) <0.88, 0.88>
+
+;; Overcrowded longs/shorts
+(longs-overcrowded $sym) if (funding-extreme-positive $sym) <0.85, 0.85>
+(shorts-overcrowded $sym) if (funding-extreme-negative $sym) <0.85, 0.85>
+
+
+;; ── 14. MARKET REGIME DETECTION ──────────────────────────────────────────
+
+;; Regime classification — determines which strategies are appropriate
+(regime-trending-up $sym) if (ema-bullish-stack $sym) (strong-trend $sym) <0.88, 0.88>
+(regime-trending-down $sym) if (ema-bearish-stack $sym) (strong-trend $sym) <0.88, 0.88>
+(regime-ranging $sym) if (no-trend $sym) (inside-bb $sym) <0.85, 0.85>
+;; Volatile = high ATR + price at extremes (not just a trending breakout)
+(regime-volatile $sym) if (high-volatility $sym) (at-bb-upper $sym) <0.82, 0.82>
+(regime-volatile $sym) if (high-volatility $sym) (at-bb-lower $sym) <0.82, 0.82>
+(regime-squeeze $sym) if (bb-squeeze $sym) (no-trend $sym) <0.88, 0.88>
+
+
+;; ── 15. CONFLUENCE SIGNALS — MULTI-INDICATOR COMBINATION ──────────────────
+;;
+;; These are the money rules. Single indicators lie. Confluence tells truth.
+;; Each signal requires 3+ confirming indicators from different categories.
+
+;; ── MEAN REVERSION BUY (ranging market) ──
+(mean-reversion-buy $sym) if
+    (oversold $sym)
+    (at-bb-lower $sym)
+    (favour-mean-reversion $sym)
+    not (ema-bearish-stack $sym) <0.85, 0.85>
+
+(mean-reversion-buy $sym) if
+    (stoch-buy-signal $sym)
+    (at-bb-lower $sym)
+    (bb-mean-revert-long $sym) <0.82, 0.82>
+
+;; ── MEAN REVERSION SELL (ranging market) ──
+(mean-reversion-sell $sym) if
+    (overbought $sym)
+    (at-bb-upper $sym)
+    (favour-mean-reversion $sym)
+    not (ema-bullish-stack $sym) <0.85, 0.85>
+
+(mean-reversion-sell $sym) if
+    (stoch-sell-signal $sym)
+    (at-bb-upper $sym)
+    (bb-mean-revert-short $sym) <0.82, 0.82>
+
+;; ── VWAP MEAN REVERSION BUY ──
+(vwap-buy $sym) if
+    (signal-long $sym)
+    (rsi-confirmed-long $sym)
+    (in-buy-zone $sym)
+    not (consolidation-trap $sym) <0.85, 0.85>
+
+;; ── VWAP MEAN REVERSION SELL ──
+(vwap-sell $sym) if
+    (signal-short $sym)
+    (rsi-confirmed-short $sym)
+    (in-sell-zone $sym)
+    not (consolidation-trap $sym) <0.85, 0.85>
+
+;; ── TREND FOLLOWING BUY (trending market) ──
+(trend-buy $sym) if
+    (ema-bullish-stack $sym)
+    (macd-bullish-cross $sym)
+    (favour-trend-follow $sym) <0.88, 0.88>
+
+(trend-buy $sym) if
+    (ema-21-above-50 $sym)
+    (above-ema-200 $sym)
+    (macd-above-zero $sym)
+    (trending $sym) <0.85, 0.85>
+
+;; ── TREND FOLLOWING SELL (trending market) ──
+(trend-sell $sym) if
+    (ema-bearish-stack $sym)
+    (macd-bearish-cross $sym)
+    (favour-trend-follow $sym) <0.88, 0.88>
+
+(trend-sell $sym) if
+    (ema-21-below-50 $sym)
+    (below-ema-200 $sym)
+    (macd-below-zero $sym)
+    (trending $sym) <0.85, 0.85>
+
+;; ── BREAKOUT BUY ──
+(breakout-buy $sym) if
+    (kc-breakout-bullish $sym)
+    (macd-strong-bullish $sym)
+    (strong-trend $sym) <0.85, 0.85>
+
+(breakout-buy $sym) if
+    (bb-squeeze $sym)
+    (kc-breakout-bullish $sym)
+    (ema-bullish-stack $sym) <0.88, 0.88>
+
+;; ── BREAKOUT SELL ──
+(breakout-sell $sym) if
+    (kc-breakout-bearish $sym)
+    (macd-strong-bearish $sym)
+    (strong-trend $sym) <0.85, 0.85>
+
+(breakout-sell $sym) if
+    (bb-squeeze $sym)
+    (kc-breakout-bearish $sym)
+    (ema-bearish-stack $sym) <0.88, 0.88>
+
+;; ── SMART MONEY BUY ──
+(smc-buy $sym) if
+    (smart-money-long $sym)
+    (oversold $sym)
+    not (ema-bearish-stack $sym) <0.85, 0.85>
+
+(smc-buy $sym) if
+    (sweep-reversal-long $sym)
+    (at-fib-support $sym)
+    (rsi-confirmed-long $sym) <0.82, 0.82>
+
+;; ── SMART MONEY SELL ──
+(smc-sell $sym) if
+    (smart-money-short $sym)
+    (overbought $sym)
+    not (ema-bullish-stack $sym) <0.85, 0.85>
+
+(smc-sell $sym) if
+    (sweep-reversal-short $sym)
+    (at-fib-resistance $sym)
+    (rsi-confirmed-short $sym) <0.82, 0.82>
+
+;; ── SENTIMENT EXTREMES ──
+(contrarian-buy $sym) if
+    (sentiment-buy)
+    (oversold $sym)
+    (at-bb-lower $sym) <0.80, 0.80>
+
+(contrarian-sell $sym) if
+    (sentiment-sell)
+    (overbought $sym)
+    (at-bb-upper $sym) <0.80, 0.80>
+
+;; ── FUNDING RATE SQUEEZE ──
+(funding-squeeze-buy $sym) if
+    (shorts-overcrowded $sym)
+    (oversold $sym)
+    (below-pivot $sym) <0.82, 0.82>
+
+(funding-squeeze-sell $sym) if
+    (longs-overcrowded $sym)
+    (overbought $sym)
+    (above-pivot $sym) <0.82, 0.82>
+
+
+;; ── 16. RISK MANAGEMENT GATES ────────────────────────────────────────────
+
+;; Risk:reward must be acceptable
+(rr-ok $sym) if (risk-reward $sym $rr) (> $rr 1.5) <0.90, 0.90>
+
+
+;; ── 17. FINAL DECISION — BUY / SELL / HOLD ───────────────────────────────
+;;
+;; Aggregate all strategy signals. Any confirmed strategy triggers the signal.
+;; Risk:reward gate must pass for entry.
+
+;; BUY — any confirmed long strategy with R:R gate
+(buy $sym) if (vwap-buy $sym) (rr-ok $sym) <0.85, 0.85>
+(buy $sym) if (trend-buy $sym) (rr-ok $sym) <0.85, 0.85>
+(buy $sym) if (mean-reversion-buy $sym) (rr-ok $sym) <0.82, 0.82>
+(buy $sym) if (breakout-buy $sym) (rr-ok $sym) <0.85, 0.85>
+(buy $sym) if (smc-buy $sym) (rr-ok $sym) <0.82, 0.82>
+(buy $sym) if (contrarian-buy $sym) (rr-ok $sym) <0.78, 0.78>
+(buy $sym) if (funding-squeeze-buy $sym) (rr-ok $sym) <0.80, 0.80>
+
+;; SELL — any confirmed short strategy with R:R gate
+(sell $sym) if (vwap-sell $sym) (rr-ok $sym) <0.85, 0.85>
+(sell $sym) if (trend-sell $sym) (rr-ok $sym) <0.85, 0.85>
+(sell $sym) if (mean-reversion-sell $sym) (rr-ok $sym) <0.82, 0.82>
+(sell $sym) if (breakout-sell $sym) (rr-ok $sym) <0.85, 0.85>
+(sell $sym) if (smc-sell $sym) (rr-ok $sym) <0.82, 0.82>
+(sell $sym) if (contrarian-sell $sym) (rr-ok $sym) <0.78, 0.78>
+(sell $sym) if (funding-squeeze-sell $sym) (rr-ok $sym) <0.80, 0.80>
+
+;; HOLD — no buy or sell signal
+(hold $sym) if (current-price $sym $p) not (buy $sym) not (sell $sym) <0.70, 0.70>
+
+
+;; ── 18. SIGNAL STRENGTH / CONFLUENCE COUNT ────────────────────────────────
+;;
+;; More confirming strategies = higher conviction
+
+(multi-confirm-buy $sym) if (vwap-buy $sym) (trend-buy $sym) <0.92, 0.92>
+(multi-confirm-buy $sym) if (mean-reversion-buy $sym) (smc-buy $sym) <0.90, 0.90>
+(multi-confirm-buy $sym) if (breakout-buy $sym) (trend-buy $sym) <0.90, 0.90>
+(multi-confirm-buy $sym) if (vwap-buy $sym) (smc-buy $sym) <0.88, 0.88>
+
+(multi-confirm-sell $sym) if (vwap-sell $sym) (trend-sell $sym) <0.92, 0.92>
+(multi-confirm-sell $sym) if (mean-reversion-sell $sym) (smc-sell $sym) <0.90, 0.90>
+(multi-confirm-sell $sym) if (breakout-sell $sym) (trend-sell $sym) <0.90, 0.90>
+(multi-confirm-sell $sym) if (vwap-sell $sym) (smc-sell $sym) <0.88, 0.88>
+
+;; High conviction = multiple strategies agree
+(high-conviction-buy $sym) if (multi-confirm-buy $sym) (rr-ok $sym) <0.92, 0.92>
+(high-conviction-sell $sym) if (multi-confirm-sell $sym) (rr-ok $sym) <0.92, 0.92>
+
+
+;; ── 19. WARNING SIGNALS / CAUTION ────────────────────────────────────────
+
+;; Conflicting signals = stay out
+(conflicting-signals $sym) if (trend-buy $sym) (mean-reversion-sell $sym) <0.80, 0.80>
+(conflicting-signals $sym) if (trend-sell $sym) (mean-reversion-buy $sym) <0.80, 0.80>
+
+;; Divergence warning — price trending but momentum fading
+(bearish-divergence-warning $sym) if (ema-bullish-stack $sym) (rsi-confirmed-short $sym) <0.82, 0.82>
+(bullish-divergence-warning $sym) if (ema-bearish-stack $sym) (rsi-confirmed-long $sym) <0.82, 0.82>
+
+;; Overextended — too far from mean, likely to snap back
+(overextended-up $sym) if (rsi-extreme-high $sym) (at-bb-upper $sym) (kc-breakout-bullish $sym) <0.85, 0.85>
+(overextended-down $sym) if (rsi-extreme-low $sym) (at-bb-lower $sym) (kc-breakout-bearish $sym) <0.85, 0.85>
+
+
+;; ── 20. META-REASONING — WHAT QOR BELIEVES ABOUT THE MARKET ──────────────
+
+;; Structure beliefs — derived from multiple indicators
+(market-healthy $sym) if (ema-bullish-stack $sym) (macd-above-zero $sym) (above-pivot $sym) <0.88, 0.88>
+(market-weak $sym) if (ema-bearish-stack $sym) (macd-below-zero $sym) (below-pivot $sym) <0.88, 0.88>
+(market-transitioning $sym) if (bb-squeeze $sym) not (strong-trend $sym) <0.80, 0.80>
+(market-chaotic $sym) if (conflicting-signals $sym) (high-volatility $sym) <0.75, 0.75>
+
+
+;; ── 21. NET DECISION — MUTUAL EXCLUSION LAYER ──────────────────────────
+;;
+;; buy and sell can both fire from different strategy paths.
+;; net-buy/net-sell resolve the conflict: only one can be true.
+
+(net-buy $sym) if (buy $sym) not (sell $sym) <0.85, 0.85>
+(net-sell $sym) if (sell $sym) not (buy $sym) <0.85, 0.85>
+(net-hold $sym) if (hold $sym) <0.70, 0.70>
+
+;; When both buy AND sell fire, conflicting-signals takes over
+(conflicting-signals $sym) if (buy $sym) (sell $sym) <0.85, 0.85>

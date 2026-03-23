@@ -1,0 +1,45 @@
+# QUANTITATIVE TRADING KNOWLEDGE CORE
+
+## Technical Indicators
+- RSI (14): Wilder's smoothing. >70 overbought, <30 oversold. Divergence is the strongest signal — price making new high while RSI declines = bearish div.
+- EMA stack: 21/50/200. Full bullish = price > 21 > 50 > 200. Golden cross = 21 crosses above 50. Death cross = opposite. 200 EMA = long-term trend filter.
+- MACD (12/26/9): Histogram > 0 = bullish momentum. Signal line crossover = momentum shift. Zero-line cross = trend change confirmation.
+- Bollinger Bands (20, 2σ): Squeeze precedes breakout. Walk the upper band = strong uptrend. Mean reversion from lower band + RSI oversold = buy setup.
+- VWAP: Daily-anchored institutional benchmark. Price below VWAP = net selling pressure. Band touch + RSI div + mean reversion zone = entry.
+- ATR (14): Volatility measure for position sizing. Risk per trade / ATR = position size. Higher ATR = wider stops, fewer contracts.
+- ADX: <20 = no trend (use mean reversion). 20-40 = trending (use trend following). >40 = strong trend (ride it). >60 = exhaustion risk.
+- Stochastic %K/%D: <20 oversold, >80 overbought. Crossover in extreme zone = reversal signal. Most useful in ranging markets.
+- Keltner Channel (20, 1.5×ATR): BB inside KC = squeeze. Breakout from squeeze = high probability move.
+- Pivot Points: PP = (H+L+C)/3. S1/R1/S2/R2 = institutional reference levels. Above PP = bullish bias.
+
+## Market Structure
+- Fibonacci: Golden zone 38.2%-61.8% = highest probability retracement. 0.618 = golden ratio.
+- Swing Points: Higher highs + higher lows = uptrend. Break of structure = regime change.
+- Fair Value Gaps: Three-candle imbalance gap. Price tends to return and fill. Institutional footprint.
+- Liquidity Sweeps: Wick past swing extreme that reverses = stop hunt. Smart money entry after retail stops cleared.
+- Order Blocks: Last opposing candle before impulse move. Institutional order accumulation zone.
+- Wyckoff: Accumulation → Markup → Distribution → Markdown. Spring = final shakeout = buy point.
+
+## Risk Management
+- Position sizing: Kelly Criterion f* = (bp - q) / b. Half-Kelly in practice. Never >2% capital per trade.
+- Risk:Reward: Minimum 1.5:1. Preferred 2:1+. High conviction 3:1+. This is the mathematical edge.
+- ATR stops: SL = entry ± multiplier × ATR. Adapts to volatility automatically.
+- Correlation: 5 correlated positions = 1 position 5× sized. Diversify across uncorrelated signals.
+- Drawdown: Circuit breaker at max drawdown. Scale down after consecutive losses.
+
+## Regime Detection
+- Trending: ADX > 25, EMA stack aligned → use trend following (MACD cross, EMA, breakout)
+- Ranging: ADX < 20, BB squeeze → use mean reversion (RSI, stochastic, Bollinger bands)
+- Volatile: High ATR, wide bands → reduce size, widen stops
+- Squeeze: BB inside KC → prepare for breakout, enter on confirmed direction
+
+## Sentiment
+- Fear & Greed: <20 = extreme fear (contrarian buy). >80 = extreme greed (contrarian sell).
+- Funding Rate: >0.01% = longs overcrowded (short squeeze risk). <-0.01% = shorts overcrowded.
+- Open Interest: Rising OI + rising price = strong trend. Rising OI + falling price = capitulation.
+
+## Confluence Rules
+- Minimum 3 independent confirmations from different categories
+- Regime filter first: trending vs ranging → strategy selection
+- Risk:reward gate: no trade below 1.5:1 regardless of confluence
+- Higher timeframe alignment: don't fight the bigger trend

@@ -1,0 +1,30 @@
+# LEGAL KNOWLEDGE CORE
+
+## Legal Method — IRAC
+Issue (what legal question?) → Rule (what law applies?) → Application (how does rule apply to facts?) → Conclusion (outcome?)
+
+## Contract Law
+- Formation: Offer + Acceptance + Consideration + Intention to create legal relations + Capacity
+- Offer vs ITT: Advertisement generally = ITT (Partridge v Crittenden). Specific promise = offer (Carlill v Carbolic Smoke Ball [1893]). Shop display = ITT (Fisher v Bell [1961]).
+- Acceptance: Mirror image rule. Counter-offer kills original (Hyde v Wrench [1840]). Postal rule: acceptance on posting (Adams v Lindsell [1818]).
+- Consideration: Must be sufficient (has value), not adequate (need not be equal). Past consideration = no consideration (Roscorla v Thomas [1842]).
+- Terms: Condition (breach = termination + damages: Poussard v Spiers). Warranty (breach = damages only: Bettini v Gye). Innominate term (Hong Kong Fir [1962]: consequences of breach determine remedy).
+- Exclusion clauses: UCTA 1977 (B2B: reasonableness test). CRA 2015 (consumer: cannot exclude death/PI from negligence).
+- Misrepresentation: False statement of existing fact that induced contract. Fraudulent (Derry v Peek). Negligent (s.2(1) Misrepresentation Act 1967). Remedy: rescission + damages.
+
+## Tort — Negligence
+- Three elements: (1) Duty of care — Caparo v Dickman [1990]: foreseeable claimant + proximity + fair/just/reasonable. (2) Breach — Blyth standard; Bolam for professionals; Montgomery for patient consent. (3) Damage — causation + remoteness.
+- Causation: But-for test (Barnett v Chelsea Hospital). Material contribution (McGhee). Fairchild exception for mesothelioma.
+- Remoteness: Wagon Mound No.1 — type of damage must be reasonably foreseeable. Thin skull rule: take claimant as you find them.
+- Defences: Contributory negligence (Law Reform Act 1945 — apportionment). Volenti (genuine free informed assumption of risk). Ex turpi causa (illegality).
+
+## Employment Law
+- Employment status: Employee (mutuality of obligation + control). Worker (broader — personal service, not own business). Uber v Aslam [2021]: platform workers = workers.
+- Unfair dismissal: Employee + 2 years qualifying. Fair reasons (s.98 ERA): conduct, capability, redundancy, SOSR, statutory restriction. Procedural fairness: ACAS Code (investigate, invite to meeting, right to be accompanied, right to appeal).
+- Discrimination: EA 2010. 9 protected characteristics. Direct (less favourable treatment because of PC). Indirect (PCP that disadvantages group — can be justified if proportionate means of legitimate aim). Harassment. Victimisation.
+- Redundancy: Genuine (s.139 ERA: business ceases/relocates, or reduced requirement for work). Pool selection, fair criteria, individual consultation. Collective: s.188 TULRCA — 20+ redundancies in 90 days = consult reps, minimum 30 days (20-99), 45 days (100+).
+
+## Company Law
+- Separate legal personality: Salomon v Salomon [1897]. Limited liability: shareholders liable only to share capital.
+- Directors' duties (CA 2006): s.171 within powers | s.172 promote success (good faith, long-term, creditors when insolvent) | s.173 independent judgment | s.174 reasonable care skill diligence | s.175 avoid conflicts | s.176 no third-party benefits | s.177 declare interests.
+- Shareholders' remedies: s.994 unfair prejudice petition. Derivative claim s.260. Winding up s.122(1)(g) IA 1986 (just and equitable).

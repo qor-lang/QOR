@@ -1,0 +1,159 @@
+;; ══════════════════════════════════════════════════════════════════════
+;; ── QOR Puzzle Solver — Observation-Based Prediction Rules ──────────
+;; ══════════════════════════════════════════════════════════════════════
+;;
+;; Pure QOR rules. No Rust template engine. No $HOLE_* placeholders.
+;; Variables bind from obs-consistent / obs-parameter facts via
+;; QOR's own unification. Forward chaining does the rest.
+;;
+;; obs-consistent = transform detected across ALL training pairs
+;; obs-parameter  = specific parameters of the transform
+;;
+
+;; ── Color Remap ─────────────────────────────────────────────────────
+;; When obs-parameter tells us color $from maps to $to, apply it
+
+(predict-cell $id $r $c $to) if
+    (input-grid $id)
+    (grid-cell $id $r $c $from)
+    (obs-parameter color-remap $from $to) <0.99, 0.99>
+
+;; Keep unmapped colors unchanged
+(predict-cell $id $r $c $v) if
+    (input-grid $id)
+    (grid-cell $id $r $c $v)
+    (obs-consistent color-remap)
+    not (obs-parameter color-remap $v $any) <0.95, 0.95>
+
+;; Color remap from per-pair analysis (works when pairs have different color sets)
+;; If any training pair maps $from → $to, apply to test input
+(predict-cell $id $r $c $to) if
+    (input-grid $id)
+    (grid-cell $id $r $c $from)
+    (obs-consistent color-remap)
+    (color-remap $inp $out $from $to) <0.95, 0.95>
+
+;; ── Fill Enclosed Regions ───────────────────────────────────────────
+
+(predict-cell $id $r $c $fill) if
+    (input-grid $id)
+    (grid-cell $id $r $c 0)
+    (enclosed-region $id $r $c)
+    (obs-consistent has-enclosed-regions)
+    (obs-parameter fill-color $fill) <0.95, 0.95>
+
+;; ── Object Extraction by Color ──────────────────────────────────────
+
+(predict-cell $id $r $c $v) if
+    (input-grid $id)
+    (grid-obj-cell $id $obj $r $c $v)
+    (grid-object $id $obj $color $sz)
+    (obs-consistent output-smaller)
+    (obs-parameter extract-color $color) <0.95, 0.95>
+
+;; ── Shift ────────────────────────────────────────────────────────────
+
+(predict-cell $id $r $c $v) if
+    (input-grid $id)
+    (obs-parameter shift-dr $dr)
+    (obs-parameter shift-dc $dc)
+    (- $r $dr $sr)
+    (- $c $dc $sc)
+    (grid-cell $id $sr $sc $v) <0.95, 0.95>
+
+;; ── Reflect Horizontal ──────────────────────────────────────────────
+
+(predict-cell $id $r $c $v) if
+    (input-grid $id)
+    (obs-consistent reflect-h)
+    (grid-size $id $rows $cols)
+    (- $cols 1 $max_c)
+    (- $max_c $c $src_c)
+    (grid-cell $id $r $src_c $v) <0.95, 0.95>
+
+;; ── Reflect Vertical ────────────────────────────────────────────────
+
+(predict-cell $id $r $c $v) if
+    (input-grid $id)
+    (obs-consistent reflect-v)
+    (grid-size $id $rows $cols)
+    (- $rows 1 $max_r)
+    (- $max_r $r $src_r)
+    (grid-cell $id $src_r $c $v) <0.95, 0.95>
+
+;; ── Rotate 90 Degrees Clockwise ─────────────────────────────────────
+
+(predict-cell $id $c $mr $v) if
+    (input-grid $id)
+    (obs-consistent rotate-90)
+    (grid-size $id $rows $cols)
+    (- $rows 1 $max_r)
+    (- $max_r $r $mr)
+    (grid-cell $id $r $c $v) <0.95, 0.95>
+
+;; ── Gravity (drop non-zero cells down) ──────────────────────────────
+
+(predict-cell $id $r $c $v) if
+    (input-grid $id)
+    (obs-consistent gravity-down)
+    (gravity-result $id $r $c $v) <0.95, 0.95>
+
+;; ── Identity (copy input to output) ─────────────────────────────────
+;; Low confidence — only wins when nothing better fires
+
+(predict-cell $id $r $c $v) if
+    (input-grid $id)
+    (obs-consistent same-size)
+    (grid-cell $id $r $c $v) <0.50, 0.50>
+
+;; ── Majority Color Fill ─────────────────────────────────────────────
+
+(predict-cell $id $r $c $maj) if
+    (input-grid $id)
+    (majority-color $id $r $c $maj) <0.85, 0.85>
+
+;; ── Cross-Region Mapping ──────────────────────────────────────────
+;; Copy values from one region to another
+
+(predict-cell $id $r $c $v) if
+    (input-grid $id)
+    (region-cell $id $reg $r $c)
+    (grid-cell $id $r2 $c2 $v)
+    (region-cell $id $reg2 $r2 $c2)
+    (!= $reg $reg2) <0.80, 0.80>
+
+;; ── Frequency Filter (keep non-unique colors) ────────────────────
+;; Keep cells whose color appears more than once in the grid
+
+(predict-cell $id $r $c $v) if
+    (input-grid $id)
+    (grid-cell $id $r $c $v)
+    (color-cell-count $id $v $n)
+    (> $n 1) <0.80, 0.80>
+
+;; ── Diagonal Neighbor Agreement ───────────────────────────────────
+;; Keep cells that share value with a diagonal neighbor
+
+(predict-cell $id $r $c $v) if
+    (input-grid $id)
+    (grid-cell $id $r $c $v)
+    (grid-diag-neighbor $id $r $c $r2 $c2)
+    (grid-cell $id $r2 $c2 $v) <0.75, 0.75>
+
+;; ── Self-Join: Same value at different position ───────────────────
+;; When a cell's value appears elsewhere in the same row
+
+(predict-cell $id $r $c $v) if
+    (input-grid $id)
+    (grid-cell $id $r $c $v)
+    (grid-cell $id $r $c2 $v)
+    (!= $c $c2) <0.70, 0.70>
+
+;; ── Keep unique colors only ──────────────────────────────────────
+;; Inverse of frequency filter — keep cells with unique value
+
+(predict-cell $id $r $c $v) if
+    (input-grid $id)
+    (grid-cell $id $r $c $v)
+    (color-cell-count $id $v $n)
+    (== $n 1) <0.75, 0.75>

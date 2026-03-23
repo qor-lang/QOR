@@ -1,0 +1,166 @@
+;; ── Influencer DNA — Content & Audience Reasoning Rules ───────────────
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── CONTENT PERFORMANCE ─────────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+
+;; Engagement analysis
+(high-engagement $post) if (engagement-rate $post $er) (> $er 5) <0.85, 0.85>
+(low-engagement $post) if (engagement-rate $post $er) (< $er 1) <0.85, 0.85>
+(viral-potential $post) if (share-rate $post $sr) (> $sr 3) <0.80, 0.80>
+(viral $post) if (view-follower-ratio $post $ratio) (> $ratio 10) <0.85, 0.85>
+(underperforming $post) if (view-avg-ratio $post $ratio) (< $ratio 0.3) <0.80, 0.80>
+(overperforming $post) if (view-avg-ratio $post $ratio) (> $ratio 3) <0.80, 0.80>
+
+;; Watch time / completion
+(strong-retention $video) if (avg-watch-pct $video $pct) (> $pct 50) <0.85, 0.85>
+(poor-retention $video) if (avg-watch-pct $video $pct) (< $pct 20) <0.85, 0.85>
+(hook-working $video) if (first-3s-retention $video $r) (> $r 70) <0.85, 0.85>
+(hook-failing $video) if (first-3s-retention $video $r) (< $r 40) <0.85, 0.85>
+(drop-off-point $video $time) if (retention-drop $video $time $pct) (> $pct 20) <0.80, 0.80>
+
+;; CTR and thumbnails
+(ctr-strong $video) if (ctr $video $c) (> $c 8) <0.85, 0.85>
+(ctr-weak $video) if (ctr $video $c) (< $c 3) <0.85, 0.85>
+(thumbnail-issue $video) if (ctr-weak $video) (title-strong $video) <0.80, 0.75>
+(title-issue $video) if (ctr-weak $video) (thumbnail-strong $video) <0.80, 0.75>
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── AUDIENCE ANALYSIS ───────────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+
+;; Growth
+(audience-growing $account) if (follower-growth-rate $account $gr) (> $gr 2) <0.85, 0.85>
+(audience-stagnant $account) if (follower-growth-rate $account $gr) (< $gr 0.5) <0.85, 0.85>
+(audience-declining $account) if (follower-growth-rate $account $gr) (< $gr 0) <0.85, 0.85>
+(rapid-growth $account) if (follower-growth-rate $account $gr) (> $gr 10) <0.85, 0.85>
+
+;; Demographics
+(audience-young $account) if (median-age $account $age) (< $age 25) <0.80, 0.80>
+(audience-mature $account) if (median-age $account $age) (> $age 35) <0.80, 0.80>
+(geo-concentrated $account) if (top-country-pct $account $pct) (> $pct 70) <0.80, 0.80>
+(geo-diverse $account) if (top-country-pct $account $pct) (< $pct 40) <0.80, 0.80>
+
+;; Health metrics
+(healthy-audience $account) if (engagement-rate $account $er) (> $er 3) (audience-growing $account) <0.80, 0.80>
+(bot-risk $account) if (follower-engagement-ratio $account $r) (< $r 0.5) <0.80, 0.80>
+(notification-decay $account) if (notification-click-rate $account $ncr) (< $ncr 5) <0.80, 0.80>
+
+;; Sentiment
+(positive-sentiment $content) if (positive-comment-pct $content $p) (> $p 70) <0.80, 0.80>
+(negative-sentiment $content) if (negative-comment-pct $content $p) (> $p 30) <0.80, 0.80>
+(controversial $content) if (positive-comment-pct $content $p) (negative-comment-pct $content $n) (> $n 25) (> $p 25) <0.80, 0.80>
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── PLATFORM STRATEGY ───────────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+
+;; Algorithm signals
+(youtube-favored $video) if (strong-retention $video) (ctr-strong $video) <0.80, 0.75>
+(tiktok-favored $video) if (completion-rate $video $cr) (> $cr 80) (share-rate $video $sr) (> $sr 2) <0.80, 0.75>
+(instagram-favored $post) if (save-rate $post $sr) (> $sr 3) <0.80, 0.75>
+(linkedin-favored $post) if (comment-rate $post $cr) (> $cr 2) (dwell-time $post $dt) (> $dt 30) <0.80, 0.75>
+
+;; Posting strategy
+(posting-too-frequent $account) if (posts-per-week $account $ppw) (> $ppw 14) (engagement-rate $account $er) (< $er 2) <0.75, 0.75>
+(posting-too-rare $account) if (posts-per-week $account $ppw) (< $ppw 2) (audience-declining $account) <0.75, 0.75>
+(optimal-frequency $account) if (posts-per-week $account $ppw) (> $ppw 3) (< $ppw 10) (audience-growing $account) <0.75, 0.75>
+(best-time-to-post $account $hour) if (peak-engagement-hour $account $hour) <0.80, 0.80>
+
+;; Platform risk
+(platform-dependent $creator) if (revenue-pct-platform $creator $platform $pct) (> $pct 80) <0.85, 0.85>
+(diversification-needed $creator) if (platform-dependent $creator) <0.85, 0.80>
+(algorithm-shift-risk $creator) if (platform-dependent $creator) (recent-algorithm-change $platform) <0.80, 0.80>
+(deplatform-risk $creator) if (community-strike $creator $count) (> $count 1) <0.85, 0.85>
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── MONETISATION ────────────────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+
+;; Revenue analysis
+(ad-revenue-strong $channel) if (rpm $channel $r) (> $r 10) <0.80, 0.80>
+(ad-revenue-weak $channel) if (rpm $channel $r) (< $r 3) <0.80, 0.80>
+(high-value-niche $channel) if (rpm $channel $r) (> $r 25) <0.80, 0.80>
+
+;; Sponsorship readiness
+(sponsor-ready $creator) if (follower-count $creator $f) (> $f 10000) (engagement-rate $creator $er) (> $er 3) <0.75, 0.75>
+(premium-sponsor-ready $creator) if (follower-count $creator $f) (> $f 100000) (niche-authority $creator) <0.75, 0.75>
+(sponsor-rate-low $deal) if (cpm $deal $c) (< $c 15) <0.80, 0.80>
+(sponsor-rate-fair $deal) if (cpm $deal $c) (> $c 25) <0.80, 0.80>
+(exclusivity-premium $deal) if (exclusive $deal) (category $deal $cat) <0.75, 0.75>
+
+;; Product revenue
+(course-viable $creator) if (email-list-size $creator $s) (> $s 5000) (niche-authority $creator) <0.75, 0.75>
+(membership-viable $creator) if (superfan-pct $creator $sf) (> $sf 5) (follower-count $creator $f) (> $f 5000) <0.75, 0.75>
+(merch-viable $creator) if (brand-recognition $creator high) (audience-young $creator) <0.75, 0.75>
+
+;; Revenue diversification — multi-step chain
+(revenue-concentrated $creator) if (top-revenue-source-pct $creator $pct) (> $pct 70) <0.80, 0.80>
+(revenue-at-risk $creator) if (revenue-concentrated $creator) (platform-dependent $creator) <0.80, 0.75>
+(diversification-urgent $creator) if (revenue-at-risk $creator) (algorithm-shift-risk $creator) <0.85, 0.80>
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── CONTENT STRATEGY ────────────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+
+;; Content type analysis
+(educational-content $post) if (content-type $post educational) <0.85, 0.85>
+(entertainment-content $post) if (content-type $post entertainment) <0.85, 0.85>
+(personal-content $post) if (content-type $post personal) <0.85, 0.85>
+(promotional-content $post) if (content-type $post promotional) <0.85, 0.85>
+
+;; Content mix
+(too-promotional $account) if (promotional-pct $account $p) (> $p 30) <0.80, 0.80>
+(lacking-personal $account) if (personal-pct $account $p) (< $p 10) (audience-declining $account) <0.75, 0.75>
+(good-content-mix $account) if (educational-pct $account $e) (> $e 40) (personal-pct $account $p) (> $p 15) (promotional-pct $account $pr) (< $pr 20) <0.75, 0.75>
+
+;; Series and format
+(series-performing $series) if (series-view-ratio $series $ratio) (> $ratio 1.2) <0.80, 0.80>
+(format-fatigue $format) if (declining-views $format $trend) (< $trend 0) <0.80, 0.80>
+(new-format-needed $account) if (format-fatigue $format) (audience-stagnant $account) <0.75, 0.75>
+
+;; Repurposing
+(repurpose-candidate $content) if (overperforming $content) (long-form $content) <0.80, 0.75>
+(clip-potential $video) if (strong-retention $video) (duration $video $d) (> $d 600) <0.75, 0.75>
+(carousel-potential $content) if (educational-content $content) (list-format $content) <0.75, 0.75>
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── BRAND BUILDING ──────────────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+
+;; Brand health
+(strong-brand $creator) if (brand-recall $creator $br) (> $br 60) (niche-authority $creator) <0.80, 0.80>
+(weak-brand $creator) if (brand-recall $creator $br) (< $br 20) <0.80, 0.80>
+(brand-confusion $creator) if (niche-count $creator $n) (> $n 3) <0.75, 0.75>
+(niche-authority $creator) if (topic-expertise $creator $topic) (content-consistency $creator $topic $pct) (> $pct 60) <0.80, 0.75>
+
+;; Email list
+(email-list-healthy $creator) if (open-rate $creator $or) (> $or 30) <0.85, 0.85>
+(email-list-dying $creator) if (open-rate $creator $or) (< $or 15) <0.80, 0.80>
+(email-list-priority $creator) if (platform-dependent $creator) not (email-list-size $creator $s) <0.85, 0.80>
+(email-list-priority $creator) if (platform-dependent $creator) (email-list-size $creator $s) (< $s 1000) <0.85, 0.80>
+
+;; Collaboration
+(collab-beneficial $creator $partner) if (audience-overlap $creator $partner $ov) (< $ov 30) (niche-adjacent $creator $partner) <0.75, 0.75>
+(collab-risky $creator $partner) if (controversial $partner) (brand-safety $creator high) <0.80, 0.80>
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── CRISIS & REPUTATION ─────────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+
+(reputation-crisis $creator) if (negative-sentiment $content) (viral $content) <0.85, 0.85>
+(cancel-risk $creator) if (reputation-crisis $creator) (past-controversy $creator) <0.85, 0.85>
+(address-publicly $issue) if (reputation-crisis $creator) (factual-error $issue) <0.80, 0.75>
+(ignore-strategy $issue) if (troll-attack $issue) not (mainstream-pickup $issue) <0.75, 0.75>
+(apology-needed $issue) if (reputation-crisis $creator) (genuine-harm $issue) <0.80, 0.80>
+(legal-review-needed $issue) if (defamation-claim $issue) <0.85, 0.85>
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── SCALING & TEAM ──────────────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+
+(hire-editor $creator) if (posts-per-week $creator $ppw) (> $ppw 3) (revenue $creator $r) (> $r 5000) <0.75, 0.75>
+(hire-thumbnail $creator) if (ctr-weak $creator) (revenue $creator $r) (> $r 3000) <0.75, 0.75>
+(burnout-risk $creator) if (posts-per-week $creator $ppw) (> $ppw 7) (solo-creator $creator) <0.80, 0.80>
+(media-company-ready $creator) if (revenue $creator $r) (> $r 50000) (team-size $creator $t) (> $t 2) <0.75, 0.75>
+(delegation-needed $creator) if (burnout-risk $creator) (revenue $creator $r) (> $r 10000) <0.80, 0.75>

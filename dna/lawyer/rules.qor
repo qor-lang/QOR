@@ -1,0 +1,107 @@
+;; ── Lawyer DNA — Legal Reasoning Rules ────────────────────────────────
+;;
+;; Legal analysis, case evaluation, and argumentation logic.
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── CONTRACT ANALYSIS ────────────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+
+;; Valid contract elements
+(valid-offer $contract) if (element $contract offer) (element $contract definite-terms) <0.90, 0.85>
+(valid-acceptance $contract) if (element $contract acceptance) (element $contract mirror-image) <0.90, 0.85>
+(valid-consideration $contract) if (element $contract consideration) (element $contract bargained-for) <0.90, 0.85>
+(valid-contract $contract) if (valid-offer $contract) (valid-acceptance $contract) (valid-consideration $contract) (element $contract capacity) <0.85, 0.80>
+
+;; Contract defenses
+(voidable $contract) if (defense $contract duress) <0.85, 0.85>
+(voidable $contract) if (defense $contract undue-influence) <0.85, 0.85>
+(voidable $contract) if (defense $contract misrepresentation) <0.85, 0.85>
+(void-contract $contract) if (defense $contract illegality) <0.90, 0.90>
+(void-contract $contract) if (defense $contract lack-capacity) (element $contract minor) <0.85, 0.85>
+(unenforceable $contract) if (statute-of-frauds $contract) not (element $contract writing) <0.85, 0.85>
+
+;; Breach analysis
+(material-breach $contract $party) if (breach $contract $party) (element $contract substantial-failure) <0.85, 0.85>
+(minor-breach $contract $party) if (breach $contract $party) not (element $contract substantial-failure) <0.80, 0.80>
+(anticipatory-breach $contract $party) if (repudiation $contract $party) (element $contract before-performance-due) <0.85, 0.85>
+
+;; Remedies
+(damages-available $contract) if (material-breach $contract $party) <0.85, 0.80>
+(specific-performance $contract) if (material-breach $contract $party) (element $contract unique-subject) <0.80, 0.80>
+(rescission-available $contract) if (voidable $contract) <0.85, 0.85>
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── TORT LAW ─────────────────────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+
+;; Negligence elements
+(duty-owed $defendant $plaintiff) if (relationship $defendant $plaintiff professional) <0.90, 0.85>
+(duty-owed $defendant $plaintiff) if (relationship $defendant $plaintiff foreseeable) <0.85, 0.85>
+(breach-of-duty $defendant) if (duty-owed $defendant $plaintiff) (standard-not-met $defendant) <0.85, 0.85>
+(causation $defendant $harm) if (but-for $defendant $harm) (proximate-cause $defendant $harm) <0.85, 0.85>
+(negligence-established $defendant) if (breach-of-duty $defendant) (causation $defendant $harm) (damages $plaintiff $harm) <0.80, 0.80>
+
+;; Defenses to negligence
+(contributory-negligence $plaintiff) if (fault $plaintiff $contrib) (> $contrib 0) <0.85, 0.85>
+(assumption-of-risk $plaintiff) if (knew-risk $plaintiff) (voluntary-exposure $plaintiff) <0.85, 0.85>
+(comparative-fault $plaintiff $pct) if (fault $plaintiff $pct) (> $pct 0) (< $pct 100) <0.85, 0.85>
+
+;; Strict liability
+(strict-liability $defendant) if (activity $defendant abnormally-dangerous) <0.90, 0.90>
+(product-liability $manufacturer) if (defect $product design) (causation $product $harm) <0.85, 0.85>
+(product-liability $manufacturer) if (defect $product manufacturing) (causation $product $harm) <0.85, 0.85>
+(product-liability $manufacturer) if (defect $product warning) (causation $product $harm) <0.80, 0.85>
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── CRIMINAL LAW ─────────────────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+
+;; Elements of crime
+(actus-reus $defendant $crime) if (voluntary-act $defendant $crime) <0.90, 0.90>
+(mens-rea $defendant $crime intent) if (purpose $defendant $crime) <0.90, 0.90>
+(mens-rea $defendant $crime knowledge) if (aware $defendant $crime) <0.85, 0.85>
+(mens-rea $defendant $crime reckless) if (disregard-risk $defendant $crime) <0.80, 0.85>
+(crime-established $defendant $crime) if (actus-reus $defendant $crime) (mens-rea $defendant $crime $level) <0.85, 0.80>
+
+;; Defenses
+(self-defense $defendant) if (reasonable-belief $defendant threat) (proportional-force $defendant) <0.85, 0.85>
+(insanity-defense $defendant) if (mental-disease $defendant) (not-understand-wrongfulness $defendant) <0.80, 0.80>
+(duress-defense $defendant) if (threat-of-harm $defendant imminent) (no-reasonable-escape $defendant) <0.80, 0.80>
+(statute-of-limitations $case) if (time-elapsed $case $years) (limitation-period $case $limit) (> $years $limit) <0.90, 0.90>
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── EVIDENCE ─────────────────────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+
+;; Admissibility
+(admissible $evidence) if (relevant $evidence) not (excluded $evidence) <0.85, 0.80>
+(excluded $evidence) if (hearsay $evidence) not (hearsay-exception $evidence) <0.85, 0.85>
+(excluded $evidence) if (prejudicial $evidence) (outweighs-probative $evidence) <0.80, 0.80>
+(excluded $evidence) if (illegally-obtained $evidence) <0.90, 0.90>
+
+;; Burden of proof
+(burden-met-civil $party) if (evidence-weight $party $w) (> $w 50) <0.85, 0.85>
+(burden-met-criminal $party) if (evidence-weight $party $w) (> $w 95) <0.90, 0.90>
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── CONSTITUTIONAL ───────────────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+
+;; Due process
+(due-process-violation $action) if (government-action $action) (liberty-interest $action) not (adequate-procedure $action) <0.85, 0.85>
+(equal-protection-issue $action) if (government-action $action) (classification $action $class) (discriminatory-impact $action) <0.80, 0.80>
+
+;; First amendment
+(protected-speech $expression) if (speech $expression) not (unprotected-category $expression) <0.85, 0.85>
+(unprotected-category $expression) if (speech-type $expression true-threat) <0.90, 0.90>
+(unprotected-category $expression) if (speech-type $expression incitement) (imminent-lawless-action $expression) <0.85, 0.85>
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── CASE STRATEGY ────────────────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+
+;; Strength assessment
+(strong-case $case) if (evidence-weight $case $w) (> $w 70) (legal-basis $case established) <0.80, 0.80>
+(weak-case $case) if (evidence-weight $case $w) (< $w 40) <0.80, 0.80>
+(settlement-recommended $case) if (strong-case $case) (cost-benefit $case favorable) <0.75, 0.75>
+(trial-recommended $case) if (strong-case $case) not (settlement-offer $case reasonable) <0.70, 0.70>

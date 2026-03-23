@@ -1,0 +1,31 @@
+# SURGICAL KNOWLEDGE CORE — Surgeon
+
+## Surgical Assessment
+- ATLS PRIMARY SURVEY: Airway (C-spine) → Breathing → Circulation (two large-bore IVs, O-neg blood) → Disability (GCS) → Exposure
+- PRE-OP: MRSA screen, group & save, VTE prophylaxis (LMWH + TED), NBM (6h solids, 2h clear fluids), informed consent (Montgomery v Lanarkshire)
+- ASA GRADE: I (normal) II (mild systemic disease) III (severe systemic disease) IV (life threat) V (moribund)
+
+## Acute Abdomen
+- APPENDICITIS: RIF pain, rebound, fever, raised WCC/CRP. Alvarado >=7 = surgery. USS first (women/children), CT if unclear.
+- PERFORATED VISCUS: Sudden severe generalised pain, rigidity, absent bowel sounds. Erect CXR (free air under diaphragm). CT more sensitive. IV abx, NGT, catheter, laparotomy.
+- BOWEL OBSTRUCTION SBO: Dilated small bowel >3cm. Adhesions #1 cause. Conservative if no strangulation (NGT, IV fluids, 48h watch). Signs of strangulation = OR.
+- BOWEL OBSTRUCTION LBO: Large bowel distension. Colorectal cancer #1 adult cause. Caecum >9cm = risk of rupture. CT. Hartmann's vs primary anastomosis.
+- MESENTERIC ISCHAEMIA: Surgical emergency. AF + pain out of proportion = suspect. Lactate rises late. CT angiography. Mortality 60-80%.
+- VOLVULUS: Sigmoid (elderly, coffee bean sign on AXR) = rigid sigmoidoscopy decompression first. Caecal = surgery.
+
+## Hepatobiliary
+- ACUTE CHOLECYSTITIS: RUQ pain + Murphy's sign + fever. USS (stones + thickened wall + pericholecystic fluid). IV abx. Early laparoscopic cholecystectomy (within 72h) superior to delayed.
+- CHOLEDOCHOLITHIASIS: RUQ pain + jaundice + raised ALP/bilirubin. MRCP confirms stones. ERCP + sphincterotomy → then cholecystectomy.
+- ACUTE PANCREATITIS: Epigastric → back pain. Lipase >3x ULN. Causes: gallstones (UK most common), alcohol. Glasgow/Ranson criteria (>=3 = severe). CT at 48-72h if not improving (necrosis).
+- WHIPPLE: For periampullary cancers. Resection of pancreatic head + duodenum + gallbladder + part CBD. Pancreaticojejunostomy + hepaticojejunostomy + gastrojejunostomy.
+
+## Colorectal
+- COLORECTAL CANCER: TNM staging. Right-sided (anaemia, mass) vs left-sided (obstruction, PR bleeding). Right hemicolectomy vs Hartmann's (emergency) vs anterior resection (rectal). APER if <5cm from dentate line.
+- DIVERTICULITIS: LIF pain + fever + raised CRP. Hinchey classification I-IV. Uncomplicated → antibiotics +/- drainage. Complicated (Hinchey III/IV) → Hartmann's.
+- HERNIAS: Inguinal — indirect (patent PV, lateral to inf epigastric, young males) vs direct (Hesselbach's triangle, older males). Femoral: more likely to strangulate, often missed. Lichtenstein (open) vs TEP/TAPP (laparoscopic).
+
+## Post-operative Complications
+- HAEMORRHAGE: Primary (intraop), Reactionary (<24h), Secondary (7-14 days — infection)
+- ANASTOMOTIC LEAK: Fever Day 3-5, rising CRP, tachycardia, peritonism. CT + rectal contrast. Small contained = conservative. Major = return to OR.
+- VTE: DVT (duplex USS), PE (CTPA). Prophylaxis: LMWH + TED stockings + early mobilisation.
+- WOUND INFECTION: Superficial = open and drain. Deep = CT for collection, radiological drainage. Anastomotic site = OR.

@@ -1,0 +1,209 @@
+;; ── Physicist DNA — Physical Laws & Systems Reasoning Rules ───────────
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── CLASSICAL MECHANICS ─────────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+
+;; Force and motion
+(in-equilibrium $body) if (net-force $body $f) (< $f 0.001) <0.90, 0.90>
+(accelerating $body) if (net-force $body $f) (> $f 0) (mass $body $m) (> $m 0) <0.90, 0.90>
+(free-fall $body) if (free-fall-condition $body) <0.85, 0.85>
+(terminal-velocity $body) if (drag-equals-weight $body) <0.80, 0.80>
+
+;; Conservation laws
+(energy-conserved $system) if (conservative-forces $system) (isolated $system) <0.90, 0.90>
+(momentum-conserved $system) if (no-external-force $system) <0.90, 0.90>
+(angular-momentum-conserved $system) if (no-external-torque $system) <0.90, 0.90>
+(inelastic-collision $event) if (collision $event) (kinetic-energy-loss-pct $event $pct) (> $pct 1) <0.85, 0.85>
+(elastic-collision $event) if (collision $event) (kinetic-energy-loss-pct $event $pct) (< $pct 1) <0.85, 0.85>
+
+;; Oscillations
+(simple-harmonic $system) if (restoring-force $system linear) (small-amplitude $system) <0.85, 0.85>
+(damped-oscillation $system) if (simple-harmonic $system) (dissipation $system $d) (> $d 0) <0.85, 0.85>
+(overdamped $system) if (damped-oscillation $system) (damping-ratio $system $z) (> $z 1) <0.85, 0.85>
+(underdamped $system) if (damped-oscillation $system) (damping-ratio $system $z) (< $z 1) <0.85, 0.85>
+(critically-damped $system) if (damped-oscillation $system) (damping-ratio $system $z) (> $z 0.99) (< $z 1.01) <0.85, 0.85>
+(resonance $system) if (freq-ratio $system $r) (> $r 0.95) (< $r 1.05) <0.85, 0.85>
+
+;; Orbital mechanics
+(bound-orbit $body) if (total-energy $body $e) (< $e 0) <0.85, 0.85>
+(escape-trajectory $body) if (total-energy $body $e) (> $e 0) <0.85, 0.85>
+(circular-orbit $body) if (bound-orbit $body) (eccentricity $body $e) (< $e 0.01) <0.85, 0.85>
+(elliptical-orbit $body) if (bound-orbit $body) (eccentricity $body $e) (> $e 0.01) <0.85, 0.85>
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── ELECTROMAGNETISM ────────────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+
+;; Fields
+(uniform-field $region) if (field-gradient $region $g) (< $g 0.01) <0.80, 0.80>
+(dipole-field $source) if (charge-distribution $source dipole) <0.85, 0.85>
+(radiation-zone $source $r) if (distance-wavelength-ratio $source $r $ratio) (> $ratio 1) <0.80, 0.80>
+(near-field $source $r) if (distance-wavelength-ratio $source $r $ratio) (< $ratio 1) <0.80, 0.80>
+
+;; EM waves
+(em-wave $field) if (oscillating-e $field) (oscillating-b $field) (perpendicular $field) <0.90, 0.90>
+(polarized $wave) if (em-wave $wave) (fixed-e-plane $wave) <0.85, 0.85>
+(interference-constructive $point) if (path-difference-wavelength-ratio $point $ratio) (< $ratio 0.1) <0.80, 0.80>
+(diffraction-significant $aperture) if (aperture-wavelength-ratio $aperture $ratio) (< $ratio 10) <0.80, 0.80>
+
+;; Circuits (physics perspective)
+(rc-circuit $circuit) if (resistance $circuit $r) (capacitance $circuit $c) <0.90, 0.90>
+(rl-circuit $circuit) if (inductance $circuit $l) (resistance $circuit $r) <0.90, 0.90>
+(resonant-circuit $circuit) if (inductance $circuit $l) (capacitance $circuit $c) <0.85, 0.85>
+(high-q-circuit $circuit) if (resonant-circuit $circuit) (q-factor $circuit $q) (> $q 10) <0.85, 0.85>
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── THERMODYNAMICS ──────────────────════════════════════════════════
+;; ══════════════════════════════════════════════════════════════════════
+
+;; State analysis
+(thermal-equilibrium $a $b) if (temp-difference $a $b $dt) (< $dt 0.1) <0.90, 0.90>
+(heat-flow $from $to) if (temperature $from $tf) (temperature $to $tt) (> $tf $tt) (thermal-contact $from $to) <0.90, 0.90>
+(isothermal $process) if (temp-change $process $dt) (< $dt 0.01) <0.85, 0.85>
+(adiabatic $process) if (heat-exchange $process $q) (< $q 0.01) <0.85, 0.85>
+(isobaric $process) if (pressure-change $process $dp) (< $dp 0.01) <0.85, 0.85>
+
+;; Entropy and second law
+(entropy-increasing $system) if (irreversible-process $system) <0.90, 0.90>
+(entropy-maximum $system) if (thermal-equilibrium $system $env) <0.85, 0.85>
+(reversible-process $system) if (quasi-static $system) (no-friction $system) (no-heat-leak $system) <0.80, 0.80>
+(carnot-limit $engine) if (hot-reservoir $engine $th) (cold-reservoir $engine $tc) <0.90, 0.90>
+
+;; Phase transitions
+(phase-transition $substance) if (latent-heat $substance $l) (> $l 0) (at-transition-temp $substance) <0.85, 0.85>
+(boiling $substance) if (temperature $substance $t) (boiling-point $substance $tb) (> $t $tb) <0.85, 0.85>
+(supercooled $substance) if (temperature $substance $t) (freezing-point $substance $tf) (< $t $tf) (liquid $substance) <0.85, 0.85>
+(critical-point $substance) if (near-critical-temp $substance) (near-critical-pressure $substance) <0.80, 0.80>
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── QUANTUM MECHANICS ───────────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+
+;; Quantum regime detection
+(quantum-regime $system) if (wavelength-size-ratio $system $ratio) (> $ratio 0.01) <0.85, 0.85>
+(classical-regime $system) if (wavelength-size-ratio $system $ratio) (< $ratio 0.001) <0.85, 0.85>
+(tunneling-possible $barrier) if (barrier-penetration-depth $barrier $d) (> $d 0.01) <0.80, 0.80>
+(tunneling-negligible $barrier) if (barrier-penetration-depth $barrier $d) (< $d 0.0001) <0.80, 0.80>
+
+;; State analysis
+(bound-state $particle) if (energy $particle $e) (potential-depth $well $v) (< $e $v) <0.85, 0.85>
+(ground-state $system) if (quantum-number $system $n) (< $n 2) <0.85, 0.85>
+(excited-state $system) if (quantum-number $system $n) (> $n 1) <0.85, 0.85>
+(degenerate-states $system) if (degeneracy $system $g) (> $g 1) <0.80, 0.80>
+(superposition $state) if (component-count $state $n) (> $n 1) <0.85, 0.85>
+(entangled $a $b) if (correlated $a $b) (non-separable $a $b) <0.85, 0.85>
+
+;; Uncertainty
+(position-well-defined $particle) if (position-uncertainty $particle $dx) (< $dx 0.01) <0.80, 0.80>
+(momentum-well-defined $particle) if (momentum-uncertainty $particle $dp) (< $dp 0.01) <0.80, 0.80>
+(uncertainty-limited $measurement) if (position-well-defined $particle) (momentum-uncertainty $particle $dp) <0.85, 0.85>
+
+;; Spin and statistics
+(spin-up $particle) if (spin-z $particle $sz) (> $sz 0) <0.85, 0.85>
+(spin-down $particle) if (spin-z $particle $sz) (< $sz 0) <0.85, 0.85>
+(fermion $particle) if (spin $particle $s) (half-integer $s) <0.90, 0.90>
+(boson $particle) if (spin $particle $s) (integer $s) <0.90, 0.90>
+(pauli-blocked $state) if (fermion $particle) (occupied $state) <0.90, 0.90>
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── RELATIVITY ──────────────────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+
+;; Special relativity
+(relativistic $body) if (velocity $body $v) (> $v 30000000) <0.85, 0.85>
+(non-relativistic $body) if (velocity $body $v) (< $v 3000000) <0.85, 0.85>
+(ultra-relativistic $body) if (velocity $body $v) (> $v 270000000) <0.85, 0.85>
+(time-dilation-significant $frame) if (relativistic $frame) <0.85, 0.80>
+(length-contraction-significant $frame) if (relativistic $frame) <0.85, 0.80>
+(rest-mass-dominant $particle) if (non-relativistic $particle) <0.85, 0.85>
+(kinetic-dominant $particle) if (ultra-relativistic $particle) <0.85, 0.85>
+
+;; General relativity
+(strong-gravity $region) if (gravitational-potential $region $phi) (> $phi 0.1) <0.85, 0.85>
+(weak-gravity $region) if (gravitational-potential $region $phi) (< $phi 0.001) <0.85, 0.85>
+(black-hole $object) if (radius $object $r) (schwarzschild-radius $object $rs) (< $r $rs) <0.90, 0.90>
+(gravitational-lensing $source) if (mass $lens $m) (alignment $source $lens $observer) <0.80, 0.80>
+(gravitational-wave-source $system) if (binary $system) (compact-objects $system) (orbital-decay $system) <0.80, 0.80>
+(frame-dragging $region) if (rotating-mass $region) (strong-gravity $region) <0.80, 0.80>
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── PARTICLE PHYSICS ────────────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+
+;; Particle classification
+(hadron $particle) if (quark-content $particle) <0.90, 0.90>
+(baryon $particle) if (hadron $particle) (quark-count $particle $n) (> $n 2) <0.90, 0.90>
+(meson $particle) if (hadron $particle) (quark-count $particle $n) (< $n 3) <0.90, 0.90>
+(lepton $particle) if (lepton-number $particle $l) (> $l 0) <0.90, 0.90>
+
+;; Interactions
+(em-interaction $process) if (charged-particles $process) (photon-exchange $process) <0.90, 0.90>
+(weak-interaction $process) if (flavor-change $process) <0.85, 0.85>
+(strong-interaction $process) if (color-charge $process) (gluon-exchange $process) <0.90, 0.90>
+
+;; Conservation laws in particle physics
+(charge-conserved $reaction) if (charge-balance $reaction $delta) (< $delta 0.001) <0.95, 0.95>
+(baryon-number-conserved $reaction) if (baryon-balance $reaction $delta) (< $delta 0.001) <0.90, 0.90>
+(lepton-number-conserved $reaction) if (lepton-balance $reaction $delta) (< $delta 0.001) <0.90, 0.90>
+(allowed-reaction $reaction) if (charge-conserved $reaction) (baryon-number-conserved $reaction) (lepton-number-conserved $reaction) <0.85, 0.85>
+(forbidden-reaction $reaction) if not (allowed-reaction $reaction) <0.85, 0.85>
+
+;; Decay
+(unstable $particle) if (lifetime $particle $t) (< $t 1000000000000) <0.85, 0.85>
+(stable $particle) if (lifetime $particle $t) (> $t 1000000000000000000) <0.90, 0.90>
+(short-lived $particle) if (lifetime $particle $t) (< $t 0.000000001) <0.85, 0.85>
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── CONDENSED MATTER ────────────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+
+(conductor $material) if (band-gap $material $eg) (< $eg 0.1) <0.85, 0.85>
+(semiconductor $material) if (band-gap $material $eg) (> $eg 0.1) (< $eg 4) <0.85, 0.85>
+(insulator $material) if (band-gap $material $eg) (> $eg 4) <0.85, 0.85>
+(superconducting $material) if (temperature $material $t) (critical-temp $material $tc) (< $t $tc) <0.85, 0.85>
+(meissner-effect $material) if (superconducting $material) <0.90, 0.85>
+(bose-einstein-condensate $system) if (temperature $system $t) (< $t 0.0001) (bosonic-atoms $system) <0.80, 0.80>
+(ferromagnetic $material) if (curie-temp $material $tc) (temperature $material $t) (< $t $tc) <0.85, 0.85>
+(paramagnetic $material) if (curie-temp $material $tc) (temperature $material $t) (> $t $tc) <0.85, 0.85>
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── ASTROPHYSICS & COSMOLOGY ────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+
+(main-sequence $star) if (luminosity $star $l) (temperature $star $t) (hydrogen-burning $star) <0.85, 0.85>
+(red-giant $star) if (luminosity $star $l) (> $l 100) (temperature $star $t) (< $t 5000) <0.80, 0.80>
+(white-dwarf $star) if (mass $star $m) (< $m 1.4) (degenerate-matter $star electron) <0.85, 0.85>
+(neutron-star $remnant) if (mass $remnant $m) (> $m 1.4) (< $m 3) (degenerate-matter $remnant neutron) <0.85, 0.85>
+(chandrasekhar-limit $star) if (white-dwarf $star) (mass $star $m) (> $m 1.38) <0.85, 0.85>
+(supernova-candidate $star) if (mass $star $m) (> $m 8) (evolved $star) <0.80, 0.80>
+(hubble-flow $galaxy) if (redshift $galaxy $z) (> $z 0.01) <0.80, 0.80>
+(dark-matter-dominated $galaxy) if (rotation-curve $galaxy flat) (visible-mass-fraction $galaxy $f) (< $f 0.2) <0.80, 0.80>
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── EXPERIMENTAL & MEASUREMENT ──────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+
+(systematic-error $experiment) if (repeated-bias $experiment $direction) <0.80, 0.80>
+(statistical-error $experiment) if (random-scatter $experiment $sigma) (> $sigma 0) <0.80, 0.80>
+(significant-result $experiment) if (sigma-level $experiment $n) (> $n 5) <0.85, 0.85>
+(tentative-result $experiment) if (sigma-level $experiment $n) (> $n 2) (< $n 5) <0.80, 0.80>
+(null-result $experiment) if (sigma-level $experiment $n) (< $n 2) <0.80, 0.80>
+(precision-limited $measurement) if (signal-resolution-ratio $measurement $ratio) (< $ratio 10) <0.80, 0.80>
+
+;; Multi-step: theory validation chain
+(prediction-matches $theory $experiment) if (prediction-error-sigma $theory $experiment $ns) (< $ns 2) <0.85, 0.80>
+(theory-supported $theory) if (prediction-matches $theory $experiment) (independent-confirmation $theory) <0.80, 0.75>
+(theory-challenged $theory) if (significant-result $experiment) not (prediction-matches $theory $experiment) <0.80, 0.80>
+(paradigm-shift-candidate $theory) if (theory-challenged $old_theory) (prediction-matches $theory $experiment) <0.75, 0.70>
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── DIMENSIONAL ANALYSIS & SCALING ──────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+
+(dimensionally-consistent $equation) if (dimension-check $equation passed) <0.95, 0.95>
+(dimensionally-inconsistent $equation) if (dimension-check $equation failed) <0.95, 0.95>
+(scale-invariant $system) if (power-law $system) (no-characteristic-scale $system) <0.80, 0.80>
+(turbulent-flow $fluid) if (reynolds-number $fluid $re) (> $re 4000) <0.85, 0.85>
+(laminar-flow $fluid) if (reynolds-number $fluid $re) (< $re 2000) <0.85, 0.85>
+(transition-flow $fluid) if (reynolds-number $fluid $re) (> $re 2000) (< $re 4000) <0.80, 0.80>

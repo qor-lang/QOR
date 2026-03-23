@@ -1,0 +1,93 @@
+;; Web Fallback — Confidence-triggered web browsing
+;; =================================================
+;; When QOR's confidence in its solution drops below 0.50,
+;; these rules activate web browsing to get a fresh perspective.
+;;
+;; ALL URLs, ALL extraction logic, ALL strategy lives HERE.
+;; Rust knows nothing about arcprize.org or any other site.
+
+;; ─── Web Sources (DNA controls which sites to visit) ───
+
+;; Primary source: arcprize.org puzzle viewer
+(web-source arcprize-play "https://arcprize.org/play?task=")
+;; API endpoint for raw JSON data
+(web-source arcprize-api "https://arcprize.org/media/data/task/task-data/")
+
+;; ─── Confidence Trigger ───
+
+;; When solve confidence drops below 0.50, activate web lookup
+(web-lookup-needed $id) if
+    (solve-confidence $id $conf)
+    (< $conf 0.50)
+    not (web-done $id) <0.90, 0.90>
+
+;; ─── Step 1: Navigate to the puzzle page ───
+
+;; Browse the puzzle on arcprize.org
+(browser-action navigate "https://arcprize.org/play?task=") if
+    (web-lookup-needed $id)
+    (web-source arcprize-play $base)
+    not (web-visited-play $id) <0.85, 0.85>
+
+;; ─── Step 2: Take a snapshot of the page ───
+
+(browser-action snapshot) if
+    (web-lookup-needed $id)
+    (page-url $url)
+    not (web-snapshot-taken $id) <0.82, 0.82>
+
+;; Mark snapshot taken
+(web-snapshot-taken $id) if
+    (web-lookup-needed $id)
+    (page-element $any $role $name $href) <0.99, 0.99>
+
+;; ─── Step 3: Extract grid data via JavaScript ───
+
+;; Use JS to pull grid data from the page's global variables
+(browser-action js "JSON.stringify({task: new URLSearchParams(location.search).get('task'), trainCount: document.querySelectorAll('#task_train .puzzle').length, testCount: document.querySelectorAll('#task_test .puzzle').length, grids: Array.from(document.querySelectorAll('.puzzle')).map(function(p,i){var cells=[];p.querySelectorAll('.cell').forEach(function(c){cells.push({r:parseInt(c.getAttribute('x')),c:parseInt(c.getAttribute('y')),v:parseInt(c.getAttribute('symbol'))})});return{index:i,cells:cells}})})") if
+    (web-snapshot-taken $id)
+    not (web-js-extracted $id) <0.85, 0.85>
+
+;; Mark JS extraction done
+(web-js-extracted $id) if
+    (web-lookup-needed $id)
+    (js-result $script $data) <0.99, 0.99>
+
+;; ─── Step 4: Fetch raw JSON as HTTP fallback ───
+
+;; If browser fails, DNA requests HTTP fetch of the API endpoint
+(http-fetch "https://arcprize.org/media/data/task/task-data/") if
+    (web-lookup-needed $id)
+    (browser-unavailable true)
+    (web-source arcprize-api $base)
+    not (web-done $id) <0.80, 0.80>
+
+;; ─── Step 5: Extract page text for hints ───
+
+(browser-action page-text) if
+    (web-js-extracted $id)
+    not (web-text-extracted $id) <0.75, 0.75>
+
+(web-text-extracted $id) if
+    (web-lookup-needed $id)
+    (page-text $text) <0.99, 0.99>
+
+;; ─── Step 6: Done browsing ───
+
+;; We're done when we have JS data and page text
+(web-done $id) if
+    (web-js-extracted $id) <0.95, 0.95>
+
+(browser-action done) if
+    (web-done $id) <0.95, 0.95>
+
+;; Also done if browser failed and HTTP fetched
+(web-done $id) if
+    (browser-unavailable true)
+    (web-lookup-needed $id) <0.90, 0.90>
+
+;; ─── Mark visited to prevent re-browsing ───
+
+(web-visited-play $id) if
+    (web-lookup-needed $id)
+    (page-url $url) <0.99, 0.99>

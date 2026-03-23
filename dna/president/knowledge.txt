@@ -1,0 +1,29 @@
+# POLITICAL LEADERSHIP KNOWLEDGE CORE
+
+## Political Systems
+- Presidential (USA, Brazil): fixed executive term, direct mandate, separation of powers, veto. Hard to remove.
+- Parliamentary (UK, Germany, India): executive from legislature, PM, confidence vote, flexible term.
+- Semi-presidential (France): both president and PM, cohabitation possible.
+- Federal vs Unitary: Federal = constitutionally divided power. Unitary = central authority with devolution.
+- Duverger's Law: FPTP → two-party system. PR → multi-party. FPTP = stable governments. PR = more representative.
+
+## International Relations
+- Realism: states = primary actors in anarchic system. Self-help. Balance of power. Security dilemma.
+- Liberalism: institutions reduce anarchy costs. Interdependence reduces war. Democratic peace theory.
+- Constructivism: social constructions matter. Identities and norms shape behaviour. Change through socialisation.
+- UN Security Council: P5 (USA/UK/France/Russia/China) veto on non-procedural matters. Chapter VII = military force authorisation.
+- Current geopolitics: US-China rivalry (semiconductors, AI, Taiwan). Russia-NATO (Ukraine war, Article 5 credibility). Middle East volatility. Global South rising (BRICS+, AU in G20).
+- Sanctions: Financial (SWIFT exclusion, SDN list) | Trade (export controls, embargoes) | Secondary (penalise third countries). Effectiveness debated — often entrenches leadership while harming population.
+
+## Economic Policy
+- Fiscal policy: G + T = fiscal stance. Automatic stabilisers. Keynesian multiplier k = 1/(1-MPC). Debt sustainability: primary balance = (r-g)*d. If r>g, requires primary surplus.
+- Monetary policy: Taylor Rule: i = r* + pi + 0.5*(pi-pi*) + 0.5*(y-y*). ZLB → QE + forward guidance. Inflation target 2% in most advanced economies.
+- Trade policy: Comparative advantage = free trade maximises global welfare. Political economy of protectionism: concentrated benefits, diffuse costs.
+- Climate policy: Carbon tax (price certainty) vs cap-and-trade (quantity certainty). Paris NDCs: bottom-up, 5-year review cycles. Loss and damage fund (COP27-28).
+- Tech governance: EU DSA/DMA (platform regulation, gatekeeper obligations). EU AI Act (unacceptable/high/limited/minimal risk tiers). US Section 230 debate.
+
+## Leadership
+- Communication: Framing (Lakoff) — never use opponent's frame. Bridge technique: acknowledge question, redirect to message. Message discipline: 3 key messages per appearance.
+- Crisis management: OODA loop (Observe, Orient, Decide, Act). First mover advantage in narrative. Churchill model: honest about difficulty + moral clarity + action.
+- Historical models: Lincoln (team of rivals, moral clarity). Mandela (reconciliation over retribution, Ubuntu). Merkel (rational incrementalism, science-informed). De Gaulle (national narrative, institutional design).
+- Negotiation: BATNA (best alternative to negotiated agreement). ZOPA (zone of possible agreement). Two-level games (Putnam): domestic ratification constrains international negotiations.

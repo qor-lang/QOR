@@ -1,0 +1,96 @@
+;; ══════════════════════════════════════════════════════════════════════
+;; ── Puzzle Solver Agent — Retry Until Solved ──────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+;;
+;; QOR DECIDES what strategy to use on each attempt.
+;; Rust provides the loop: try → check → feedback → retry.
+;;
+;; On each attempt, Rust asserts:
+;;   (attempt-number task N)        — current attempt
+;;   (attempt-failed task M)        — for each previous failed attempt M
+;;
+;; QOR uses attempt-failed facts to avoid repeating the same strategy.
+;; Templates fire based on obs-consistent / obs-parameter / color-remap.
+;; Different attempts prioritize different observations.
+;;
+
+;; ── Agent Identity ──────────────────────────────────────────────────
+
+(agent-type puzzle-solver) <0.99, 0.99>
+
+;; ── Strategy Selection Per Attempt ──────────────────────────────────
+;; QOR tells Rust which strategy to prioritize by asserting
+;; (use-strategy attempt-N strategy-name) facts.
+;; Templates check these to decide whether to fire.
+;;
+;; Attempt 1: Try all detected observations (highest confidence first)
+;; Attempt 2: If color-remap failed, try rotate/reflect
+;; Attempt 3: Try composed transforms
+;; Attempt 4: Try identity-with-modifications
+;; Attempt 5: Last resort — pure identity
+
+;; By default, all observations trigger their templates.
+;; After failures, QOR can suppress specific strategies by asserting
+;; (suppress-strategy strategy-name) facts.
+
+;; ── Learn Rules ─────────────────────────────────────────────────────
+;; What facts to save when a puzzle is solved correctly.
+;; Rust collects these and writes to learned.qor.
+
+(save-known-transform $task $transform) if
+    (obs-consistent $transform) <0.95, 0.95>
+
+(save-known-remap $task $from $to) if
+    (obs-parameter color-remap $from $to) <0.95, 0.95>
+
+(save-known-shift $task $dr $dc) if
+    (obs-parameter shift-dr $dr)
+    (obs-parameter shift-dc $dc) <0.95, 0.95>
+
+;; Save per-pair color remap facts that worked
+(save-known-pair-remap $task $from $to) if
+    (color-remap $inp $out $from $to) <0.90, 0.90>
+
+;; ── Confidence-Based Strategy ──────────────────────────────────────
+;; Rust injects (solve-confidence $id $score) and (attempt-number $id $N).
+;; QOR reads these to decide strategy. Confidence = previous accuracy.
+
+;; High confidence (>0.70): keep current approach, just refine
+(strategy refine) if
+    (solve-confidence $id $conf)
+    (> $conf 0.70) <0.85, 0.85>
+
+;; Medium confidence (0.50–0.70): try different transforms
+(strategy alternate) if
+    (solve-confidence $id $conf)
+    (> $conf 0.50)
+    (< $conf 0.70) <0.80, 0.80>
+
+;; Low confidence (<0.50): activate web lookup
+(strategy web-lookup) if
+    (solve-confidence $id $conf)
+    (< $conf 0.50) <0.90, 0.90>
+
+;; First attempt (no confidence yet): try everything
+(strategy try-all) if
+    (attempt-number $id 1)
+    not (solve-confidence $id $any) <0.85, 0.85>
+
+;; ── Strategy-Based Suppression ────────────────────────────────────
+;; When strategy is "alternate", suppress the transform that already failed.
+;; Previous failures are marked by (attempt-failed $id $N).
+
+;; After 3+ failures, suppress color-remap (try spatial transforms instead)
+(suppress-strategy color-remap) if
+    (attempt-failed $id 3) <0.80, 0.80>
+
+;; After 4+ failures, suppress spatial too — web is the only hope
+(suppress-strategy spatial-transform) if
+    (attempt-failed $id 4) <0.75, 0.75>
+
+;; ── Confidence Boosting ─────────────────────────────────────────────
+;; If QOR solved a similar puzzle before, boost confidence
+
+(high-confidence-prediction $task) if
+    (obs-consistent $transform)
+    (save-known-transform $prev $transform) <0.95, 0.90>
