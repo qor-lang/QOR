@@ -1,0 +1,8 @@
+[package]
+name = "qor-core"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Core types and parser for QORlang"
+
+[dependencies]

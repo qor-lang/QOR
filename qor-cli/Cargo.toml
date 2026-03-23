@@ -1,0 +1,19 @@
+[package]
+name = "qor-cli"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "CLI and REPL for QORlang"
+
+[[bin]]
+name = "qor"
+path = "src/main.rs"
+
+[dependencies]
+qor-core = { path = "../qor-core" }
+qor-runtime = { path = "../qor-runtime" }
+qor-bridge = { path = "../qor-bridge" }
+qor-inference = { path = "../qor-inference" }
+
+[features]
+web = ["qor-bridge/web"]

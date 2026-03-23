@@ -1,0 +1,30 @@
+[package]
+name = "qor-agent"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "qor-agent"
+path = "src/main.rs"
+
+[[bin]]
+name = "arc3"
+path = "src/bin/arc3.rs"
+
+[features]
+default = ["datafrog"]
+datafrog = ["qor-runtime/datafrog"]
+
+[dependencies]
+qor-runtime = { path = "../qor-runtime" }
+qor-core    = { path = "../qor-core" }
+qor-bridge  = { path = "../qor-bridge" }
+agentchrome = "1.3"
+tokio       = { version = "1", features = ["rt-multi-thread", "macros", "sync", "time", "process"] }
+serde       = { version = "1", features = ["derive"] }
+serde_json  = "1"
+ureq        = { version = "2", features = ["cookies"] }
+anyhow      = "1"
+zip         = "2"
+dirs        = "6"
+ctrlc       = "3"

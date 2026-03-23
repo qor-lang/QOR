@@ -1,0 +1,14 @@
+[package]
+name = "qor-py"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "qor_py"
+crate-type = ["cdylib"]
+
+[dependencies]
+pyo3 = { version = "0.24", features = ["extension-module"] }
+qor-core    = { path = "../qor-core" }
+qor-runtime = { path = "../qor-runtime" }
+qor-bridge  = { path = "../qor-bridge", default-features = false }

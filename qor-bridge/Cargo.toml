@@ -1,0 +1,26 @@
+[package]
+name = "qor-bridge"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Universal data ingestion bridge for QORlang"
+
+[dependencies]
+qor-core = { path = "../qor-core" }
+qor-runtime = { path = "../qor-runtime" }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+csv = "1"
+regex = "1"
+flate2 = "1"
+nom = "7"
+parquet = "54"
+spider = { version = "2", optional = true }
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "sync", "time"], optional = true }
+ureq = "2"
+ndarray = "0.16"
+
+[features]
+web = ["spider", "tokio"]
+
+[dev-dependencies]

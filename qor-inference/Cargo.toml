@@ -1,0 +1,10 @@
+[package]
+name = "qor-inference"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Reasoning engine for QORlang"
+
+[dependencies]
+qor-core = { path = "../qor-core" }
+qor-runtime = { path = "../qor-runtime" }
