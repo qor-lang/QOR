@@ -1,0 +1,73 @@
+;; ── CTO DNA — Technology Reasoning Rules ──────────────────────────────
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── SYSTEM HEALTH ────────────────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+
+(system-healthy $svc) if (uptime $svc $u) (> $u 99.9) (error-rate $svc $e) (< $e 0.1) <0.90, 0.90>
+(system-degraded $svc) if (uptime $svc $u) (< $u 99.5) <0.85, 0.85>
+(system-critical $svc) if (uptime $svc $u) (< $u 99.0) <0.90, 0.90>
+(latency-ok $svc) if (p99-latency $svc $l) (< $l 200) <0.85, 0.85>
+(latency-problem $svc) if (p99-latency $svc $l) (> $l 500) <0.85, 0.85>
+
+;; Scaling
+(needs-scaling $svc) if (cpu-usage $svc $cpu) (> $cpu 80) <0.85, 0.85>
+(needs-scaling $svc) if (memory-usage $svc $mem) (> $mem 85) <0.85, 0.85>
+(over-provisioned $svc) if (cpu-usage $svc $cpu) (< $cpu 20) (memory-usage $svc $mem) (< $mem 30) <0.80, 0.80>
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── TECHNICAL DEBT ───────────────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+
+(high-tech-debt $repo) if (code-coverage $repo $cov) (< $cov 50) <0.80, 0.80>
+(high-tech-debt $repo) if (avg-pr-time $repo $days) (> $days 5) <0.75, 0.75>
+(legacy-risk $system) if (age-years $system $age) (> $age 8) not (recent-refactor $system) <0.80, 0.80>
+(dependency-risk $system) if (outdated-deps $system $n) (> $n 10) <0.80, 0.80>
+(refactor-needed $system) if (high-tech-debt $system) (change-frequency $system high) <0.80, 0.75>
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── SECURITY ─────────────────────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+
+(security-risk $system critical) if (vulnerability $system $vuln) (severity $vuln critical) <0.95, 0.95>
+(security-risk $system high) if (vulnerability $system $vuln) (severity $vuln high) <0.90, 0.90>
+(needs-patching $system) if (security-risk $system $level) <0.90, 0.85>
+(data-exposure-risk $system) if (pii-stored $system) not (encryption-at-rest $system) <0.90, 0.90>
+(compliance-risk $system) if (pii-stored $system) not (audit-log $system) <0.85, 0.85>
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── ARCHITECTURE DECISIONS ───────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+
+(microservice-candidate $module) if (team-size $module $t) (> $t 5) (independent-deployment $module) <0.75, 0.75>
+(monolith-appropriate $system) if (team-size $system $t) (< $t 10) (low-scale $system) <0.80, 0.75>
+(single-point-failure $system $component) if (dependency $system $component) not (redundancy $component) <0.85, 0.85>
+(cache-needed $endpoint) if (latency-problem $endpoint) (read-heavy $endpoint) <0.80, 0.80>
+(db-bottleneck $system) if (latency-problem $system) (db-query-time $system $qt) (> $qt 100) <0.85, 0.85>
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── TEAM & PROCESS ───────────────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+
+(understaffed $team) if (open-positions $team $n) (> $n 3) <0.80, 0.80>
+(bus-factor-risk $system) if (primary-contributors $system $n) (< $n 2) <0.85, 0.85>
+(velocity-declining $team) if (sprint-velocity $team $v) (prior-velocity $team $pv) (< $v $pv) <0.80, 0.80>
+(deployment-risk $system) if (deploy-frequency $system $f) (< $f 1) (change-batch-size $system large) <0.80, 0.80>
+(ci-broken $repo) if (build-status $repo failing) <0.95, 0.90>
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── BUILD VS BUY ─────────────────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+
+(build-recommended $need) if (core-competency $need) (competitive-advantage $need) <0.80, 0.75>
+(buy-recommended $need) if (commodity $need) not (core-competency $need) <0.80, 0.75>
+(open-source-option $need) if (oss-solution $need $project) (community-health $project active) <0.75, 0.75>
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── DATA & ML ────────────────────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+
+(data-quality-issue $dataset) if (missing-rate $dataset $mr) (> $mr 10) <0.80, 0.80>
+(model-drift $model) if (accuracy-drop-pct $model $drop) (> $drop 10) <0.85, 0.85>
+(retrain-needed $model) if (model-drift $model) <0.85, 0.80>
+(ml-appropriate $problem) if (data-available $problem) (pattern-exists $problem) (scale $problem large) <0.75, 0.75>

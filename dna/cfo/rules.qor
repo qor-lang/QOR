@@ -1,0 +1,73 @@
+;; ── CFO DNA — Financial Reasoning Rules ──────────────────────────────
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── FINANCIAL RATIOS ─────────────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+
+;; Liquidity
+(healthy-liquidity $co) if (current-ratio $co $cr) (> $cr 1.5) <0.90, 0.85>
+(liquidity-risk $co) if (current-ratio $co $cr) (< $cr 1.0) <0.90, 0.90>
+(excess-liquidity $co) if (current-ratio $co $cr) (> $cr 3.0) <0.80, 0.80>
+
+;; Profitability
+(gross-margin-healthy $co) if (gross-margin $co $gm) (> $gm 40) <0.85, 0.85>
+(margin-compression $co) if (gross-margin $co $gm) (prior-gross-margin $co $pgm) (< $gm $pgm) <0.85, 0.85>
+(ebitda-positive $co) if (ebitda $co $e) (> $e 0) <0.90, 0.90>
+(roi-acceptable $project) if (roi $project $r) (> $r 15) <0.85, 0.80>
+
+;; Leverage
+(safe-leverage $co) if (debt-equity $co $de) (< $de 1.5) <0.85, 0.85>
+(high-leverage $co) if (debt-equity $co $de) (> $de 2.5) <0.85, 0.85>
+(interest-coverage-ok $co) if (interest-coverage $co $ic) (> $ic 3) <0.85, 0.85>
+(default-risk $co) if (interest-coverage $co $ic) (< $ic 1.5) <0.90, 0.90>
+
+;; Efficiency
+(efficient-collections $co) if (dso $co $d) (< $d 45) <0.85, 0.85>
+(slow-collections $co) if (dso $co $d) (> $d 90) <0.85, 0.85>
+(inventory-bloat $co) if (dio $co $d) (> $d 90) <0.80, 0.80>
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── BUDGET & FORECAST ────────────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+
+(over-budget $dept $pct) if (budget $dept $budgeted) (actual-spend $dept $actual) (> $actual $budgeted) <0.90, 0.85>
+(under-budget $dept $pct) if (budget $dept $budgeted) (actual-spend $dept $actual) (< $actual $budgeted) <0.90, 0.85>
+(variance-material $dept) if (over-budget $dept $pct) (> $pct 10) <0.85, 0.85>
+(forecast-miss $quarter) if (revenue-forecast $quarter $f) (revenue-actual $quarter $a) (< $a $f) <0.85, 0.85>
+(beat-forecast $quarter) if (revenue-forecast $quarter $f) (revenue-actual $quarter $a) (> $a $f) <0.85, 0.85>
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── CASH FLOW ────────────────────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+
+(positive-ocf $co) if (operating-cash-flow $co $ocf) (> $ocf 0) <0.90, 0.90>
+(cash-burn $co) if (operating-cash-flow $co $ocf) (< $ocf 0) <0.90, 0.90>
+(free-cash-flow-positive $co) if (free-cash-flow $co $fcf) (> $fcf 0) <0.90, 0.90>
+(capex-heavy $co) if (capex-ratio $co $cr) (> $cr 20) <0.80, 0.80>
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── TAX & COMPLIANCE ─────────────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+
+(tax-efficient $co) if (effective-tax-rate $co $etr) (< $etr 25) <0.80, 0.80>
+(tax-exposure $co) if (tax-dispute $co $amount) (> $amount 1000000) <0.85, 0.85>
+(audit-risk $co) if (aggressive-position $co $item) <0.80, 0.80>
+(sox-compliant $co) if (internal-controls $co effective) (audit-opinion $co clean) <0.85, 0.85>
+(material-weakness $co) if (internal-controls $co deficient) <0.90, 0.90>
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── CAPITAL ALLOCATION ───────────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+
+(dividend-sustainable $co) if (payout-ratio $co $pr) (< $pr 60) (positive-ocf $co) <0.85, 0.80>
+(buyback-appropriate $co) if (undervalued $co) (free-cash-flow-positive $co) <0.80, 0.75>
+(raise-capital $co) if (burn-rate-concern $co) (growth-opportunity $co high) <0.80, 0.80>
+(debt-refinance $co) if (debt-maturity $co $months) (< $months 12) <0.85, 0.85>
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── VALUATION ────────────────────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+
+(undervalued $co) if (pe-ratio $co $pe) (industry-pe $industry $ipe) (< $pe $ipe) <0.75, 0.75>
+(overvalued $co) if (pe-ratio $co $pe) (industry-pe $industry $ipe) (> $pe $ipe) <0.75, 0.75>
+(fair-value $co) if (dcf-premium-pct $co $pct) (> $pct -20) (< $pct 20) <0.75, 0.75>

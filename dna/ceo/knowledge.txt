@@ -1,0 +1,35 @@
+# CEO KNOWLEDGE CORE
+
+## Strategy
+- Porter's Five Forces: Competitive rivalry + Supplier power + Buyer power + Threat of new entrants + Threat of substitutes = industry attractiveness
+- Three Horizons: H1 (defend core, 70% resources) + H2 (emerging, 20%) + H3 (seed future, 10%). Most companies die by neglecting H3.
+- Jobs to Be Done: Customers hire products to do jobs. Understand the job, own the market. Disruption = cheaper solution does same job well enough.
+- OKRs (Doerr): Objectives = qualitative direction. Key Results = measurable, time-bound. 70% = success. Radical transparency.
+- Flywheel (Collins/Bezos): Virtuous cycle that creates compounding returns. Amazon: low prices → more customers → more sellers → lower costs → lower prices.
+- Blue Ocean: Eliminate-Reduce-Raise-Create grid. Value innovation = differentiation + low cost simultaneously.
+
+## Unit Economics
+- CAC = total sales & marketing spend / new customers acquired
+- LTV = (ARPU * gross margin %) / churn rate (SaaS)
+- LTV:CAC: <1 = dying, 1-3 = marginal, 3:1 = healthy, >5 = underinvesting
+- CAC payback: target <12 months (consumer), <18 months (SMB SaaS), <24 months (enterprise)
+- Rule of 40: Revenue growth % + FCF margin % >= 40 = healthy SaaS
+- Gross margin benchmarks: SaaS 70-80%+, Marketplace 50-70%, DTC physical 40-60%, Hardware 30-50%
+
+## Fundraising
+- SAFE: convertible at next priced round with discount (15-25%) or valuation cap. Fast, cheap, no board seat.
+- Term sheet key terms: Pre-money valuation | Liquidation preference (1x non-participating = clean; 2x participating = avoid) | Anti-dilution (broad-based weighted average = fair; full ratchet = punitive) | Board composition
+- Series stages: Seed (PMF signal, founding team, $1-3M) → A (repeatable acquisition, $5-15M) → B (scale, $20-50M)
+
+## Organisation
+- Scaling stages: 0-10 (founder does everything) → 10-50 (functional leads) → 50-200 (management layer) → 200-500 (VP layer) → 500+ (divisional)
+- High talent density (Hastings): Adequate performance = generous severance. Keeper test: "Would I fight to keep this person?"
+- Radical candour (Scott): Care Personally + Challenge Directly. Ruinous empathy = care without challenge (most common failure).
+- Amazon Working Backwards: Press release first → FAQ → mockup → working document. Customer outcome determines what you build.
+- Decision types: One-way doors (irreversible, go slow, senior) vs two-way doors (reversible, go fast, delegate). Most decisions = two-way.
+
+## Board Management
+- No surprises. Send pre-read 1 week before.
+- Board memo format: metrics vs plan + narrative + key risks + decisions needed
+- Investor updates: KPIs + key wins + key challenges + key risks + asks
+- Fiduciary duties: Duty of care + Duty of loyalty + Business judgment rule

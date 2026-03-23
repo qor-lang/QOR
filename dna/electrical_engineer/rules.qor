@@ -1,0 +1,230 @@
+;; ── Electrical Engineer DNA — Circuit & Systems Reasoning Rules ────────
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── CIRCUIT FUNDAMENTALS ────────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+
+;; Current and voltage conditions
+(overcurrent $circuit) if (current $circuit $i) (rated-current $circuit $max) (> $i $max) <0.90, 0.90>
+(undervoltage $node) if (voltage $node $v) (min-voltage $node $vmin) (< $v $vmin) <0.85, 0.85>
+(overvoltage $node) if (voltage $node $v) (max-voltage $node $vmax) (> $v $vmax) <0.90, 0.90>
+(voltage-drop-excessive $path) if (voltage-drop-pct $path $pct) (> $pct 10) <0.80, 0.80>
+
+;; Power dissipation
+(thermal-concern $component) if (power-utilization $component $pct) (> $pct 80) <0.85, 0.85>
+(thermal-failure-risk $component) if (power-utilization $component $pct) (> $pct 100) <0.95, 0.95>
+(junction-overtemp $device) if (junction-temp $device $tj) (max-junction-temp $device $tjmax) (> $tj $tjmax) <0.90, 0.90>
+(needs-heatsink $device) if (thermal-concern $device) (package $device $pkg) <0.85, 0.80>
+(derating-needed $component) if (ambient-temp $env $ta) (> $ta 50) <0.80, 0.80>
+
+;; Impedance
+(impedance-mismatch $line) if (mismatch-pct $line $pct) (> $pct 10) <0.80, 0.80>
+(reflection-risk $line) if (impedance-mismatch $line) (frequency $line $f) (> $f 100000000) <0.85, 0.85>
+(matched-impedance $line) if (mismatch-pct $line $pct) (< $pct 5) <0.85, 0.85>
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── SEMICONDUCTOR ANALYSIS ──────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+
+;; MOSFET operating region
+(mosfet-cutoff $device) if (vgs $device $vgs) (vth $device $vth) (< $vgs $vth) <0.90, 0.90>
+(mosfet-saturation $device) if (vgs-minus-vth $device $vov) (> $vov 0) (vds $device $vds) (> $vds $vov) <0.85, 0.85>
+(mosfet-triode $device) if (vgs-minus-vth $device $vov) (> $vov 0) (vds $device $vds) (< $vds $vov) <0.85, 0.85>
+
+;; BJT states
+(bjt-cutoff $device) if (vbe $device $vbe) (< $vbe 0.6) <0.85, 0.85>
+(bjt-active $device) if (vbe $device $vbe) (> $vbe 0.6) (vce $device $vce) (> $vce 0.2) <0.85, 0.85>
+(bjt-saturated $device) if (vbe $device $vbe) (> $vbe 0.6) (vce $device $vce) (< $vce 0.2) <0.85, 0.85>
+
+;; Diode analysis
+(diode-forward $diode) if (vf $diode $vf) (> $vf 0.3) <0.85, 0.85>
+(diode-reverse $diode) if (vr $diode $vr) (> $vr 0) <0.85, 0.85>
+(diode-breakdown-risk $diode) if (reverse-utilization $diode $pct) (> $pct 80) <0.90, 0.90>
+
+;; Op-amp conditions
+(opamp-saturated-high $opamp) if (output-voltage $opamp $vo) (supply-positive $opamp $vp) (> $vo $vp) <0.85, 0.85>
+(opamp-saturated-low $opamp) if (output-voltage $opamp $vo) (supply-negative $opamp $vn) (< $vo $vn) <0.85, 0.85>
+(gain-bandwidth-issue $opamp) if (required-gbw $opamp $req) (gbw $opamp $gbw) (> $req $gbw) <0.85, 0.85>
+(slew-limit $opamp) if (output-rate $opamp $dv) (slew-rate $opamp $sr) (> $dv $sr) <0.85, 0.85>
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── POWER SUPPLY DESIGN ────────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+
+;; Regulation
+(regulation-poor $supply) if (load-regulation $supply $lr) (> $lr 5) <0.80, 0.80>
+(line-regulation-poor $supply) if (line-regulation $supply $lr) (> $lr 3) <0.80, 0.80>
+(ripple-excessive $supply) if (ripple-pct $supply $rp) (> $rp 2) <0.85, 0.85>
+
+;; Converter topology selection
+(use-buck $design) if (vin $design $vi) (vout $design $vo) (< $vo $vi) (efficiency-target $design $e) (> $e 85) <0.80, 0.75>
+(use-boost $design) if (vin $design $vi) (vout $design $vo) (> $vo $vi) <0.80, 0.75>
+(use-buck-boost $design) if (vin-overlaps-vout $design) <0.75, 0.75>
+(use-ldo $design) if (vin $design $vi) (vout $design $vo) (< $vo $vi) (dropout $design $d) (< $d 2) (current $design $i) (< $i 1) <0.80, 0.80>
+(use-flyback $design) if (isolation-required $design) (power $design $p) (< $p 100) <0.75, 0.75>
+
+;; Duty cycle analysis
+(dcm-risk $converter) if (load-current $converter $il) (critical-current $converter $ic) (< $il $ic) <0.80, 0.80>
+(duty-cycle-high $converter) if (duty-cycle $converter $d) (> $d 0.7) <0.80, 0.80>
+(duty-cycle-extreme $converter) if (duty-cycle $converter $d) (> $d 0.85) <0.85, 0.85>
+
+;; Power factor
+(pf-poor $load) if (power-factor $load $pf) (< $pf 0.8) <0.85, 0.85>
+(pf-correction-needed $load) if (pf-poor $load) (power $load $p) (> $p 75) <0.85, 0.80>
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── SIGNAL INTEGRITY ────────────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+
+;; Noise analysis
+(snr-poor $signal) if (snr $signal $s) (< $s 20) <0.85, 0.85>
+(snr-adequate $signal) if (snr $signal $s) (> $s 40) <0.85, 0.85>
+(noise-dominated $signal) if (snr $signal $s) (< $s 6) <0.90, 0.90>
+(quantization-limited $adc) if (enob $adc $bits) (required-bits $adc $req) (< $bits $req) <0.85, 0.85>
+
+;; Aliasing
+(aliasing-risk $system) if (signal-freq $system $fs) (nyquist-freq $system $fn) (> $fs $fn) <0.90, 0.90>
+(nyquist-ok $system) if (signal-freq $system $fs) (nyquist-freq $system $fn) (< $fs $fn) <0.85, 0.85>
+(antialiasing-needed $system) if (aliasing-risk $system) <0.85, 0.85>
+
+;; Filter requirements
+(lowpass-needed $signal) if (noise-above-signal $signal) <0.80, 0.80>
+(highpass-needed $signal) if (dc-offset $signal $dc) (> $dc 0.1) <0.75, 0.75>
+(notch-needed $signal) if (interference-freq $signal $fi) <0.80, 0.80>
+(bandpass-needed $signal) if (lowpass-needed $signal) (highpass-needed $signal) <0.75, 0.75>
+
+;; Crosstalk and EMI
+(crosstalk-risk $trace) if (spacing-height-ratio $trace $ratio) (< $ratio 3) <0.80, 0.80>
+(emi-risk $circuit) if (switching-freq $circuit $f) (> $f 1000000) (unshielded $circuit) <0.80, 0.80>
+(emi-compliance-risk $product) if (emi-risk $product) not (emi-filter $product) <0.85, 0.80>
+(ground-loop $system) if (ground-points $system $n) (> $n 1) (analog-signal $system) <0.75, 0.75>
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── PCB DESIGN ──────────────────────────────────────════════════════
+;; ══════════════════════════════════════════════════════════════════════
+
+;; Trace sizing
+(trace-too-narrow $trace) if (current-density $trace $jd) (> $jd 30) <0.80, 0.80>
+(via-current-limit $via) if (current $via $i) (> $i 0.5) (single-via $via) <0.80, 0.80>
+(controlled-impedance-needed $trace) if (frequency $trace $f) (> $f 50000000) (length $trace $l) (> $l 0.05) <0.85, 0.85>
+
+;; Layer stack
+(four-layer-needed $pcb) if (mixed-signal $pcb) <0.80, 0.75>
+(four-layer-needed $pcb) if (high-speed $pcb) (frequency $pcb $f) (> $f 100000000) <0.85, 0.80>
+(ground-plane-needed $pcb) if (analog-signal $pcb) <0.85, 0.85>
+(ground-plane-needed $pcb) if (high-speed $pcb) <0.85, 0.85>
+
+;; Decoupling
+(decoupling-needed $ic) if (digital $ic) <0.90, 0.85>
+(bulk-cap-needed $rail) if (transient-current $rail $di) (> $di 1) <0.85, 0.85>
+(ceramic-preferred $cap) if (esr-critical $cap) (frequency $cap $f) (> $f 1000000) <0.85, 0.85>
+
+;; Thermal
+(copper-pour-needed $pcb) if (power-dissipation $pcb $p) (> $p 2) <0.80, 0.80>
+(thermal-via-needed $component) if (thermal-pad $component) (power-dissipated $component $p) (> $p 0.5) <0.85, 0.85>
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── DIGITAL DESIGN ──────────────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+
+;; Timing
+(setup-violation $ff) if (setup-slack $ff $slack) (< $slack 0) <0.90, 0.90>
+(hold-violation $ff) if (hold-slack $ff $slack) (< $slack 0) <0.90, 0.90>
+(metastability-risk $ff) if (async-input $ff) not (synchronizer $ff) <0.85, 0.85>
+(cdc-issue $signal) if (clock-domain $signal $cd1) (destination-domain $signal $cd2) not (synchronizer $signal) <0.90, 0.90>
+
+;; Logic level
+(level-shift-needed $interface) if (voltage-a $interface $va) (voltage-b $interface $vb) (> $va $vb) <0.85, 0.85>
+(logic-incompatible $a $b) if (logic-family $a $fa) (logic-family $b $fb) (vol $a $vol) (vih $b $vih) (> $vol $vih) <0.85, 0.85>
+
+;; State machine
+(state-unreachable $fsm $state) if (state $fsm $state) not (transition-to $fsm $state) <0.80, 0.80>
+(deadlock-possible $fsm) if (state $fsm $s1) (state $fsm $s2) (transition $fsm $s1 $s2) (transition $fsm $s2 $s1) not (exit-condition $fsm $s1) <0.75, 0.75>
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── EMBEDDED SYSTEMS ────────────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+
+;; Resource constraints
+(flash-full $mcu) if (flash-utilization $mcu $pct) (> $pct 90) <0.85, 0.85>
+(ram-tight $mcu) if (ram-utilization $mcu $pct) (> $pct 80) <0.85, 0.85>
+(stack-overflow-risk $task) if (stack-utilization $task $pct) (> $pct 85) <0.90, 0.90>
+(cpu-overloaded $mcu) if (cpu-utilization $mcu $u) (> $u 85) <0.85, 0.85>
+
+;; RTOS analysis
+(priority-inversion-risk $system) if (mutex $system $m) (high-priority-task $system $h) (low-priority-task $system $l) (shared-resource $h $l $m) <0.80, 0.80>
+(deadline-miss $task) if (wcet $task $w) (deadline $task $d) (> $w $d) <0.90, 0.90>
+(schedulable $system) if (cpu-utilization $system $u) (< $u 69) <0.80, 0.80>
+(dma-needed $peripheral) if (data-rate $peripheral $r) (> $r 1000000) <0.80, 0.80>
+
+;; Peripherals
+(adc-resolution-insufficient $adc) if (lsb-voltage $adc $lsb) (required-resolution $adc $req) (> $lsb $req) <0.85, 0.85>
+(uart-baud-mismatch $link) if (baud-error-pct $link $pct) (> $pct 3) <0.85, 0.85>
+(spi-too-fast $bus) if (spi-clock $bus $clk) (max-spi $bus $max) (> $clk $max) <0.85, 0.85>
+(i2c-pullup-needed $bus) if (i2c $bus) not (pullup-resistor $bus) <0.90, 0.85>
+
+;; Watchdog
+(watchdog-needed $system) if (safety-critical $system) <0.90, 0.85>
+(watchdog-timeout-risk $system) if (loop-time-ratio $system $ratio) (> $ratio 0.7) <0.85, 0.85>
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── MOTOR CONTROL ───────────────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+
+(motor-stall $motor) if (speed $motor $s) (< $s 5) (current-ratio $motor $cr) (> $cr 0.8) <0.85, 0.85>
+(motor-overloaded $motor) if (current $motor $i) (rated-current $motor $ir) (> $i $ir) <0.85, 0.85>
+(back-emf-issue $motor) if (bemf-supply-ratio $motor $ratio) (> $ratio 0.9) <0.80, 0.80>
+(foc-needed $motor) if (motor-type $motor pmsm) (precision-required $motor) <0.80, 0.75>
+(dead-time-needed $bridge) if (h-bridge $bridge) <0.90, 0.85>
+(shoot-through-risk $bridge) if (h-bridge $bridge) not (dead-time $bridge) <0.95, 0.90>
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── COMMUNICATIONS ──────────────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+
+(ber-poor $link) if (bit-error-rate $link $ber) (> $ber 0.001) <0.85, 0.85>
+(link-margin-ok $link) if (link-margin $link $m) (> $m 10) <0.85, 0.85>
+(link-margin-poor $link) if (link-margin $link $m) (< $m 3) <0.85, 0.85>
+(modulation-upgrade $link) if (ber-poor $link) (snr $link $snr) (> $snr 20) <0.75, 0.75>
+
+;; Protocol selection
+(use-can $bus) if (automotive $bus) (noise-environment $bus harsh) <0.80, 0.75>
+(use-spi $bus) if (high-speed-data $bus) (short-distance $bus) (point-to-point $bus) <0.80, 0.75>
+(use-i2c $bus) if (low-speed $bus) (multi-device $bus) <0.80, 0.75>
+(use-uart $bus) if (point-to-point $bus) (asynchronous $bus) <0.75, 0.75>
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── SAFETY & COMPLIANCE ─────────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+
+(safety-critical $system) if (application $system medical) <0.95, 0.95>
+(safety-critical $system) if (application $system automotive) <0.90, 0.90>
+(safety-critical $system) if (application $system aerospace) <0.95, 0.95>
+(isolation-needed $circuit) if (mains-connected $circuit) (user-accessible $circuit) <0.95, 0.95>
+(fuse-needed $circuit) if (overcurrent $circuit) <0.90, 0.85>
+(fuse-needed $circuit) if (mains-connected $circuit) <0.95, 0.95>
+(esd-protection-needed $pin) if (user-accessible $pin) <0.90, 0.85>
+(tvs-needed $port) if (external-connection $port) <0.85, 0.85>
+
+;; Multi-step: component failure analysis chain
+(component-stressed $comp) if (thermal-concern $comp) <0.85, 0.80>
+(component-stressed $comp) if (overcurrent $comp) <0.90, 0.85>
+(early-failure-risk $comp) if (component-stressed $comp) (operating-hours $comp $h) (> $h 1000) <0.80, 0.75>
+(system-reliability-concern $system) if (early-failure-risk $comp) (critical-component $system $comp) <0.80, 0.75>
+(redundancy-needed $system) if (system-reliability-concern $system) (safety-critical $system) <0.85, 0.80>
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── BATTERY & ENERGY ────────────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+
+(battery-low $device) if (soc $device $s) (< $s 20) <0.90, 0.90>
+(battery-critical $device) if (soc $device $s) (< $s 5) <0.95, 0.95>
+(charge-rate-high $battery) if (charge-c-rate $battery $cr) (> $cr 1) <0.85, 0.85>
+(thermal-runaway-risk $battery) if (charge-rate-high $battery) (cell-temp $battery $t) (> $t 45) <0.90, 0.90>
+(cell-imbalance $pack) if (cell-voltage-spread $pack $mv) (> $mv 100) <0.85, 0.85>
+(balancing-needed $pack) if (cell-imbalance $pack) <0.85, 0.80>
+(deep-discharge-risk $battery) if (cell-voltage $battery $v) (< $v 2.5) <0.90, 0.90>
+
+;; Power budget
+(power-budget-exceeded $system) if (total-power $system $p) (budget $system $b) (> $p $b) <0.85, 0.85>
+(sleep-mode-needed $device) if (battery-powered $device) (runtime-hours $device $h) (< $h 720) <0.80, 0.80>

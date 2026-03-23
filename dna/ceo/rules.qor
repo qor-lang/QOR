@@ -1,0 +1,77 @@
+;; ── CEO DNA — Strategic Business Reasoning Rules ─────────────────────
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── MARKET POSITION ──────────────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+
+(market-leader $company) if (market-share $company $ms) (> $ms 30) <0.85, 0.85>
+(challenger $company) if (market-share $company $ms) (> $ms 15) (< $ms 30) <0.85, 0.80>
+(niche-player $company) if (market-share $company $ms) (< $ms 5) <0.85, 0.80>
+(growing-market $market) if (growth-rate $market $g) (> $g 10) <0.85, 0.85>
+(declining-market $market) if (growth-rate $market $g) (< $g 0) <0.85, 0.85>
+
+;; Competitive threat
+(competitive-threat $competitor) if (market-share $competitor $ms) (growth-rate $competitor $g) (> $g 20) <0.80, 0.80>
+(disruption-risk $market) if (new-entrant $market $entrant) (technology-advantage $entrant) <0.80, 0.80>
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── FINANCIAL HEALTH ─────────────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+
+(profitable $company) if (net-margin $company $m) (> $m 0) <0.95, 0.90>
+(highly-profitable $company) if (net-margin $company $m) (> $m 20) <0.90, 0.90>
+(cash-rich $company) if (cash-ratio $company $cr) (> $cr 2) <0.85, 0.85>
+(overleveraged $company) if (debt-equity $company $de) (> $de 3) <0.85, 0.85>
+(burn-rate-concern $company) if (runway-months $company $m) (< $m 12) <0.90, 0.90>
+(urgent-funding $company) if (runway-months $company $m) (< $m 6) <0.95, 0.95>
+
+;; Revenue health
+(revenue-growing $company) if (revenue-growth $company $g) (> $g 15) <0.85, 0.85>
+(revenue-declining $company) if (revenue-growth $company $g) (< $g 0) <0.85, 0.85>
+(customer-concentration-risk $company) if (top-customer-pct $company $p) (> $p 30) <0.85, 0.80>
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── STRATEGIC DECISIONS ──────────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+
+;; Growth strategy
+(pursue-acquisition $target) if (strategic-fit $target high) (valuation $target reasonable) (cash-rich $company) <0.75, 0.75>
+(pursue-organic-growth $segment) if (growing-market $segment) (competitive-advantage $company $segment) <0.80, 0.75>
+(pivot-needed $company) if (revenue-declining $company) (declining-market $market) <0.80, 0.80>
+
+;; Investment decisions
+(invest-r-and-d $area) if (technology-advantage $competitor) (strategic-importance $area high) <0.80, 0.75>
+(cut-costs $division) if (division-margin $division $m) (< $m 0) (> (division-age $division) 4) <0.75, 0.75>
+
+;; Hiring
+(hire-aggressively $dept) if (revenue-growing $company) (capacity-constraint $dept) <0.80, 0.75>
+(hiring-freeze $company) if (burn-rate-concern $company) <0.85, 0.80>
+(restructure $company) if (overleveraged $company) (revenue-declining $company) <0.80, 0.80>
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── RISK ASSESSMENT ──────────────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+
+(operational-risk $company) if (single-point-failure $company $system) <0.80, 0.80>
+(regulatory-risk $company) if (pending-regulation $company $reg) (impact $reg high) <0.80, 0.80>
+(reputational-risk $company) if (incident $company $type) (public-impact $type high) <0.85, 0.85>
+(key-person-risk $company) if (critical-role $company $person) not (successor $person $backup) <0.80, 0.80>
+(supply-chain-risk $company) if (single-supplier $company $category) <0.80, 0.80>
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── STAKEHOLDER MANAGEMENT ───────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+
+(board-alignment-needed $issue) if (strategic-change $issue) (board-approval-required $issue) <0.85, 0.80>
+(investor-communication $event) if (material-change $event) <0.90, 0.85>
+(employee-morale-risk $action) if (layoff $action) (> (layoff-pct $action) 10) <0.85, 0.85>
+(culture-threat $change) if (acquisition $change) (culture-mismatch $change high) <0.80, 0.80>
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── PRODUCT-MARKET FIT ───────────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+
+(product-market-fit $product) if (retention-rate $product $r) (> $r 40) (nps $product $n) (> $n 40) <0.85, 0.80>
+(no-pmf $product) if (retention-rate $product $r) (< $r 20) <0.85, 0.85>
+(scale-ready $product) if (product-market-fit $product) (unit-economics-positive $product) <0.80, 0.80>
+(premature-scaling $company) if (no-pmf $product) (hire-aggressively $dept) <0.85, 0.85>

@@ -1,0 +1,198 @@
+;; ── Doctor GP DNA — Medical Reasoning Rules ───────────────────────────
+;;
+;; Clinical reasoning through QOR forward chaining.
+;; Load via: qor chat --dna doctor_gp
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── VITAL SIGNS ASSESSMENT ───────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+
+;; Fever detection
+(fever $patient) if (temperature $patient $t) (> $t 38.0) <0.95, 0.95>
+(high-fever $patient) if (temperature $patient $t) (> $t 39.5) <0.95, 0.95>
+(hypothermia $patient) if (temperature $patient $t) (< $t 35.0) <0.95, 0.95>
+
+;; Blood pressure classification
+(hypertension $patient) if (systolic $patient $s) (> $s 140) <0.90, 0.90>
+(hypertension $patient) if (diastolic $patient $d) (> $d 90) <0.90, 0.90>
+(hypotension $patient) if (systolic $patient $s) (< $s 90) <0.90, 0.90>
+(severe-hypertension $patient) if (systolic $patient $s) (> $s 180) <0.95, 0.95>
+
+;; Heart rate
+(tachycardia $patient) if (heart-rate $patient $hr) (> $hr 100) <0.95, 0.90>
+(bradycardia $patient) if (heart-rate $patient $hr) (< $hr 60) <0.95, 0.90>
+(normal-heart-rate $patient) if (heart-rate $patient $hr) (> $hr 59) (< $hr 101) <0.95, 0.90>
+
+;; Respiratory rate
+(tachypnea $patient) if (resp-rate $patient $rr) (> $rr 20) <0.90, 0.90>
+(bradypnea $patient) if (resp-rate $patient $rr) (< $rr 12) <0.90, 0.90>
+
+;; Oxygen saturation
+(hypoxia $patient) if (spo2 $patient $sat) (< $sat 94) <0.95, 0.95>
+(severe-hypoxia $patient) if (spo2 $patient $sat) (< $sat 90) <0.98, 0.95>
+(normal-oxygen $patient) if (spo2 $patient $sat) (> $sat 94) <0.95, 0.90>
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── RED FLAG DETECTION ───────────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+
+;; Chest pain red flags
+(acs-risk $patient) if (symptom $patient chest-pain) (symptom $patient radiation-arm) <0.85, 0.90>
+(acs-risk $patient) if (symptom $patient chest-pain) (symptom $patient diaphoresis) <0.80, 0.85>
+(acs-risk $patient) if (symptom $patient chest-pain) (risk-factor $patient diabetes) <0.75, 0.80>
+(pe-risk $patient) if (symptom $patient chest-pain) (symptom $patient dyspnea) (symptom $patient tachycardia) <0.80, 0.85>
+
+;; Headache red flags
+(sah-risk $patient) if (symptom $patient thunderclap-headache) <0.90, 0.95>
+(meningitis-risk $patient) if (symptom $patient headache) (symptom $patient neck-stiffness) (fever $patient) <0.85, 0.90>
+(gca-risk $patient) if (symptom $patient headache) (symptom $patient jaw-claudication) (age $patient $a) (> $a 50) <0.80, 0.85>
+
+;; Abdominal red flags
+(appendicitis-risk $patient) if (symptom $patient abdominal-pain) (symptom $patient rif-tenderness) (fever $patient) <0.80, 0.85>
+(aaa-risk $patient) if (symptom $patient abdominal-pain) (symptom $patient pulsatile-mass) (age $patient $a) (> $a 60) <0.85, 0.90>
+(bowel-obstruction-risk $patient) if (symptom $patient abdominal-pain) (symptom $patient vomiting) (symptom $patient distension) <0.80, 0.85>
+
+;; Sepsis screening
+(sirs $patient) if (fever $patient) (tachycardia $patient) <0.80, 0.85>
+(sepsis-risk $patient) if (sirs $patient) (symptom $patient infection) <0.85, 0.90>
+(sepsis-risk $patient) if (sirs $patient) (hypotension $patient) <0.90, 0.95>
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── SYMPTOM CLUSTERS ─────────────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+
+;; Upper respiratory infection
+(uri-likely $patient) if (symptom $patient cough) (symptom $patient rhinorrhea) (fever $patient) <0.85, 0.80>
+(uri-likely $patient) if (symptom $patient sore-throat) (symptom $patient rhinorrhea) <0.80, 0.75>
+
+;; Pneumonia suspicion
+(pneumonia-likely $patient) if (symptom $patient cough) (symptom $patient productive-sputum) (fever $patient) <0.80, 0.85>
+(pneumonia-likely $patient) if (symptom $patient cough) (tachypnea $patient) (fever $patient) <0.85, 0.85>
+
+;; UTI suspicion
+(uti-likely $patient) if (symptom $patient dysuria) (symptom $patient frequency) <0.85, 0.85>
+(uti-likely $patient) if (symptom $patient dysuria) (symptom $patient suprapubic-pain) <0.80, 0.85>
+(pyelonephritis-risk $patient) if (uti-likely $patient) (fever $patient) (symptom $patient flank-pain) <0.85, 0.90>
+
+;; Cardiac
+(heart-failure-likely $patient) if (symptom $patient dyspnea) (symptom $patient orthopnea) (symptom $patient edema) <0.85, 0.85>
+(afib-likely $patient) if (symptom $patient palpitations) (symptom $patient irregular-pulse) <0.80, 0.80>
+
+;; Musculoskeletal
+(fracture-likely $patient) if (symptom $patient pain) (symptom $patient swelling) (symptom $patient deformity) <0.85, 0.85>
+(gout-likely $patient) if (symptom $patient joint-pain) (symptom $patient redness) (symptom $patient first-mtp) <0.80, 0.80>
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── RISK FACTORS ─────────────────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+
+;; Cardiovascular risk
+(cv-risk-high $patient) if (risk-factor $patient smoking) (hypertension $patient) <0.85, 0.85>
+(cv-risk-high $patient) if (risk-factor $patient diabetes) (risk-factor $patient hyperlipidemia) <0.80, 0.85>
+(cv-risk-high $patient) if (risk-factor $patient family-hx-mi) (age $patient $a) (> $a 45) <0.75, 0.80>
+
+;; Diabetes screening
+(dm-screen $patient) if (bmi $patient $b) (> $b 30) (age $patient $a) (> $a 35) <0.80, 0.80>
+(dm-likely $patient) if (lab-result $patient hba1c $val) (> $val 6.5) <0.95, 0.95>
+(pre-dm $patient) if (lab-result $patient hba1c $val) (> $val 5.7) (< $val 6.5) <0.90, 0.90>
+
+;; VTE risk
+(dvt-risk $patient) if (symptom $patient leg-swelling) (symptom $patient calf-pain) (risk-factor $patient immobility) <0.80, 0.85>
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── LAB INTERPRETATION ───────────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+
+;; Blood count
+(anemia $patient) if (lab-result $patient hemoglobin $hb) (< $hb 12) <0.90, 0.90>
+(severe-anemia $patient) if (lab-result $patient hemoglobin $hb) (< $hb 7) <0.95, 0.95>
+(leukocytosis $patient) if (lab-result $patient wbc $wbc) (> $wbc 11) <0.90, 0.90>
+(leukopenia $patient) if (lab-result $patient wbc $wbc) (< $wbc 4) <0.90, 0.90>
+(thrombocytopenia $patient) if (lab-result $patient platelets $plt) (< $plt 150) <0.90, 0.90>
+
+;; Renal function
+(aki $patient) if (lab-result $patient creatinine $cr) (> $cr 1.5) <0.85, 0.85>
+(ckd-likely $patient) if (lab-result $patient gfr $gfr) (< $gfr 60) <0.85, 0.85>
+(severe-ckd $patient) if (lab-result $patient gfr $gfr) (< $gfr 30) <0.90, 0.90>
+
+;; Liver function
+(hepatitis-likely $patient) if (lab-result $patient alt $alt) (> $alt 100) <0.80, 0.85>
+(cholestasis $patient) if (lab-result $patient alp $alp) (> $alp 300) (lab-result $patient bilirubin $bil) (> $bil 2) <0.80, 0.85>
+
+;; Metabolic
+(hyperkalemia $patient) if (lab-result $patient potassium $k) (> $k 5.5) <0.90, 0.95>
+(hypokalemia $patient) if (lab-result $patient potassium $k) (< $k 3.5) <0.90, 0.90>
+(hyponatremia $patient) if (lab-result $patient sodium $na) (< $na 135) <0.90, 0.90>
+(hypernatremia $patient) if (lab-result $patient sodium $na) (> $na 145) <0.90, 0.90>
+
+;; Inflammatory markers
+(inflammation $patient) if (lab-result $patient crp $crp) (> $crp 10) <0.85, 0.85>
+(severe-inflammation $patient) if (lab-result $patient crp $crp) (> $crp 100) <0.90, 0.90>
+
+;; Thyroid
+(hypothyroid $patient) if (lab-result $patient tsh $tsh) (> $tsh 4.5) <0.85, 0.85>
+(hyperthyroid $patient) if (lab-result $patient tsh $tsh) (< $tsh 0.4) <0.85, 0.85>
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── TREATMENT RULES ──────────────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+
+;; First-line treatments
+(treat-consider $patient acei) if (hypertension $patient) <0.85, 0.80>
+(treat-consider $patient statin) if (cv-risk-high $patient) <0.80, 0.80>
+(treat-consider $patient metformin) if (dm-likely $patient) <0.85, 0.80>
+(treat-consider $patient antibiotics) if (pneumonia-likely $patient) <0.85, 0.85>
+(treat-consider $patient antibiotics) if (pyelonephritis-risk $patient) <0.90, 0.85>
+
+;; Urgent actions
+(urgent-referral $patient) if (acs-risk $patient) <0.95, 0.95>
+(urgent-referral $patient) if (sah-risk $patient) <0.95, 0.95>
+(urgent-referral $patient) if (sepsis-risk $patient) <0.95, 0.95>
+(urgent-referral $patient) if (aaa-risk $patient) <0.95, 0.95>
+(urgent-referral $patient) if (severe-hypoxia $patient) <0.95, 0.95>
+
+;; Investigations needed
+(needs-ecg $patient) if (acs-risk $patient) <0.95, 0.95>
+(needs-ecg $patient) if (afib-likely $patient) <0.90, 0.90>
+(needs-cxr $patient) if (pneumonia-likely $patient) <0.85, 0.85>
+(needs-cxr $patient) if (heart-failure-likely $patient) <0.85, 0.85>
+(needs-blood-test $patient) if (sepsis-risk $patient) <0.95, 0.95>
+(needs-blood-test $patient) if (dm-screen $patient) <0.80, 0.80>
+(needs-urine-test $patient) if (uti-likely $patient) <0.85, 0.85>
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── DRUG INTERACTIONS & CONTRAINDICATIONS ────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+
+;; ACEi contraindications
+(contraindicated $patient acei) if (condition $patient pregnancy) <0.95, 0.95>
+(contraindicated $patient acei) if (condition $patient bilateral-renal-stenosis) <0.95, 0.95>
+(contraindicated $patient acei) if (hyperkalemia $patient) <0.90, 0.90>
+
+;; Metformin contraindications
+(contraindicated $patient metformin) if (severe-ckd $patient) <0.90, 0.90>
+
+;; NSAIDs contraindications
+(contraindicated $patient nsaid) if (condition $patient peptic-ulcer) <0.90, 0.90>
+(contraindicated $patient nsaid) if (aki $patient) <0.85, 0.85>
+(contraindicated $patient nsaid) if (heart-failure-likely $patient) <0.85, 0.85>
+
+;; Safe prescribing
+(safe-to-prescribe $patient $drug) if (treat-consider $patient $drug) not (contraindicated $patient $drug) <0.85, 0.80>
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── AGE & GENDER SCREENING ──────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+
+;; Screening recommendations
+(screen-colon-cancer $patient) if (age $patient $a) (> $a 45) <0.80, 0.80>
+(screen-breast-cancer $patient) if (gender $patient female) (age $patient $a) (> $a 40) <0.80, 0.80>
+(screen-cervical-cancer $patient) if (gender $patient female) (age $patient $a) (> $a 25) (< $a 65) <0.80, 0.80>
+(screen-aaa $patient) if (gender $patient male) (age $patient $a) (> $a 65) (risk-factor $patient smoking) <0.80, 0.80>
+
+;; Pediatric considerations
+(pediatric $patient) if (age $patient $a) (< $a 18) <0.99, 0.95>
+(neonatal $patient) if (age $patient $a) (< $a 1) <0.99, 0.95>
+(geriatric $patient) if (age $patient $a) (> $a 65) <0.99, 0.95>
+(falls-risk $patient) if (geriatric $patient) (medication $patient polypharmacy) <0.80, 0.80>
+(falls-risk $patient) if (geriatric $patient) (symptom $patient dizziness) <0.75, 0.80>

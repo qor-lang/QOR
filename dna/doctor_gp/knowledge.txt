@@ -1,0 +1,43 @@
+# MEDICAL KNOWLEDGE CORE — General Practitioner
+
+## Diagnostic Framework
+- HISTORY: Chief complaint → HPC → Past Medical History → Medications → Allergies → Family History → Social History → Systems Review
+- RED FLAGS: Chest pain + radiation + diaphoresis = ACS until proven otherwise | Worst headache of life = SAH | Sudden vision loss = emergency | Unexplained weight loss + night sweats = malignancy screen | Saddle anaesthesia + back pain = cauda equina emergency
+- DIFFERENTIALS: Always generate a ranked differential — never a single answer without alternatives
+
+## Cardiovascular
+- Hypertension: Target <130/80 (AHA). First-line: ACEi or ARB, CCB, thiazide. ABPM for confirmation.
+- Heart Failure: HFrEF (EF<40%) — ACEi + beta-blocker + MRA + SGLT2i (EMPEROR/DAPA-HF trials). Loop diuretics for fluid overload.
+- AF: CHA2DS2-VASc score for stroke risk. Score >=1 male / >=2 female = DOAC (apixaban, rivaroxaban, edoxaban). Rate vs rhythm control decision based on symptoms, age, duration.
+- DVT/PE: Wells score. D-dimer if low probability. CTPA gold standard for PE. DOAC treatment. Provoked PE = 3 months, unprovoked = 6 months minimum.
+- ACS: STEMI = emergency PCI <90 min. NSTEMI = anticoagulate, risk stratify (GRACE score), early angiography.
+
+## Respiratory
+- Asthma: GINA Steps 1-5. Step 1: SABA PRN. Step 2: Low ICS. Step 3: Low ICS/LABA. Step 4: Medium ICS/LABA. Step 5: Biologics (dupilumab, mepolizumab). Acute = SABA + prednisolone + oxygen 94-98%.
+- COPD: GOLD A-D. FEV1/FVC <0.7 confirms. LAMA first-line (GOLD B). LAMA+LABA (GOLD C/D). ICS only if eos >300 or frequent exacerbations.
+- CAP: CURB-65 (Confusion/Urea >7/RR >=30/BP <90systolic/Age >=65). 0-1 = oral amox, 2 = consider admit, >=3 = hospital. Add clarithromycin if severe/atypical.
+
+## Endocrine
+- T2DM: HbA1c target 48-53 mmol/mol. Metformin first-line. Add SGLT2i if CVD/CKD/HF. GLP-1 RA if obesity. Insulin if HbA1c not controlled.
+- Hypothyroidism: TSH high + T4 low. Levothyroxine 1.6 mcg/kg/day. Target TSH 0.5-2.5. Check 6-8 weekly until stable.
+- Addison's: Synacthen test. Replace glucocorticoid (hydrocortisone) + mineralocorticoid (fludrocortisone). Sick day rules essential.
+
+## Neurology
+- Stroke: FAST. NIHSS. Ischaemic: tPA <4.5h, thrombectomy <24h (large vessel occlusion). Haemorrhagic: BP control <140 systolic, reverse anticoagulation.
+- Epilepsy: Sodium valproate first-line (men/women without childbearing potential). Lamotrigine or levetiracetam (women of childbearing potential). Status epilepticus: lorazepam IV → levetiracetam IV → anaesthesia.
+
+## Mental Health
+- Depression: PHQ-9 >=10 = treat. SSRI (sertraline, citalopram) + CBT. Takes 4-6 weeks. Refer if self-harm risk.
+- Anxiety: GAD-7. SSRI/SNRI + CBT. Pregabalin for GAD. Avoid benzodiazepines long-term.
+- Safeguarding: Know local referral pathways. Document all concerns. Child protection: immediate referral if risk.
+
+## Pharmacology Key Interactions
+- Warfarin increased by: azithromycin, metronidazole, amiodarone, fluconazole, NSAIDs, alcohol
+- SSRIs + tramadol/MAOIs = serotonin syndrome risk
+- NSAIDs: avoid in CKD (eGFR<30), heart failure, peptic ulcer. Interact with antihypertensives (reduce effect), lithium.
+- Antibiotic stewardship: narrow spectrum, culture before treating, review at 48-72h, 5-7 days for most infections
+
+## Communication Frameworks
+- Calgary-Cambridge: Initiating → Gathering information → Examination → Explanation and planning → Closing
+- SPIKES (bad news): Setting, Perception, Invitation, Knowledge, Empathy, Summary
+- Teach-back method for health literacy. Ask-Tell-Ask.

@@ -1,0 +1,101 @@
+;; ── Data Scientist DNA — Statistical & ML Reasoning Rules ────────────
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── DATA QUALITY ─────────────────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+
+(clean-data $dataset) if (missing-pct $dataset $m) (< $m 5) (duplicate-pct $dataset $d) (< $d 1) <0.85, 0.85>
+(dirty-data $dataset) if (missing-pct $dataset $m) (> $m 20) <0.85, 0.85>
+(needs-imputation $dataset $col) if (missing-pct-col $dataset $col $m) (> $m 5) (< $m 50) <0.80, 0.80>
+(drop-column $dataset $col) if (missing-pct-col $dataset $col $m) (> $m 50) <0.80, 0.80>
+(outlier-present $dataset $col) if (zscore-max $dataset $col $z) (> $z 3) <0.80, 0.80>
+(skewed $dataset $col) if (skewness $dataset $col $s) (> $s 2) <0.80, 0.80>
+(class-imbalance $dataset) if (minority-pct $dataset $p) (< $p 10) <0.85, 0.85>
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── FEATURE ENGINEERING ──────────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+
+(high-cardinality $dataset $col) if (unique-values $dataset $col $n) (> $n 100) <0.80, 0.80>
+(low-variance $dataset $col) if (variance $dataset $col $v) (< $v 0.01) <0.80, 0.80>
+(correlated $dataset $col1 $col2) if (correlation $dataset $col1 $col2 $r) (> $r 0.8) <0.80, 0.80>
+(multicollinear $dataset) if (correlated $dataset $col1 $col2) <0.80, 0.75>
+(needs-encoding $dataset $col) if (dtype $dataset $col categorical) <0.85, 0.85>
+(needs-scaling $dataset $col) if (range-span $dataset $col $span) (> $span 1000) <0.80, 0.80>
+(target-encode $dataset $col) if (high-cardinality $dataset $col) (needs-encoding $dataset $col) <0.75, 0.75>
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── MODEL SELECTION ──────────────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+
+;; Classification
+(use-logistic $task) if (task-type $task classification) (linear-separable $task) (interpretability $task high) <0.80, 0.75>
+(use-random-forest $task) if (task-type $task classification) (features $task $n) (> $n 10) <0.75, 0.75>
+(use-xgboost $task) if (task-type $task classification) (tabular-data $task) <0.80, 0.75>
+(use-neural-net $task) if (task-type $task classification) (data-size $task $n) (> $n 100000) (non-tabular $task) <0.75, 0.75>
+
+;; Regression
+(use-linear-regression $task) if (task-type $task regression) (linear-relationship $task) (interpretability $task high) <0.80, 0.75>
+(use-ridge $task) if (task-type $task regression) (multicollinear $dataset) <0.80, 0.75>
+(use-lasso $task) if (task-type $task regression) (features $task $n) (> $n 50) <0.75, 0.75>
+
+;; Clustering
+(use-kmeans $task) if (task-type $task clustering) (spherical-clusters $task) <0.80, 0.75>
+(use-dbscan $task) if (task-type $task clustering) (noise-expected $task) <0.75, 0.75>
+
+;; Time series
+(use-arima $task) if (task-type $task timeseries) (stationary $task) <0.80, 0.75>
+(use-prophet $task) if (task-type $task timeseries) (seasonality $task) <0.75, 0.75>
+(use-lstm $task) if (task-type $task timeseries) (data-size $task $n) (> $n 10000) <0.75, 0.75>
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── MODEL EVALUATION ─────────────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+
+(overfitting $model) if (train-test-gap $model $gap) (> $gap 10) <0.85, 0.85>
+(underfitting $model) if (train-accuracy $model $ta) (< $ta 70) <0.85, 0.85>
+(good-fit $model) if (test-accuracy $model $te) (> $te 80) (train-test-gap $model $gap) (< $gap 5) <0.80, 0.80>
+
+;; Classification metrics
+(precision-issue $model $class) if (precision $model $class $p) (< $p 0.7) <0.80, 0.80>
+(recall-issue $model $class) if (recall $model $class $r) (< $r 0.7) <0.80, 0.80>
+(auc-good $model) if (auc-roc $model $a) (> $a 0.85) <0.85, 0.85>
+(auc-poor $model) if (auc-roc $model $a) (< $a 0.6) <0.85, 0.85>
+
+;; Cross-validation
+(cv-stable $model) if (cv-std $model $std) (< $std 2) <0.80, 0.80>
+(cv-unstable $model) if (cv-std $model $std) (> $std 5) <0.80, 0.80>
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── STATISTICAL TESTS ────────────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+
+(statistically-significant $test) if (p-value $test $p) (< $p 0.05) <0.85, 0.85>
+(not-significant $test) if (p-value $test $p) (> $p 0.05) <0.85, 0.85>
+(large-effect $test) if (effect-size $test $d) (> $d 0.8) <0.80, 0.80>
+(small-effect $test) if (effect-size $test $d) (< $d 0.2) <0.80, 0.80>
+(use-parametric $test) if (normal-distribution $test) (equal-variance $test) <0.80, 0.80>
+(use-nonparametric $test) if not (normal-distribution $test) <0.80, 0.80>
+
+;; Sample size
+(sample-too-small $study) if (sample-size $study $n) (< $n 30) <0.80, 0.80>
+(powered-study $study) if (power $study $p) (> $p 0.8) <0.85, 0.85>
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── PATTERN DISCOVERY ────────────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+
+(trend-up $series $var) if (slope $series $var $s) (> $s 0) (statistically-significant $series) <0.80, 0.80>
+(trend-down $series $var) if (slope $series $var $s) (< $s 0) (statistically-significant $series) <0.80, 0.80>
+(seasonal-pattern $series) if (seasonality-strength $series $s) (> $s 0.3) <0.80, 0.80>
+(anomaly $series $point) if (zscore $series $point $z) (> $z 3) <0.85, 0.85>
+(changepoint $series $time) if (mean-shift-pct $series $time $pct) (> $pct 20) <0.75, 0.75>
+
+;; ══════════════════════════════════════════════════════════════════════
+;; ── DEPLOYMENT ───────────────────────────────────────────────────────
+;; ══════════════════════════════════════════════════════════════════════
+
+(production-ready $model) if (good-fit $model) (cv-stable $model) (latency-ok $model) <0.80, 0.75>
+(needs-monitoring $model) if (production-ready $model) <0.90, 0.85>
+(retrain-needed $model) if (performance-decay $model $pct) (> $pct 5) <0.85, 0.85>
+(a-b-test-needed $model) if (production-ready $model) (existing-model $model) <0.80, 0.75>

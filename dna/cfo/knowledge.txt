@@ -1,0 +1,29 @@
+# CFO KNOWLEDGE CORE
+
+## Financial Statements
+- Three-statement linkage: Net Income → Retained Earnings (B/S) + Operating CF (CF). Depreciation: added back to CF, reduces PP&E (B/S). CapEx: investing outflow (CF), increases PP&E (B/S). Debt: financing inflow (CF), increases Debt (B/S).
+- Income Statement: Revenue - COGS = Gross Profit. GP - OpEx = EBITDA. EBITDA - D&A = EBIT. EBIT - Interest = EBT. EBT * (1-tax) = Net Income.
+- Cash Flow from Operations (indirect): Net Income + D&A + SBC - delta_AR - delta_Inventory + delta_AP + delta_Deferred Revenue
+- Free Cash Flow = Operating CF - CapEx
+- Working capital: DSO = AR/(Revenue/365). DPO = AP/(COGS/365). DIO = Inventory/(COGS/365). CCC = DSO + DIO - DPO. Negative CCC = float advantage.
+
+## Valuation
+- DCF: Project FCF → discount at WACC → Terminal Value (Gordon Growth: TV = FCF_n*(1+g)/(WACC-g) OR Exit multiple). EV = PV(FCFs) + PV(TV). Equity Value = EV - Net Debt. WARNING: TV = 60-80% of EV — terminal assumptions dominate.
+- WACC = (E/V)*Re + (D/V)*Rd*(1-T). Re = Rf + beta*(Rm-Rf) (CAPM). Rf = 10yr govt bond (~4-5% currently). ERP = ~5-7%.
+- Comparable companies: EV/EBITDA (most common, capital structure neutral) | EV/Revenue (high-growth, no profit) | P/E (accounting affected, use with care) | P/FCF (most honest)
+- LBO returns: driven by (1) EBITDA growth (2) Multiple expansion (3) Debt paydown. Target IRR >20%, MOIC >2.5x in 5 years.
+- ROIC vs WACC: Create value only when ROIC > WACC. Growth at ROIC < WACC destroys value — growing faster makes it worse.
+
+## FP&A
+- Driver-based model: revenue from business drivers (SaaS: users * conversion * ARPU). Forces understanding of mechanics.
+- SaaS metrics: ARR, MRR, NRR/NDR (>120% exceptional — existing customers growing faster than churning), GRR (gross retention = without expansion), Churn.
+- Rule of 40: Revenue growth % + FCF margin % >= 40 = healthy.
+- Scenario planning: Base (50%) + Bull (25%) + Bear (25%). Stress test: impact of 20% revenue miss on runway.
+- Variance analysis: price variance + volume variance + mix variance. Root cause: structural change or timing?
+
+## Treasury & Governance
+- Liquidity: minimum 6-12 months operating expenses cash buffer. 13-week rolling cash forecast.
+- FX hedging: Forward contracts (lock in rate), options (flexibility, pay premium). Natural hedge: match revenue and cost currencies.
+- Financial controls: Segregation of duties. Reconciliation controls. Journal entry approval. Access reviews quarterly.
+- Fraud red flags: Channel stuffing | Round-tripping | Bill-and-hold revenue | Aggressive capitalisation. Ask: does cash flow support reported earnings?
+- SOX (US public companies): s.302 CEO/CFO certify accuracy. s.404 management assessment of internal controls + auditor attestation.

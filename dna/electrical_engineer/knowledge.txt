@@ -1,0 +1,42 @@
+# ELECTRICAL ENGINEERING KNOWLEDGE CORE
+
+## Circuit Theory
+- V = IR. P = IV = I^2*R = V^2/R
+- KVL: Sum voltages in closed loop = 0
+- KCL: Sum currents at node = 0
+- Thevenin: Replace any linear 2-terminal network with V_th (open circuit voltage) in series with R_th (resistance with sources zeroed)
+- AC: Z_C = 1/jwC. Z_L = jwL. Complex power S = P + jQ. Power factor PF = cos(theta) = P/|S|
+- RC time constant: tau = RC. 5 tau = 99.3% settled.
+- RLC: Natural frequency wn = 1/sqrt(LC). Damping ratio zeta = R/2 * sqrt(C/L).
+
+## Semiconductors
+- MOSFET saturation: I_D = 0.5 * u_n * Cox * (W/L) * (V_GS - V_th)^2
+- CMOS: pMOS pull-up + nMOS pull-down. Static power ~0. Dynamic power P = alpha*C*f*V^2. Reducing V most effective.
+- Op-amp rules (with negative feedback): V+ = V- (virtual short). I+ = I- = 0 (no input current)
+- Inverting amp: gain = -Rf/Rin. Non-inverting: gain = 1 + Rf/Rin.
+
+## Digital Design
+- Setup time: data stable before clock edge. Hold time: data stable after clock edge. Violation = metastability.
+- Clock domain crossing: two flip-flop synchroniser for single-bit. FIFO with grey-coded pointers for multi-bit.
+- FSM: Moore (output = f(state)) vs Mealy (output = f(state, input)). Draw state diagram first.
+- Timing: Critical path = longest combinational delay. Clock period >= t_pcq + t_comb + t_su.
+
+## Power Electronics
+- Buck converter: V_out = D * V_in
+- Boost converter: V_out = V_in / (1-D)
+- SiC MOSFETs vs Si: higher breakdown, higher temp, lower switching losses, lower on-resistance per area. Used in EV inverters.
+- FOC motor control: Clarke transform (abc -> alpha/beta) then Park transform (-> dq frame). Control Id (flux) and Iq (torque) independently.
+
+## PCB Design & EMC
+- Controlled impedance microstrip: Z0 ~ 87/sqrt(er+1.41) * ln(5.98*H/(0.8*W+T))
+- Return current at high frequency: path of least inductance = directly under signal trace. Never slot ground plane under signal.
+- Decoupling: 100nF ceramic within 5mm of each Vdd pin. Add 10nF for higher frequencies. Short, low-inductance connections.
+- ESD protection: TVS diodes on all I/O. IEC 61000-4-2: contact ±6kV, air ±8kV.
+- ADC SNR: SNR_ideal = 6.02*N + 1.76 dB for N-bit ADC. ENOB < N due to noise.
+
+## Embedded Systems
+- I2C: two-wire, open-drain + pull-ups, 100/400/1000 kHz, 7-bit addressing, ACK/NACK
+- SPI: four-wire MOSI/MISO/SCK/CS, full-duplex, faster than I2C, one CS per device
+- UART: async, baud rate match, start+data+parity+stop bits
+- CAN: differential, multi-master, 1Mbit/s, priority arbitration, automotive/industrial
+- RTOS: tasks, preemptive scheduler, FreeRTOS: xTaskCreate, xQueueSend/Receive, xSemaphoreTake/Give. Priority inversion -> priority inheritance.

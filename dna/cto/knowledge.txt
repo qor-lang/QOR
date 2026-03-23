@@ -1,0 +1,31 @@
+# CTO KNOWLEDGE CORE
+
+## Technical Strategy
+- Build vs Buy vs Integrate: Build = competitive moat, no alternative. Buy = commodity function. Integrate = API exists.
+- Technical debt quadrant: Reckless+Deliberate (toxic) | Prudent+Deliberate (acceptable with plan) | Reckless+Inadvertent (training issue) | Prudent+Inadvertent (learning). Budget 15-20% capacity for debt repayment.
+- Architecture Decision Records (ADRs): Title + Status + Context + Decision + Consequences. Living documentation of WHY.
+- Technology Radar: Adopt → Trial → Assess → Hold. Run quarterly. Creates shared language.
+- Make vs manage: self-manage only if managed option has unacceptable limitations at your scale.
+
+## Engineering Organisation
+- Team Topologies: Stream-aligned (feature ownership, high autonomy) | Enabling (help others adopt new tech) | Platform (reduce cognitive load) | Complicated subsystem (deep specialist expertise)
+- DORA Metrics: Deployment frequency (elite: multiple/day) | Lead time <1 hour | Change failure rate 0-15% | MTTR <1 hour. High performers faster AND more stable — trade-off is a myth.
+- Engineering levels: L3 (junior, team) → L4 (mid, independent) → L5 (senior, project lead) → L6 (staff, cross-team) → L7 (principal, company-wide). M1 (EM, 4-8 reports) → Director → VP → CTO.
+
+## Distributed Systems
+- CAP theorem: In partition, choose Consistency (return error) or Availability (return possibly stale). CP: Zookeeper, HBase. AP: Cassandra, DynamoDB.
+- Consistency models (weak→strong): Eventual → Causal → Sequential → Linearisable
+- Saga pattern: local transactions + compensating transactions for rollback. Choreography (events) vs Orchestration (central coordinator).
+- Event sourcing: Immutable append-only log. State = replay events. CQRS companion: write side appends events, read side builds projections.
+- API design: REST (stateless, idempotent GET, appropriate status codes). GraphQL (client specifies data shape, DataLoader for N+1). gRPC (protobuf binary, streaming, HTTP/2).
+
+## Security Architecture
+- Zero trust: Never trust always verify. mTLS between services. Least privilege. Continuous validation.
+- Secrets management: HashiCorp Vault or AWS Secrets Manager. Dynamic secrets (auto-expire). Envelope encryption. Rotate without downtime.
+- SOC 2 Type II: Controls operate effectively over >=6 months. Required for enterprise sales. Five categories: Security, Availability, Confidentiality, Processing Integrity, Privacy.
+
+## AI/ML Infrastructure
+- vLLM: PagedAttention manages KV cache like virtual memory. Continuous batching. 24x higher throughput than naive serving.
+- Quantisation: FP32 → FP16 (2x memory, minimal loss) → INT8 (4x, 1-3% loss) → INT4 (8x, 3-8% loss)
+- RAG architecture: Chunking → Embedding → Vector store → Retrieval → Reranking → Context injection
+- Fine-tuning decision: Prompt engineering first (free) → RAG (adds knowledge) → Fine-tuning (changes behaviour). LoRA trains only low-rank matrices (~0.1% of parameters).

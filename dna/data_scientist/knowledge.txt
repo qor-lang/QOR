@@ -1,0 +1,28 @@
+# DATA SCIENCE & MACHINE LEARNING KNOWLEDGE CORE
+
+## Statistics
+- Bayes: P(H|D) = P(D|H)*P(H)/P(D)
+- Hypothesis testing: Type I error alpha = P(reject H0 | H0 true). Type II error beta = P(fail to reject | H0 false). Power = 1-beta. p-value = P(data or more extreme | H0 true). NOT P(H0 true given data).
+- Sample size: n = 2*sigma^2*(z_alpha/2 + z_beta)^2 / MDE^2. Power 80%: z_beta = 0.842. Two-sided alpha=0.05: z_alpha/2 = 1.960.
+- Bootstrap CI: resample with replacement 1000+ times, compute statistic, take 2.5th and 97.5th percentiles.
+- Causal inference: RCT = gold standard. DiD (parallel trends assumption). IV (instrument correlated with treatment, not outcome except through treatment). RDD (treatment assigned at threshold). Propensity score matching (balance observables only).
+- Multiple testing: Bonferroni: alpha/n (conservative). Benjamini-Hochberg FDR (better for exploratory).
+
+## Machine Learning
+- Bias-variance: MSE = Bias^2 + Variance + Irreducible noise. High bias = underfitting. High variance = overfitting.
+- Regularisation: L1 Lasso (sparse, feature selection: lambda*sum|w_j|). L2 Ridge (shrinks all: lambda*sum(w_j^2)). Elastic net = L1 + L2.
+- Tree ensembles: Random Forest = bagging + feature randomness → reduces variance. XGBoost/LightGBM = gradient boosting → reduces bias. XGBoost objective: L(theta) = sum(l(y_i, y_hat_i)) + sum(Omega(f_k)). LightGBM: GOSS + EFB → faster on large datasets.
+- Neural networks: Universal approximation theorem. Backprop via chain rule. Vanishing gradients: use ReLU, residual connections, batch norm. Adam: m_t = 0.9*m_{t-1} + 0.1*g_t, v_t = 0.999*v_{t-1} + 0.001*g_t^2, w_t = w_{t-1} - alpha*m_hat_t/(sqrt(v_hat_t)+eps).
+- Transformer attention: Attention(Q,K,V) = softmax(Q*K^T/sqrt(d_k))*V. Scale by sqrt(d_k) prevents vanishing gradients in softmax. Multi-head: h attention functions in parallel.
+- Scaling laws (Chinchilla): Optimal training tokens ≈ 20x parameters. Chinchilla (70B params, 1.4T tokens) beats GPT-3 (175B, 300B tokens).
+
+## Experimental Design
+- A/B test: Always calculate sample size BEFORE running. Underpowered tests = false negatives that mislead.
+- CUPED: metric_cuped = metric - theta*pre_metric where theta = Cov(metric, pre)/Var(pre). Reduces variance 20-70%.
+- Thompson sampling: maintain Beta(alpha_i, beta_i) posterior per arm. Sample from each, select highest. Better than UCB1 in practice.
+- Pitfalls: (1) Peeking — stopping early inflates Type I error to ~25%. Use sequential testing. (2) Multiple testing — 20 metrics at alpha=0.05 expects 1 false positive. Use BH-FDR. (3) Novelty effect — needs 2-4 weeks. (4) Network effects — cluster randomisation required. (5) Simpson's paradox — stratified analysis.
+
+## Feature Engineering
+- Missing data: MCAR (mechanism independent of data) | MAR (depends on observed) | MNAR (depends on missing value — hardest). Imputation: mean/median (simple), KNN (preserves patterns), MICE (model each feature from others).
+- SHAP values: Shapley attribution — fairly attributes prediction to features. TreeSHAP: O(TLD^2), exact, efficient. Summary plot (importance + direction). Dependence plot (SHAP vs feature value — shows interactions).
+- Cross-validation: K-fold. Stratified K-fold (imbalanced). Time series: walk-forward (never use future to predict past). Purged K-fold (embargo gap for overlapping windows). Nested CV: outer = performance, inner = hyperparameter selection.
